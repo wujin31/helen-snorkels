@@ -1,237 +1,30 @@
 {
  "version": 1,
- "generated_at": "2026-09-27T15:11:21.236898Z",
+ "generated_at": "2026-09-27T15:17:04.344711Z",
  "timezone": "America/Los_Angeles",
- "summary": "Not a snorkel day: waves ~4 ft, over 2.5 ft.",
- "best_bet": null,
+ "summary": "Maybe Marine Room 8:30–10:00 am. La Jolla Cove: waves ~3 ft, over 2.5 ft.",
+ "best_bet": "marine-room",
  "spots": [
-  {
-   "id": "la-jolla-cove",
-   "name": "La Jolla Cove",
-   "tier": 1,
-   "difficulty": "easy",
-   "verdict": "no",
-   "confidence": "high",
-   "vis_ft": [
-    12,
-    25
-   ],
-   "reason": "Waves ~4 ft, over 2.5 ft",
-   "window": null,
-   "window_day": null,
-   "gates": [
-    "Waves ~4 ft, over 2.5 ft"
-   ],
-   "cautions": [
-    "NWS Beach Hazards Statement",
-    "Waves from a coarse offshore model"
-   ],
-   "factors": [
-    {
-     "label": "Water quality",
-     "effect": "+",
-     "detail": "No county advisory"
-    },
-    {
-     "label": "Beach Hazards Statement",
-     "effect": "-",
-     "detail": "Beach Hazards Statement issued September 27 at 4:52AM PDT until September 28 at 5:00AM PDT by NWS San Diego CA"
-    },
-    {
-     "label": "Rain",
-     "effect": "+",
-     "detail": "None in the last few days"
-    },
-    {
-     "label": "Swell",
-     "effect": "+",
-     "detail": "near-bottom motion 0.17 m/s"
-    },
-    {
-     "label": "Plankton",
-     "effect": "+",
-     "detail": "chlorophyll 0.4 µg/L at the pier"
-    },
-    {
-     "label": "Turbidity",
-     "effect": "+",
-     "detail": "0.3 NTU at Scripps Pier (~25 ft)"
-    },
-    {
-     "label": "Tide",
-     "effect": "+",
-     "detail": "Incoming during the window"
-    },
-    {
-     "label": "Wind",
-     "effect": "+",
-     "detail": "~5 kt"
-    }
-   ],
-   "conditions": {
-    "hs_ft": 3.9,
-    "tp_s": 11.55,
-    "swell_dir_deg": 214.0,
-    "wave_source": "openmeteo",
-    "orbital_ms": 0.172,
-    "wind_kt": 3.1,
-    "gust_kt": 4.3,
-    "wind_dir_deg": 211.0,
-    "wind_onshore": false,
-    "tide_ft": 4.9,
-    "tide_trend": "incoming"
-   },
-   "hourly": [
-    {
-     "time": "2026-09-27T15:30:00Z",
-     "score": 0.985,
-     "tide_ft": 5.4,
-     "tide_trend": "incoming",
-     "wind_kt": 0.9
-    },
-    {
-     "time": "2026-09-27T16:00:00Z",
-     "score": 0.985,
-     "tide_ft": 5.67,
-     "tide_trend": "incoming",
-     "wind_kt": 0.9
-    },
-    {
-     "time": "2026-09-27T16:30:00Z",
-     "score": 0.057,
-     "tide_ft": 5.79,
-     "tide_trend": "slack",
-     "wind_kt": 4.7
-    },
-    {
-     "time": "2026-09-27T17:00:00Z",
-     "score": -0.943,
-     "tide_ft": 5.74,
-     "tide_trend": "outgoing",
-     "wind_kt": 4.7
-    },
-    {
-     "time": "2026-09-27T17:30:00Z",
-     "score": -0.991,
-     "tide_ft": 5.52,
-     "tide_trend": "outgoing",
-     "wind_kt": 5.0
-    },
-    {
-     "time": "2026-09-27T18:00:00Z",
-     "score": -0.991,
-     "tide_ft": 5.16,
-     "tide_trend": "outgoing",
-     "wind_kt": 5.0
-    },
-    {
-     "time": "2026-09-27T18:30:00Z",
-     "score": -1.144,
-     "tide_ft": 4.67,
-     "tide_trend": "outgoing",
-     "wind_kt": 5.7
-    },
-    {
-     "time": "2026-09-27T19:00:00Z",
-     "score": -1.144,
-     "tide_ft": 4.07,
-     "tide_trend": "outgoing",
-     "wind_kt": 5.7
-    },
-    {
-     "time": "2026-09-27T19:30:00Z",
-     "score": -1.167,
-     "tide_ft": 3.41,
-     "tide_trend": "outgoing",
-     "wind_kt": 5.8
-    },
-    {
-     "time": "2026-09-27T20:00:00Z",
-     "score": -1.167,
-     "tide_ft": 2.73,
-     "tide_trend": "outgoing",
-     "wind_kt": 5.8
-    },
-    {
-     "time": "2026-09-27T20:30:00Z",
-     "score": -0.98,
-     "tide_ft": 2.07,
-     "tide_trend": "outgoing",
-     "wind_kt": 4.9
-    },
-    {
-     "time": "2026-09-27T21:00:00Z",
-     "score": -0.98,
-     "tide_ft": 1.46,
-     "tide_trend": "outgoing",
-     "wind_kt": 4.9
-    },
-    {
-     "time": "2026-09-27T21:30:00Z",
-     "score": -0.939,
-     "tide_ft": 0.95,
-     "tide_trend": "outgoing",
-     "wind_kt": 4.7
-    },
-    {
-     "time": "2026-09-27T22:00:00Z",
-     "score": -0.939,
-     "tide_ft": 0.56,
-     "tide_trend": "outgoing",
-     "wind_kt": 4.7
-    },
-    {
-     "time": "2026-09-27T22:30:00Z",
-     "score": -1.167,
-     "tide_ft": 0.31,
-     "tide_trend": "outgoing",
-     "wind_kt": 5.8
-    },
-    {
-     "time": "2026-09-27T23:00:00Z",
-     "score": -0.667,
-     "tide_ft": 0.22,
-     "tide_trend": "slack",
-     "wind_kt": 5.8
-    },
-    {
-     "time": "2026-09-27T23:30:00Z",
-     "score": 0.231,
-     "tide_ft": 0.29,
-     "tide_trend": "incoming",
-     "wind_kt": 6.2
-    },
-    {
-     "time": "2026-09-28T00:00:00Z",
-     "score": 0.231,
-     "tide_ft": 0.51,
-     "tide_trend": "incoming",
-     "wind_kt": 6.2
-    }
-   ],
-   "shore_normal_deg": 15.0,
-   "has_cam": false
-  },
   {
    "id": "marine-room",
    "name": "Marine Room / La Jolla Shores",
    "tier": 1,
    "difficulty": "moderate",
-   "verdict": "no",
-   "confidence": "high",
+   "verdict": "maybe",
+   "confidence": "low",
    "vis_ft": [
-    10,
-    22
+    14,
+    28
    ],
-   "reason": "Waves ~4 ft, over 2.5 ft",
-   "window": null,
-   "window_day": null,
-   "gates": [
-    "Waves ~4 ft, over 2.5 ft"
-   ],
+   "reason": "~14–28 ft vis, 1.3 ft NW swell at 11 s, incoming tide, light wind · NWS Beach Hazards Statement",
+   "window": {
+    "start": "2026-09-27T15:30:00Z",
+    "end": "2026-09-27T17:00:00Z"
+   },
+   "window_day": "today",
+   "gates": [],
    "cautions": [
-    "NWS Beach Hazards Statement",
-    "Waves from a coarse offshore model"
+    "NWS Beach Hazards Statement"
    ],
    "factors": [
     {
@@ -251,8 +44,8 @@
     },
     {
      "label": "Swell",
-     "effect": "-",
-     "detail": "near-bottom motion 0.79 m/s"
+     "effect": "~",
+     "detail": "near-bottom motion 0.26 m/s"
     },
     {
      "label": "Plankton",
@@ -276,16 +69,16 @@
     }
    ],
    "conditions": {
-    "hs_ft": 3.9,
-    "tp_s": 11.55,
-    "swell_dir_deg": 214.0,
-    "wave_source": "openmeteo",
-    "orbital_ms": 0.792,
-    "wind_kt": 3.1,
-    "gust_kt": 4.3,
-    "wind_dir_deg": 211.0,
+    "hs_ft": 1.3,
+    "tp_s": 11.11111068725586,
+    "swell_dir_deg": 294.4274597167969,
+    "wave_source": "mop",
+    "orbital_ms": 0.259,
+    "wind_kt": 2.3,
+    "gust_kt": 3.3,
+    "wind_dir_deg": 231.0,
     "wind_onshore": false,
-    "tide_ft": 4.9,
+    "tide_ft": 5.0,
     "tide_trend": "incoming"
    },
    "hourly": [
@@ -418,6 +211,212 @@
    ],
    "shore_normal_deg": 305.0,
    "has_cam": true
+  },
+  {
+   "id": "la-jolla-cove",
+   "name": "La Jolla Cove",
+   "tier": 1,
+   "difficulty": "easy",
+   "verdict": "no",
+   "confidence": "high",
+   "vis_ft": [
+    9,
+    19
+   ],
+   "reason": "Waves ~3 ft, over 2.5 ft",
+   "window": null,
+   "window_day": null,
+   "gates": [
+    "Waves ~3 ft, over 2.5 ft"
+   ],
+   "cautions": [
+    "NWS Beach Hazards Statement"
+   ],
+   "factors": [
+    {
+     "label": "Water quality",
+     "effect": "+",
+     "detail": "No county advisory"
+    },
+    {
+     "label": "Beach Hazards Statement",
+     "effect": "-",
+     "detail": "Beach Hazards Statement issued September 27 at 4:52AM PDT until September 28 at 5:00AM PDT by NWS San Diego CA"
+    },
+    {
+     "label": "Rain",
+     "effect": "+",
+     "detail": "None in the last few days"
+    },
+    {
+     "label": "Swell",
+     "effect": "-",
+     "detail": "near-bottom motion 0.49 m/s"
+    },
+    {
+     "label": "Plankton",
+     "effect": "+",
+     "detail": "chlorophyll 0.4 µg/L at the pier"
+    },
+    {
+     "label": "Turbidity",
+     "effect": "+",
+     "detail": "0.3 NTU at Scripps Pier (~25 ft)"
+    },
+    {
+     "label": "Tide",
+     "effect": "+",
+     "detail": "Incoming during the window"
+    },
+    {
+     "label": "Wind",
+     "effect": "+",
+     "detail": "~5 kt"
+    }
+   ],
+   "conditions": {
+    "hs_ft": 3.0,
+    "tp_s": 11.11111068725586,
+    "swell_dir_deg": 306.37445068359375,
+    "wave_source": "mop",
+    "orbital_ms": 0.493,
+    "wind_kt": 2.3,
+    "gust_kt": 3.3,
+    "wind_dir_deg": 231.0,
+    "wind_onshore": false,
+    "tide_ft": 5.0,
+    "tide_trend": "incoming"
+   },
+   "hourly": [
+    {
+     "time": "2026-09-27T15:30:00Z",
+     "score": 0.985,
+     "tide_ft": 5.4,
+     "tide_trend": "incoming",
+     "wind_kt": 0.9
+    },
+    {
+     "time": "2026-09-27T16:00:00Z",
+     "score": 0.985,
+     "tide_ft": 5.67,
+     "tide_trend": "incoming",
+     "wind_kt": 0.9
+    },
+    {
+     "time": "2026-09-27T16:30:00Z",
+     "score": 0.057,
+     "tide_ft": 5.79,
+     "tide_trend": "slack",
+     "wind_kt": 4.7
+    },
+    {
+     "time": "2026-09-27T17:00:00Z",
+     "score": -0.943,
+     "tide_ft": 5.74,
+     "tide_trend": "outgoing",
+     "wind_kt": 4.7
+    },
+    {
+     "time": "2026-09-27T17:30:00Z",
+     "score": -0.991,
+     "tide_ft": 5.52,
+     "tide_trend": "outgoing",
+     "wind_kt": 5.0
+    },
+    {
+     "time": "2026-09-27T18:00:00Z",
+     "score": -0.991,
+     "tide_ft": 5.16,
+     "tide_trend": "outgoing",
+     "wind_kt": 5.0
+    },
+    {
+     "time": "2026-09-27T18:30:00Z",
+     "score": -1.144,
+     "tide_ft": 4.67,
+     "tide_trend": "outgoing",
+     "wind_kt": 5.7
+    },
+    {
+     "time": "2026-09-27T19:00:00Z",
+     "score": -1.144,
+     "tide_ft": 4.07,
+     "tide_trend": "outgoing",
+     "wind_kt": 5.7
+    },
+    {
+     "time": "2026-09-27T19:30:00Z",
+     "score": -1.167,
+     "tide_ft": 3.41,
+     "tide_trend": "outgoing",
+     "wind_kt": 5.8
+    },
+    {
+     "time": "2026-09-27T20:00:00Z",
+     "score": -1.167,
+     "tide_ft": 2.73,
+     "tide_trend": "outgoing",
+     "wind_kt": 5.8
+    },
+    {
+     "time": "2026-09-27T20:30:00Z",
+     "score": -0.98,
+     "tide_ft": 2.07,
+     "tide_trend": "outgoing",
+     "wind_kt": 4.9
+    },
+    {
+     "time": "2026-09-27T21:00:00Z",
+     "score": -0.98,
+     "tide_ft": 1.46,
+     "tide_trend": "outgoing",
+     "wind_kt": 4.9
+    },
+    {
+     "time": "2026-09-27T21:30:00Z",
+     "score": -0.939,
+     "tide_ft": 0.95,
+     "tide_trend": "outgoing",
+     "wind_kt": 4.7
+    },
+    {
+     "time": "2026-09-27T22:00:00Z",
+     "score": -0.939,
+     "tide_ft": 0.56,
+     "tide_trend": "outgoing",
+     "wind_kt": 4.7
+    },
+    {
+     "time": "2026-09-27T22:30:00Z",
+     "score": -1.167,
+     "tide_ft": 0.31,
+     "tide_trend": "outgoing",
+     "wind_kt": 5.8
+    },
+    {
+     "time": "2026-09-27T23:00:00Z",
+     "score": -0.667,
+     "tide_ft": 0.22,
+     "tide_trend": "slack",
+     "wind_kt": 5.8
+    },
+    {
+     "time": "2026-09-27T23:30:00Z",
+     "score": 0.231,
+     "tide_ft": 0.29,
+     "tide_trend": "incoming",
+     "wind_kt": 6.2
+    },
+    {
+     "time": "2026-09-28T00:00:00Z",
+     "score": 0.231,
+     "tide_ft": 0.51,
+     "tide_trend": "incoming",
+     "wind_kt": 6.2
+    }
+   ],
+   "shore_normal_deg": 15.0,
+   "has_cam": false
   }
  ],
  "day": {
@@ -697,8 +696,8 @@
    "label": "Tide predictions (NOAA 9410230)",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-09-27T15:11:21.236898Z",
-   "valid_at": "2026-09-27T15:11:21.236898Z",
+   "fetched_at": "2026-09-27T15:17:04.344711Z",
+   "valid_at": "2026-09-27T15:17:04.344711Z",
    "error": null
   },
   {
@@ -706,8 +705,8 @@
    "label": "Pier wind (NOAA 9410230)",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-09-27T15:11:21.236898Z",
-   "valid_at": "2026-09-27T15:06:00Z",
+   "fetched_at": "2026-09-27T15:17:04.344711Z",
+   "valid_at": "2026-09-27T15:12:00Z",
    "error": null
   },
   {
@@ -715,7 +714,7 @@
    "label": "Water temperature",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-09-27T15:11:21.236898Z",
+   "fetched_at": "2026-09-27T15:17:04.344711Z",
    "valid_at": "2026-09-27T14:52:00Z",
    "error": null
   },
@@ -724,7 +723,7 @@
    "label": "Chlorophyll (SCCOOS pier)",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-09-27T15:11:21.236898Z",
+   "fetched_at": "2026-09-27T15:17:04.344711Z",
    "valid_at": "2026-09-27T14:52:00Z",
    "error": null
   },
@@ -733,7 +732,7 @@
    "label": "Turbidity (SCCOOS pier)",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-09-27T15:11:21.236898Z",
+   "fetched_at": "2026-09-27T15:17:04.344711Z",
    "valid_at": "2026-09-27T14:52:00Z",
    "error": null
   },
@@ -742,26 +741,26 @@
    "label": "NWS alerts",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-09-27T15:11:21.236898Z",
-   "valid_at": "2026-09-27T15:11:21.236898Z",
+   "fetched_at": "2026-09-27T15:17:04.344711Z",
+   "valid_at": "2026-09-27T15:17:04.344711Z",
    "error": null
   },
   {
    "id": "waves:la-jolla-cove",
-   "label": "Waves (openmeteo) · la-jolla-cove",
+   "label": "Waves (mop) · la-jolla-cove",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-09-27T15:11:21.236898Z",
-   "valid_at": "2026-09-27T15:11:21.236898Z",
+   "fetched_at": "2026-09-27T15:17:04.344711Z",
+   "valid_at": "2026-09-27T14:00:00Z",
    "error": null
   },
   {
    "id": "waves:marine-room",
-   "label": "Waves (openmeteo) · marine-room",
+   "label": "Waves (mop) · marine-room",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-09-27T15:11:21.236898Z",
-   "valid_at": "2026-09-27T15:11:21.236898Z",
+   "fetched_at": "2026-09-27T15:17:04.344711Z",
+   "valid_at": "2026-09-27T14:00:00Z",
    "error": null
   },
   {
@@ -769,8 +768,8 @@
    "label": "Wind forecast (Open-Meteo) · la-jolla-cove",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-09-27T15:11:21.236898Z",
-   "valid_at": "2026-09-27T15:11:21.236898Z",
+   "fetched_at": "2026-09-27T15:17:04.344711Z",
+   "valid_at": "2026-09-27T15:17:04.344711Z",
    "error": null
   },
   {
@@ -778,8 +777,8 @@
    "label": "Wind forecast (Open-Meteo) · marine-room",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-09-27T15:11:21.236898Z",
-   "valid_at": "2026-09-27T15:11:21.236898Z",
+   "fetched_at": "2026-09-27T15:17:04.344711Z",
+   "valid_at": "2026-09-27T15:17:04.344711Z",
    "error": null
   },
   {
@@ -787,8 +786,8 @@
    "label": "Rain (Open-Meteo) · la-jolla-cove",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-09-27T15:11:21.236898Z",
-   "valid_at": "2026-09-27T15:11:21.236898Z",
+   "fetched_at": "2026-09-27T15:17:04.344711Z",
+   "valid_at": "2026-09-27T15:17:04.344711Z",
    "error": null
   },
   {
@@ -796,8 +795,8 @@
    "label": "Rain (Open-Meteo) · marine-room",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-09-27T15:11:21.236898Z",
-   "valid_at": "2026-09-27T15:11:21.236898Z",
+   "fetched_at": "2026-09-27T15:17:04.344711Z",
+   "valid_at": "2026-09-27T15:17:04.344711Z",
    "error": null
   },
   {
@@ -805,8 +804,8 @@
    "label": "Water quality · la-jolla-cove",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-09-27T15:11:21.236898Z",
-   "valid_at": "2026-09-27T15:11:21.236898Z",
+   "fetched_at": "2026-09-27T15:17:04.344711Z",
+   "valid_at": "2026-09-27T15:17:04.344711Z",
    "error": null
   },
   {
@@ -814,8 +813,8 @@
    "label": "Water quality · marine-room",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-09-27T15:11:21.236898Z",
-   "valid_at": "2026-09-27T15:11:21.236898Z",
+   "fetched_at": "2026-09-27T15:17:04.344711Z",
+   "valid_at": "2026-09-27T15:17:04.344711Z",
    "error": null
   }
  ],
