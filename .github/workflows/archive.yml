@@ -5,7 +5,7 @@ name: Archive
 # gates the cam on sun elevation, so late or skipped cron runs are harmless.
 on:
   schedule:
-    - cron: "7,22,37,52 12-23,0-3 * * *"
+    - cron: "8,23,38,53 12-23,0-3 * * *"
   workflow_dispatch:
     inputs:
       only:

@@ -2,10 +2,10 @@ name: Score
 
 # Hourly across ~5am-7pm Pacific: fetch fresh conditions, score every spot,
 # append the call to the public history (data branch), and redeploy the page
-# with the answer baked into its HTML. :47 lands a fresh call by ~5:50 am PDT.
+# with the answer baked into its HTML. :48 lands a fresh call by ~5:50 am PDT.
 on:
   schedule:
-    - cron: "47 12-23,0-2 * * *"
+    - cron: "48 12-23,0-2 * * *"
   workflow_dispatch:
 
 permissions:
