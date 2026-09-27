@@ -146,6 +146,10 @@ def score(
     now: Annotated[
         str | None, typer.Option(help="Pretend it's this ISO time (UTC default)")
     ] = None,
+    storage: Annotated[
+        str | None,
+        typer.Option(help="Archive to fall back on for CDIP. Default: $SNORKEL_STORAGE, if set"),
+    ] = None,
 ) -> None:
     """Fetch fresh conditions, score every spot, write status.json."""
     import json
@@ -157,8 +161,15 @@ def score(
 
     when = _parse_now(now)
     spots, sources, cfg = load_spots(), load_sources(), load_scoring()
+    archive = None
+    spec = storage or os.environ.get("SNORKEL_STORAGE")
+    if spec:
+        try:
+            archive = storage_from_spec(spec)
+        except Exception as exc:  # scoring must not depend on the archive
+            print(f"archive fallback unavailable: {exc}")
     with make_client() as client:
-        cond = gather(client, when, spots, sources)
+        cond = gather(client, when, spots, sources, storage=archive)
     doc = score_all(cond, spots, sources, cfg)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(doc.model_dump_json(indent=1))

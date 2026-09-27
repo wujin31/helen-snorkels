@@ -258,3 +258,24 @@ def test_murky_pier_turbidity_pulls_vis_down_most_near_the_pier(cfg: ScoringConf
     far = score(spots["la-jolla-cove"], conditions(spots["la-jolla-cove"], turbidity=murky), cfg)
     assert near.vis_ft and far.vis_ft and near.vis_ft[1] < far.vis_ft[1]
     assert any(f.label == "Turbidity" and f.effect == "-" for f in near.factors)
+
+
+def test_offshore_model_waves_are_weighted_by_exposure(cfg: ScoringConfig) -> None:
+    room = next(s for s in load_spots() if s.id == "marine-room")
+    # 4.3 ft from 320°: the Marine Room is sheltered from that direction -> Maybe, not No.
+    sheltered = {room.id: ok("w", waves(1.3, 12, dp=320, source="openmeteo"))}
+    status = score(room, conditions(room, waves=sheltered), cfg)
+    assert status.verdict == "maybe"
+    assert "coarse" in status.reason
+    # A big exposed swell still rules it out, even from the coarse model.
+    exposed = {room.id: ok("w", waves(1.8, 14, dp=260, source="openmeteo"))}
+    status = score(room, conditions(room, waves=exposed), cfg)
+    assert status.verdict == "no"
+    assert "offshore estimate" in status.reason
+
+
+def test_buoy_waves_use_exposure_but_no_extra_slack(cove: SpotConfig, cfg: ScoringConfig) -> None:
+    exposed = {cove.id: ok("w", waves(0.9, 12, dp=290, source="buoy"))}  # ~3 ft from the NW
+    assert score(cove, conditions(cove, waves=exposed), cfg).verdict == "no"
+    sheltered = {cove.id: ok("w", waves(0.9, 12, dp=190, source="buoy"))}  # from the S
+    assert score(cove, conditions(cove, waves=sheltered), cfg).verdict != "no"

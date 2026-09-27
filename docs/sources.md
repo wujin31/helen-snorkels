@@ -40,6 +40,18 @@ services on 2026-09-27 with `probe.yml` (branches `probe/discovery-*`).
 - **CoastWatch sector:** the "VY" sector spans 0–45°N, 120–60°W. The West
   Coast node's ERDDAP blocks GitHub runner IPs, so the central node is used.
 
+## Known access limits
+
+- **CDIP** sometimes answers GitHub-runner requests with "Access Denied. Please
+  contact us at www@cdip.ucsd.edu" (it varies by runner IP). The scorer then
+  falls back to the archiver's latest CDIP snapshot (`pipeline.latest_archived`),
+  so a refused runner doesn't change the call. The buoy is archived hourly to
+  keep load low. A note to CDIP is drafted in `docs/cdip-note.md`.
+- **CoastWatch West Coast ERDDAP** blocks GitHub runner IPs; the central node is used.
+- Offshore waves (buoy, Open-Meteo) are scaled by the spot's exposure to their
+  direction before gating, and the coarse model alone only rules a day out when
+  it's 1.5x over the limit (`rules.COARSE_MODEL_GATE_FACTOR`).
+
 ## Not used
 
 - **Swim Guide:** its JSON API requires authentication; the county is the
