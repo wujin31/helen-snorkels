@@ -38,7 +38,11 @@ def _summary(records: list[CaptureRecord]) -> str:
         "|---|---|---|---|---|",
     ]
     for r in records:
-        detail = (r.error or r.key or "").replace("|", "/")[:160]
+        detail = r.error or r.key or ""
+        qc = {k: r.meta[k] for k in ("strategy", "brightness", "frozen", "rows") if k in r.meta}
+        if qc:
+            detail += f" {qc}"
+        detail = detail.replace("|", "/")[:200]
         lines.append(
             f"| {r.source} | {r.variant or ''} | {r.status} | {r.bytes or ''} | {detail} |"
         )
@@ -131,6 +135,74 @@ def probe(
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_bytes(item.content)
             print(f"  saved {path}")
+
+
+@app.command()
+def score(
+    out: Annotated[Path, typer.Option(help="Where to write status.json")] = Path("status.json"),
+    history: Annotated[
+        Path | None, typer.Option(help="Append one row per spot to this JSONL file")
+    ] = None,
+    now: Annotated[
+        str | None, typer.Option(help="Pretend it's this ISO time (UTC default)")
+    ] = None,
+) -> None:
+    """Fetch fresh conditions, score every spot, write status.json."""
+    import json
+
+    from snorkel.pipeline import gather
+    from snorkel.publish.status import history_rows
+    from snorkel.score.config import load_scoring
+    from snorkel.score.run import score_all
+
+    when = _parse_now(now)
+    spots, sources, cfg = load_spots(), load_sources(), load_scoring()
+    with make_client() as client:
+        cond = gather(client, when, spots, sources)
+    doc = score_all(cond, spots, sources, cfg)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(doc.model_dump_json(indent=1))
+    print(doc.summary)
+    for spot in doc.spots:
+        print(f"  {spot.name}: {spot.verdict} ({spot.confidence}) · {spot.reason}")
+    for health in doc.sources:
+        if health.stale:
+            print(f"  stale: {health.label}: {health.error or 'old data'}")
+    if history:
+        history.parent.mkdir(parents=True, exist_ok=True)
+        with history.open("a") as fh:
+            for row in history_rows(doc):
+                fh.write(json.dumps(row) + "\n")
+
+
+@app.command("discover-mops")
+def discover_mops(
+    window: Annotated[int, typer.Option(help="MOPs to scan either side of the bisection")] = 20,
+) -> None:
+    """Find the CDIP MOP alongshore points nearest each configured spot."""
+    from snorkel.discover import list_mop_ids, nearest_mops, read_mop_site
+
+    with make_client() as client:
+        ids = list_mop_ids(client)
+    print(f"{len(ids)} MOP nowcast files ({ids[0]}..{ids[-1]})" if ids else "no MOP files found")
+    for spot in load_spots():
+        print(f"\n{spot.id} ({spot.lat}, {spot.lon}):")
+        for site in nearest_mops(spot.lat, spot.lon, ids, read_mop_site, window=window):
+            km = site.distance_km(spot.lat, spot.lon)
+            print(f"  {site.id}  {site.lat:.5f}, {site.lon:.5f}  {km:.2f} km  {site.meta}")
+
+
+@app.command()
+def sniff(
+    url: Annotated[str, typer.Argument(help="Page to load headlessly")],
+    wait: Annotated[float, typer.Option(help="Seconds to keep listening")] = 20,
+) -> None:
+    """List every request a page makes (find hidden JSON/API and stream URLs)."""
+    from snorkel.discover import sniff_requests
+
+    for resource_type, method, request_url in sniff_requests(url, wait):
+        if resource_type not in {"image", "font", "stylesheet"}:
+            print(f"{resource_type:10} {method:5} {request_url}")
 
 
 if __name__ == "__main__":

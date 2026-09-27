@@ -10,11 +10,11 @@
   difficulty: easy
   access: shore
   bottom_depth_m: 5
-  shore_normal_deg: 10          # the cove opens roughly north
-  cdip_mop_id: null             # TODO: nearest MOP alongshore point (D0xxx)
+  shore_normal_deg: 15          # the cove opens roughly north (MOP D0482: 18°)
+  cdip_mop_id: D0482            # 0.18 km, 10 m depth
   cdip_buoy: "201"              # Scripps Nearshore
   tide_station: "9410230"       # NOAA CO-OPS La Jolla (Scripps Pier)
-  water_quality_ids: []         # TODO: sdbeachinfo / Swim Guide station(s)
+  water_quality_ids: ["105"]    # county site: La Jolla Cove
   exposure_deg:
     exposed: [250, 330]
     sheltered: [150, 230]
@@ -30,17 +30,17 @@
 
 - id: marine-room
   name: Marine Room / La Jolla Shores
-  lat: 32.8532                  # approx. reef off the Marine Room; verify
+  lat: 32.8532                  # reef off the Marine Room (county site 106 is at 32.8548, -117.2598)
   lon: -117.2598
   tier: 1
   difficulty: moderate          # Shores all levels; Marine Room reef advanced
   access: shore
   bottom_depth_m: 4
-  shore_normal_deg: 280         # beach faces roughly west-northwest
-  cdip_mop_id: null             # TODO
+  shore_normal_deg: 305         # faces WNW-NW here (MOP D0496: 318°)
+  cdip_mop_id: D0496            # 0.34 km, 10 m depth
   cdip_buoy: "201"
   tide_station: "9410230"
-  water_quality_ids: []         # TODO
+  water_quality_ids: ["106", "54"]  # county sites: Ave De La Playa (Marine Room), Vallecitos
   exposure_deg:
     exposed: [190, 290]         # prior: surge on south swell
     sheltered: [300, 340]

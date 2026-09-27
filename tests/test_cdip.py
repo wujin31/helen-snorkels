@@ -20,6 +20,7 @@ def test_subset_keeps_recent_rows_on_every_time_axis(tmp_path: Path) -> None:
             "waveEnergyDensity": (("waveTime", "waveFrequency"), np.ones((48, 64))),
             "sstSeaSurfaceTemperature": ("sstTime", np.full(24, 20.5)),
             "waveBandwidth": ("waveFrequency", np.full(64, 0.01)),
+            "sourceFilename": ("sourceCount", np.array([b"file%05d.nc" % i for i in range(2000)])),
         },
         coords={"waveTime": wave_time, "sstTime": sst_time, "waveFrequency": freq},
     )
@@ -34,4 +35,5 @@ def test_subset_keeps_recent_rows_on_every_time_axis(tmp_path: Path) -> None:
         assert sub.sizes["sstTime"] == 3  # 21:00 .. 23:00
         assert sub.sizes["waveFrequency"] == 64  # spectra kept whole
         assert sub["waveEnergyDensity"].shape == (6, 64)
+        assert "sourceFilename" not in sub.variables
     assert meta["rows"] == {"waveTime": 6, "sstTime": 3}

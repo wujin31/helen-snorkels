@@ -1,0 +1,73 @@
+import { readFileSync } from "node:fs";
+import { describe, expect, it } from "vitest";
+import { esc, range } from "../src/format";
+import { renderPage, staleBanner } from "../src/render";
+import type { StatusDoc } from "../src/types";
+
+const sample: StatusDoc = JSON.parse(readFileSync(new URL("../fixtures/status.sample.json", import.meta.url), "utf8"));
+
+function clone(): StatusDoc {
+  return structuredClone(sample);
+}
+
+describe("renderPage", () => {
+  it("leads with the best bet's verdict and window", () => {
+    const html = renderPage(sample, null);
+    expect(html).toContain('id="hero-title" class="verdict-word">Maybe<');
+    expect(html).toContain("Marine Room<span class=\"hero-when\">7:00–8:30 am</span>");
+    expect(html).toContain("Other spots");
+  });
+
+  it("escapes every data string", () => {
+    const doc = clone();
+    doc.spots[0].reason = '<img src=x onerror="alert(1)">';
+    doc.day.alerts = ["<script>bad()</script>"];
+    const html = renderPage(doc, null);
+    expect(html).not.toContain("<img src=x");
+    expect(html).not.toContain("<script>bad");
+    expect(html).toContain("&lt;script&gt;bad()&lt;/script&gt;");
+  });
+
+  it("renders every verdict with a word, not color alone", () => {
+    for (const verdict of ["yes", "maybe", "no", "unknown"] as const) {
+      const doc = clone();
+      doc.spots[0].verdict = verdict;
+      const html = renderPage(doc, null);
+      expect(html).toMatch(/Yes|Maybe|No|Can't tell|Not today/);
+    }
+  });
+
+  it("falls back to an overall hero when nothing is callable", () => {
+    const doc = clone();
+    doc.best_bet = null;
+    doc.spots.forEach((s) => (s.verdict = "unknown"));
+    doc.summary = "Not enough fresh data to call it right now.";
+    const html = renderPage(doc, null);
+    expect(html).toContain("Can't tell right now");
+    expect(html).not.toContain("Other spots");
+  });
+
+  it("never calls conditions safe", () => {
+    expect(renderPage(sample, new Date(sample.generated_at)).toLowerCase()).not.toMatch(/\bsafe\b/);
+  });
+});
+
+describe("staleness", () => {
+  it("warns when the data is old", () => {
+    const t = Date.parse(sample.generated_at);
+    expect(staleBanner(sample, new Date(t + 30 * 60_000))).toBe("");
+    expect(staleBanner(sample, new Date(t + 4 * 3600_000))).toContain("4 h ago");
+  });
+});
+
+describe("format", () => {
+  it("formats windows in Pacific time", () => {
+    expect(range("2026-09-27T14:00:00Z", "2026-09-27T15:30:00Z")).toBe("7:00–8:30 am");
+    expect(range("2026-09-27T18:30:00Z", "2026-09-27T20:00:00Z")).toBe("11:30 am–1:00 pm");
+    expect(range("2026-12-01T15:00:00Z", "2026-12-01T16:30:00Z")).toBe("7:00–8:30 am"); // PST
+  });
+
+  it("escapes html", () => {
+    expect(esc(`<a href="x">'&'</a>`)).toBe("&lt;a href=&quot;x&quot;&gt;&#39;&amp;&#39;&lt;/a&gt;");
+  });
+});

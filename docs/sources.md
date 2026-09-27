@@ -1,42 +1,56 @@
 # Data sources
 
-What the archiver captures (`config/sources.yaml`), how often, and what's still
-unconfirmed. "Confirmed" means probed against the live service.
+What the pipeline reads, how often it's archived (`config/sources.yaml`), and
+how each ID was found. Everything here was confirmed against the live
+services on 2026-09-27 with `probe.yml` (branches `probe/discovery-*`).
 
-| Source id | Provider / endpoint | Cadence | Status |
+| Source id | What | Archive cadence | Used by v0 scorer |
 |---|---|---|---|
-| `cam.scripps_pier` | HDOnTap stream page → snapshot / HLS / headless browser | 15 min, sun ≥ 2° | **Unconfirmed**: capture method not probed yet; permission request drafted (`docs/scripps-cam-request.md`) |
-| `tides.predictions` | NOAA CO-OPS datagetter, 9410230, 6-min + hi/lo, MLLW | 6 h | Unconfirmed (well-documented API) |
-| `tides.observed` | CO-OPS water level, water temp, wind, air temp (last 6 h) | 1 h | Unconfirmed |
-| `weather.ndbc_ljpc1` | NDBC realtime2 `LJPC1.txt`, trimmed to 6 h | 1 h | Unconfirmed |
-| `weather.openmeteo_forecast` | Open-Meteo forecast, hourly wind/precip, all spots in one call | 1 h | Unconfirmed |
-| `weather.openmeteo_marine` | Open-Meteo marine, hourly waves/swell/SST | 1 h | Unconfirmed |
-| `weather.nws_grid` | api.weather.gov points → forecastGridData (land point) | 3 h | Unconfirmed |
-| `weather.nws_alerts` | api.weather.gov active alerts at land + nearshore points | 1 h | Unconfirmed |
-| `cdip.buoy` | THREDDS OPeNDAP `cdip/realtime/201p1_rt.nc`, last 3 h incl. spectra | 30 min | Unconfirmed; buoy 201 = Scripps Nearshore |
-| `cdip.mop_nowcast` | THREDDS OPeNDAP `cdip/model/MOP_alongshore/<MOP>_nowcast.nc` | 1 h | **Blocked on MOP IDs** |
-| `cdip.mop_forecast` | THREDDS fileServer `<MOP>_forecast.nc` | 12 h | **Blocked on MOP IDs** |
-| `sccoos.pier` | CeNCOOS ERDDAP `scripps-pier-automated-shore-sta-1`, last 2 h | 30 min | Unconfirmed |
-| `sccoos.habs` | habs.sccoos.org/scripps-pier page | daily | Unconfirmed; look for an ERDDAP dataset instead |
-| `water_quality.sdbeachinfo` | sdbeachinfo.com (home page placeholder) | 1 h | **Needs endpoint discovery** |
-| `water_quality.swimguide` | theswimguide.org/beach/1986 (La Jolla Cove) | 6 h | Unconfirmed; find the Shores page too |
-| `coastwatch.viirs` | CoastWatch ERDDAP griddap, VIIRS Kd490 + chl | daily | **Needs dataset IDs** |
+| `cam.scripps_pier` | One still from the Scripps Pier underwater cam via the HDOnTap embed endpoint that the Shore Stations' PierViz page uses (`scripps_pier-underwater-CUST`), decoded with ffmpeg; falls back to the public page's HLS URL, then a headless browser | 15 min, sun ≥ 2° | Not yet (Phase 3 CV) |
+| `tides.predictions` | NOAA CO-OPS 9410230, 6-min + highs/lows, MLLW | 6 h | Tide curve, trend, best window |
+| `tides.observed` | CO-OPS water level, water temp, wind, air temp | 1 h | Pier wind (primary), water temp (fallback) |
+| `weather.ndbc_ljpc1` | NDBC LJPC1 (same pier station), trimmed to 6 h | 1 h | Pier wind (fallback) |
+| `weather.openmeteo_forecast` | Hourly wind, gusts, precipitation for both spots | 1 h | Window wind, rain gate |
+| `weather.openmeteo_marine` | Hourly waves/swell/SST for both spots | 1 h | Waves (last-resort fallback) |
+| `weather.nws_grid` | NWS SGX gridpoint forecast (land point) | 3 h | Archive only |
+| `weather.nws_alerts` | NWS active alerts at a land and a nearshore point | 1 h | High Surf → No; Beach Hazards / Rip Current → caps at Maybe |
+| `cdip.buoy` | Buoy 201 Scripps Nearshore, last 3 h incl. full spectra + SST | 30 min | Waves (fallback) |
+| `cdip.mop_nowcast` | MOP alongshore nowcast incl. spectra: **D0482** (Cove, 0.18 km, 10 m, normal 18°), **D0496** (Marine Room, 0.34 km, 10 m, normal 318°) | 1 h | Waves (primary), orbital velocity, decay |
+| `cdip.mop_forecast` | MOP forecast files, as issued | 12 h | Archive only (Phase 7) |
+| `sccoos.pier` | CeNCOOS ERDDAP `scripps-pier-automated-shore-sta-1`: temperature, chlorophyll (ECO), **turbidity (ECO, NTU)**, O₂, salinity | 30 min | Water temp, chlorophyll, turbidity → visibility |
+| `sccoos.habs` | SCCOOS ERDDAP `HABs-ScrippsPier` weekly samples (chlorophyll, domoic acid, cell counts) | daily | Archive only (bloom notes later) |
+| `water_quality.county` | County DEHQ sdbeachinfo.com site list with advisory levels (OutSystems screen service `ScreenDataSetGetSiteById`) | 1 h | Advisory/closure → No |
+| `coastwatch.viirs` | CoastWatch `noaacwNPPVIIRSkd490SectorVYDaily` (750 m), `kd_490` box around each spot | daily | Archive only (Tier 3 clarity) |
 
-## To look up (needs network access to these hosts)
+## How IDs were found
 
-- **MOP IDs** for the Cove and the Marine Room: the nearest MOP alongshore point
-  to each spot, checked against its shore normal. San Diego County MOPs are
-  numbered south→north as `D0xxx`. Fill `cdip_mop_id` in `config/spots.yaml`.
-- **Water quality**: the station IDs for La Jolla Cove and La Jolla Shores on
-  sdbeachinfo.com, and whichever JSON/HTML endpoint the site's map uses. Fill
-  `water_quality_ids` and replace the placeholder URL.
-- **CoastWatch**: the VIIRS Kd490 and chlorophyll daily 750 m sector dataset
-  covering Southern California, its variable names, and whether it has an
-  altitude axis or descending latitude.
-- **Cam**: whether HDOnTap exposes a still/thumbnail URL; otherwise how the
-  embed loads its HLS stream (static HTML vs. JS/API, token lifetime,
-  Referer requirement).
-- **HABs**: an ERDDAP dataset for the weekly Scripps Pier HAB samples.
+- **MOP points:** `snorkel discover-mops` bisects the THREDDS catalog
+  (`cdip/model/MOP_alongshore`, 1,210 San Diego points D0001–D1210) on
+  latitude, then ranks neighbours by distance. The shore normals agree with
+  the spots: the Cove faces north, the Marine Room reach faces WNW–NW.
+- **County sites:** 90 sampling sites come back from the screen service.
+  La Jolla Cove is **105**; the Marine Room is between **106** (Ave De La
+  Playa, 32.8548, -117.2598) and **54** (Vallecitos). `PriorityMax` is each
+  site's worst active event: 1 open, 2 advisory, 4 closure (and 3 the page's
+  "warning"), confirmed against the page's own counts (8 advisories, 4
+  closures) on 2026-09-27.
+- **County API version:** read from the app's
+  `CoSD_Beach_Water_CW.MainFlow.HomeBlockNew.mvc.js` whenever the server
+  reports it changed, so a county redeploy doesn't break the fetcher.
+- **CoastWatch sector:** the "VY" sector spans 0–45°N, 120–60°W. The West
+  Coast node's ERDDAP blocks GitHub runner IPs, so the central node is used.
 
-Use `uv run snorkel probe <source> --save-fixture` to hit one source and save
-what comes back as a test fixture.
+## Not used
+
+- **Swim Guide:** its JSON API requires authentication; the county is the
+  primary source anyway.
+- **HDOnTap thumbnails:** a static `snapshot_…jpg` exists, but its refresh
+  rate is unknown; the embed stream gives a guaranteed-current frame.
+
+## Probing
+
+`uv run snorkel probe <source> [--save-fixture]` hits one source now.
+`snorkel sniff <url>` lists the requests a page makes (how the county and
+cam endpoints were found). To run either from a GitHub runner, push a branch
+named `probe/<anything>` containing `probe/run.sh` (see
+`.github/workflows/probe.yml`).
