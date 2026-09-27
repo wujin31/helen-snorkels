@@ -52,7 +52,7 @@ sources:
       - [32.8506, -117.2713]    # nearshore marine zone
 
   cdip.buoy:                    # realtime spectra + SST, OPeNDAP subset
-    every_minutes: 30
+    every_minutes: 60           # keep CDIP load low (it blocks some cloud IPs)
     dods: https://thredds.cdip.ucsd.edu/thredds/dodsC
     hours: 3
 

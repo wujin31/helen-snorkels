@@ -117,3 +117,47 @@ def test_real_fixtures_score_like_the_live_run(monkeypatch: pytest.MonkeyPatch) 
     assert not stale, stale
     assert doc.day.turbidity_ntu is not None and doc.day.wetsuit
     json.loads(doc.model_dump_json())
+
+
+def test_cdip_refusal_falls_back_to_the_archive(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    """CDIP intermittently refuses some cloud-runner IPs; the scorer then uses
+    the archiver's latest snapshots and still reaches the same verdicts."""
+    import gzip
+
+    from snorkel.archive import append_manifest, snapshot_key
+    from snorkel.models import CaptureRecord
+    from snorkel.storage import LocalStorage
+
+    def refused(url: str, cutoff: datetime) -> tuple[bytes, dict[str, object]]:
+        raise OSError('syntax error, unexpected "{" context: {"error": "Access Denied"}')
+
+    monkeypatch.setattr(cdip_fetch, "dataset_subset_bytes", refused)
+
+    storage = LocalStorage(tmp_path)
+    archived_at = datetime(2026, 9, 27, 7, 10, tzinfo=UTC)
+    records = []
+    for source, variant, fixture in (
+        ("cdip.mop_nowcast", "D0482", "cdip.mop_nowcast/D0482.nc"),
+        ("cdip.mop_nowcast", "D0496", "cdip.mop_nowcast/D0496.nc"),
+        ("cdip.buoy", "buoy201", "cdip.buoy/buoy201.nc"),
+    ):
+        key = snapshot_key(source, variant, archived_at, "nc")
+        storage.put(key, gzip.compress((FIX / fixture).read_bytes()), "application/gzip")
+        records.append(
+            CaptureRecord(source=source, variant=variant, run_at=archived_at, status="ok", key=key)
+        )
+    append_manifest(storage, archived_at.date(), records)
+
+    spots, sources = load_spots(), load_sources()
+    sources.sources["water_quality.county"]["api_version"] = "API"
+    with httpx.Client(transport=httpx.MockTransport(fixture_handler)) as client:
+        cond = gather(client, CAPTURED, spots, sources, storage=storage)
+    doc = score_all(cond, spots, sources, load_scoring())
+
+    by_id = {s.id: s for s in doc.spots}
+    assert by_id["la-jolla-cove"].verdict == "no"
+    assert by_id["marine-room"].verdict == "maybe"
+    assert {s.conditions.wave_source for s in doc.spots} == {"mop"}
+    assert cond.waves["marine-room"].source == "mop D0496 (archived)"

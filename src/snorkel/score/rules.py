@@ -43,6 +43,7 @@ from snorkel.sun import LOCAL_TZ, SunTimes
 from snorkel.units import m_to_ft, ms_to_kt
 
 DEFAULT_TP_S = 10.0
+COARSE_MODEL_GATE_FACTOR = 1.5  # offshore-model waves must be this far over the limit to gate
 COMPASS = ["N", "NE", "E", "SE", "S", "SW", "W", "NW"]
 
 
@@ -289,8 +290,25 @@ def score_spot(
             sc.tp_s = current.tp_s
             sc.swell_dir_deg = current.dp_deg
             sc.wave_source = waves.source
-            if sc.hs_ft > spot.thresholds.max_hs_ft:
-                gates.append(f"Waves ~{sc.hs_ft:.0f} ft, over {spot.thresholds.max_hs_ft:g} ft")
+            limit = spot.thresholds.max_hs_ft
+            if waves.source == "mop":
+                # MOP is modelled at this spot: compare it directly.
+                if sc.hs_ft > limit:
+                    gates.append(f"Waves ~{sc.hs_ft:.0f} ft, over {limit:g} ft")
+            else:
+                # Buoy and model waves are offshore: scale by how exposed the
+                # spot is to that direction. The coarse model alone only rules
+                # a day out when it's far over the limit; otherwise it's a Maybe.
+                at_spot = sc.hs_ft * exposure_weight(
+                    current.dp_deg, spot.exposure_deg.exposed, spot.exposure_deg.sheltered
+                )
+                if waves.source == "openmeteo":
+                    limit *= COARSE_MODEL_GATE_FACTOR
+                if at_spot > limit:
+                    gates.append(
+                        f"~{at_spot:.0f} ft of {compass(current.dp_deg)} swell reaching the spot "
+                        f"(offshore estimate), over {spot.thresholds.max_hs_ft:g} ft"
+                    )
         if waves.source == "openmeteo":
             cautions.append("Waves from a coarse offshore model")
         samples = []

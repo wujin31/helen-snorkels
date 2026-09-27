@@ -7,13 +7,14 @@ a failure becomes a failed SourceResult with the error, never an exception.
 
 from __future__ import annotations
 
+import gzip
 from collections.abc import Callable
 from datetime import datetime, timedelta
 from typing import Any, TypeVar
 
 import httpx
 
-from snorkel.archive import run_with_timeout
+from snorkel.archive import read_manifest, run_with_timeout
 from snorkel.fetch import cdip as cdip_fetch
 from snorkel.fetch import sccoos as sccoos_fetch
 from snorkel.fetch import tides as tides_fetch
@@ -36,6 +37,7 @@ from snorkel.observations import (
 from snorkel.parse import cdip as cdip_parse
 from snorkel.parse import coops, county, ndbc, nws, openmeteo, sccoos
 from snorkel.score.conditions import Conditions
+from snorkel.storage import Storage
 
 T = TypeVar("T")
 TIMEOUT_S = 90.0
@@ -104,12 +106,38 @@ def _last_time(obs: list[Any]) -> datetime | None:
     return max((o.time for o in obs), default=None)
 
 
+def latest_archived(storage: Storage, source_id: str, variant: str, now: datetime) -> bytes:
+    """The newest archived snapshot of one source item (from the archiver's manifests)."""
+    records = read_manifest(storage, now.date() - timedelta(days=1)) + read_manifest(
+        storage, now.date()
+    )
+    ok = [
+        r
+        for r in records
+        if r.source == source_id and r.variant == variant and r.status == "ok" and r.key
+    ]
+    if not ok:
+        raise RuntimeError(f"no archived {source_id} {variant}")
+    latest = max(ok, key=lambda r: r.run_at)
+    assert latest.key is not None
+    data = storage.get(latest.key)
+    if data is None:
+        raise RuntimeError(f"archived object missing: {latest.key}")
+    return gzip.decompress(data) if latest.key.endswith(".gz") else data
+
+
 def gather(
     client: httpx.Client,
     now: datetime,
     spots: list[SpotConfig],
     sources: SourcesConfig,
+    storage: Storage | None = None,
 ) -> Conditions:
+    """Gather fresh conditions.
+
+    With `storage`, CDIP inputs fall back to the archiver's latest snapshots when
+    a live request fails (CDIP intermittently refuses some cloud-runner IPs).
+    """
     g = Gatherer(client, now, spots, sources)
     cond = Conditions(now=now)
     station = spots[0].tide_station
@@ -153,6 +181,16 @@ def gather(
                     lambda w: _last_time(w.obs),
                 )
             )
+            if storage is not None:
+                candidates.append(
+                    g.result(
+                        f"mop {mop} (archived)",
+                        lambda mop=mop: cdip_parse.parse_waves(
+                            latest_archived(storage, "cdip.mop_nowcast", mop, now), "mop", mop
+                        ),
+                        lambda w: _last_time(w.obs),
+                    )
+                )
         if spot.cdip_buoy:
             buoy = spot.cdip_buoy
             candidates.append(
@@ -168,6 +206,18 @@ def gather(
                     lambda w: _last_time(w.obs),
                 )
             )
+            if storage is not None:
+                candidates.append(
+                    g.result(
+                        f"buoy {buoy} (archived)",
+                        lambda buoy=buoy: cdip_parse.parse_waves(
+                            latest_archived(storage, "cdip.buoy", f"buoy{buoy}", now),
+                            "buoy",
+                            buoy,
+                        ),
+                        lambda w: _last_time(w.obs),
+                    )
+                )
         if marine_result.ok and marine_result.value and spot.id in marine_result.value:
             series = marine_result.value[spot.id]
             candidates.append(
