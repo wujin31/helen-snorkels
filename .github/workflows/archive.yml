@@ -19,17 +19,22 @@ on:
 
 permissions:
   contents: read
+  id-token: write # the archive gateway authenticates this run by its OIDC token
 
 concurrency:
   group: archive
   cancel-in-progress: false
+
+env:
+  # Private Supabase bucket via the archive-gateway edge function (no secrets).
+  # Set the SNORKEL_STORAGE repo variable to override, e.g. `s3:<bucket>`.
+  SNORKEL_STORAGE: ${{ vars.SNORKEL_STORAGE || 'gateway:https://dujjlhiytnrtsebxshhw.supabase.co/functions/v1/archive-gateway' }}
 
 jobs:
   archive:
     runs-on: ubuntu-latest
     timeout-minutes: 12
     env:
-      SNORKEL_STORAGE: s3
       S3_ENDPOINT: ${{ secrets.S3_ENDPOINT }}
       S3_REGION: ${{ secrets.S3_REGION }}
       S3_BUCKET: ${{ secrets.S3_BUCKET }}
@@ -40,15 +45,6 @@ jobs:
       ONLY: ${{ inputs.only }}
       FORCE: ${{ inputs.force }}
     steps:
-      - name: Check storage secrets
-        run: |
-          for name in S3_ENDPOINT S3_BUCKET S3_ACCESS_KEY_ID S3_SECRET_ACCESS_KEY; do
-            if [ -z "${!name}" ]; then
-              echo "::error::Secret $name is not set. See docs/setup.md."
-              exit 1
-            fi
-          done
-
       - uses: actions/checkout@v4
 
       - uses: astral-sh/setup-uv@v6

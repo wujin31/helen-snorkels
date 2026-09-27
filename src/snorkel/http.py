@@ -31,24 +31,26 @@ def make_client(transport: httpx.BaseTransport | None = None) -> httpx.Client:
     )
 
 
-def get_with_retry(
+def request_with_retry(
     client: httpx.Client,
+    method: str,
     url: str,
     *,
     params: Mapping[str, Any] | None = None,
     headers: Mapping[str, str] | None = None,
+    content: bytes | None = None,
     attempts: int = 3,
     backoff_s: float = 2.0,
     sleep: Callable[[float], None] = time.sleep,
 ) -> httpx.Response:
-    """GET with exponential backoff on transport errors, 429 and 5xx.
+    """Send with exponential backoff on transport errors, 429 and 5xx.
 
     Other 4xx responses raise immediately: retrying a bad request is impolite.
     """
     last: Exception | None = None
     for attempt in range(attempts):
         try:
-            response = client.get(url, params=params, headers=headers)
+            response = client.request(method, url, params=params, headers=headers, content=content)
         except httpx.TransportError as exc:
             last = exc
         else:
@@ -64,3 +66,25 @@ def get_with_retry(
             sleep(backoff_s * 2**attempt)
     assert last is not None
     raise last
+
+
+def get_with_retry(
+    client: httpx.Client,
+    url: str,
+    *,
+    params: Mapping[str, Any] | None = None,
+    headers: Mapping[str, str] | None = None,
+    attempts: int = 3,
+    backoff_s: float = 2.0,
+    sleep: Callable[[float], None] = time.sleep,
+) -> httpx.Response:
+    return request_with_retry(
+        client,
+        "GET",
+        url,
+        params=params,
+        headers=headers,
+        attempts=attempts,
+        backoff_s=backoff_s,
+        sleep=sleep,
+    )

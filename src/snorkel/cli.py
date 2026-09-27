@@ -75,6 +75,25 @@ def archive(
         raise typer.Exit(1)
 
 
+@app.command("check-storage")
+def check_storage(
+    storage: Annotated[
+        str | None,
+        typer.Option(help="local:<dir>, gateway:<url> or s3[:<bucket>]. Default: $SNORKEL_STORAGE"),
+    ] = None,
+) -> None:
+    """Write, read back, and miss one object to prove storage works end to end."""
+    target = storage_from_spec(storage)
+    key = "state/healthcheck/latest.txt"
+    payload = f"ok {datetime.now(UTC).isoformat()}".encode()
+    target.put(key, payload, "text/plain")
+    read_back = target.get(key)
+    missing = target.get("state/healthcheck/never-written.txt")
+    print(f"{target.describe()}: wrote {key}, read back {read_back!r}, missing -> {missing!r}")
+    if read_back != payload or missing is not None:
+        raise typer.Exit(1)
+
+
 @app.command()
 def probe(
     source: Annotated[str, typer.Argument(help="Source id, e.g. tides.observed")],

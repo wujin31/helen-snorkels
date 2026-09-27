@@ -1,10 +1,13 @@
 """Object storage for the archive: frames, raw snapshots and manifests.
 
-Two backends behind one small interface:
+Three backends behind one small interface:
 
 - `LocalStorage` writes under a directory (dev and tests).
-- `S3Storage` talks to any S3-compatible store. Production uses Supabase
-  Storage's S3 endpoint; Cloudflare R2 would be a change of env vars only.
+- `GatewayStorage` (production) goes through the `archive-gateway` Supabase
+  edge function, authenticated with GitHub Actions' short-lived OIDC token,
+  so no storage secret is stored anywhere.
+- `S3Storage` talks to any S3-compatible store (Supabase's S3 endpoint or
+  Cloudflare R2) if we ever outgrow the gateway.
 
 Nothing written here ever goes into git.
 """
@@ -12,8 +15,15 @@ Nothing written here ever goes into git.
 from __future__ import annotations
 
 import os
+import time
+from collections.abc import Callable, Mapping
 from pathlib import Path
 from typing import Any, Protocol
+from urllib.parse import quote
+
+import httpx
+
+from snorkel.http import request_with_retry
 
 
 class Storage(Protocol):
@@ -95,16 +105,107 @@ class S3Storage:
         return f"s3:{self.bucket} @ {self.endpoint_url}"
 
 
-def storage_from_spec(spec: str | None = None) -> Storage:
-    """Build storage from `local:<dir>` or `s3[:<bucket>]`.
+OIDC_AUDIENCE = "snorkel-status"
 
-    Defaults to $SNORKEL_STORAGE, then `local:.archive`. S3 credentials come
-    from S3_ENDPOINT, S3_REGION, S3_ACCESS_KEY_ID, S3_SECRET_ACCESS_KEY and
-    (unless given in the spec) S3_BUCKET.
+
+class GitHubOidcToken:
+    """Mints GitHub Actions OIDC tokens (needs `permissions: id-token: write`).
+
+    Tokens live about five minutes, so one is reused for four and then renewed.
+    """
+
+    def __init__(
+        self,
+        audience: str = OIDC_AUDIENCE,
+        environ: Mapping[str, str] | None = None,
+        client: httpx.Client | None = None,
+        clock: Callable[[], float] = time.monotonic,
+    ) -> None:
+        environ = environ if environ is not None else os.environ
+        self._request_url = environ.get("ACTIONS_ID_TOKEN_REQUEST_URL", "")
+        self._request_token = environ.get("ACTIONS_ID_TOKEN_REQUEST_TOKEN", "")
+        if not self._request_url or not self._request_token:
+            raise ValueError(
+                "no GitHub Actions OIDC context; run inside Actions with id-token: write"
+            )
+        self.audience = audience
+        self._client = client or httpx.Client(timeout=30)
+        self._clock = clock
+        self._token: str | None = None
+        self._minted_at = 0.0
+
+    def __call__(self) -> str:
+        if self._token is None or self._clock() - self._minted_at > 240:
+            sep = "&" if "?" in self._request_url else "?"
+            response = request_with_retry(
+                self._client,
+                "GET",
+                f"{self._request_url}{sep}audience={quote(self.audience)}",
+                headers={"Authorization": f"bearer {self._request_token}"},
+            )
+            self._token = str(response.json()["value"])
+            self._minted_at = self._clock()
+        return self._token
+
+
+class GatewayStorage:
+    def __init__(
+        self,
+        base_url: str,
+        token: Callable[[], str],
+        client: httpx.Client | None = None,
+        sleep: Callable[[float], None] = time.sleep,
+    ) -> None:
+        self.base_url = base_url.rstrip("/")
+        self._token = token
+        self._client = client or httpx.Client(timeout=httpx.Timeout(60.0, connect=10.0))
+        self._sleep = sleep
+
+    def _url(self, key: str) -> str:
+        return f"{self.base_url}/object/{quote(key, safe='/')}"
+
+    def put(self, key: str, data: bytes, content_type: str) -> None:
+        request_with_retry(
+            self._client,
+            "PUT",
+            self._url(key),
+            headers={"Authorization": f"Bearer {self._token()}", "Content-Type": content_type},
+            content=data,
+            sleep=self._sleep,
+        )
+
+    def get(self, key: str) -> bytes | None:
+        try:
+            response = request_with_retry(
+                self._client,
+                "GET",
+                self._url(key),
+                headers={"Authorization": f"Bearer {self._token()}"},
+                sleep=self._sleep,
+            )
+        except httpx.HTTPStatusError as exc:
+            if exc.response.status_code == 404:
+                return None
+            raise
+        return response.content
+
+    def describe(self) -> str:
+        return f"gateway:{self.base_url}"
+
+
+def storage_from_spec(spec: str | None = None) -> Storage:
+    """Build storage from `local:<dir>`, `gateway:<url>` or `s3[:<bucket>]`.
+
+    Defaults to $SNORKEL_STORAGE, then `local:.archive`. The gateway
+    authenticates with GitHub Actions OIDC. S3 credentials come from
+    S3_ENDPOINT, S3_REGION, S3_ACCESS_KEY_ID, S3_SECRET_ACCESS_KEY and (unless
+    given in the spec) S3_BUCKET.
     """
     spec = spec or os.environ.get("SNORKEL_STORAGE") or "local:.archive"
     if spec.startswith("local:"):
         return LocalStorage(Path(spec.removeprefix("local:")))
+    if spec.startswith("gateway:"):
+        return GatewayStorage(spec.removeprefix("gateway:"), GitHubOidcToken())
     if spec == "s3" or spec.startswith("s3:"):
         bucket = spec.removeprefix("s3").removeprefix(":") or os.environ.get("S3_BUCKET", "")
         env = {
@@ -123,4 +224,6 @@ def storage_from_spec(spec: str | None = None) -> Storage:
             access_key_id=env["S3_ACCESS_KEY_ID"],
             secret_access_key=env["S3_SECRET_ACCESS_KEY"],
         )
-    raise ValueError(f"unknown storage spec {spec!r}; use local:<dir> or s3[:<bucket>]")
+    raise ValueError(
+        f"unknown storage spec {spec!r}; use local:<dir>, gateway:<url> or s3[:<bucket>]"
+    )

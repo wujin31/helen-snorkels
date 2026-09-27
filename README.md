@@ -7,12 +7,12 @@ the Scripps Pier underwater cam.
 
 - **Project brief:** [docs/brief.md](docs/brief.md)
 - **Data sources and status:** [docs/sources.md](docs/sources.md)
-- **One-time setup (Supabase, secrets, Pages):** [docs/setup.md](docs/setup.md)
+- **Infrastructure and setup:** [docs/setup.md](docs/setup.md)
 
 ## Status
 
 Phase 0: the archiver runs every 15 minutes in daylight and stores raw snapshots
-of every source plus one pier-cam still in private object storage. Scoring and
+of every source plus one pier-cam still in a private Supabase bucket. Scoring and
 the page come next.
 
 ## Develop

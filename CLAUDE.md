@@ -15,6 +15,7 @@ uv run ruff check && uv run ruff format --check && uv run pyright
 uv run snorkel archive --storage local:.archive           # capture everything due
 uv run snorkel archive --storage local:.archive --force --only tides.observed
 uv run snorkel probe cdip.buoy --save-fixture             # hit one live source, save a fixture
+uv run snorkel check-storage --storage local:.archive     # storage round trip
 ```
 
 ## Layout
@@ -22,8 +23,8 @@ uv run snorkel probe cdip.buoy --save-fixture             # hit one live source,
 - `config/spots.yaml`: spot registry (`SpotConfig`). `config/sources.yaml`: archiver cadence and per-source params.
 - `src/snorkel/fetch/`: one module per provider. A capture function takes a `FetchContext` and returns `RawSnapshot | ItemError` items; `fetch/__init__.py` registers source ids.
 - `src/snorkel/archive.py`: runs due sources and writes to storage + the daily manifest.
-- `src/snorkel/storage.py`: `LocalStorage` / `S3Storage` (Supabase Storage's S3 endpoint in prod).
-- `supabase/migrations/`: swim-log table (RLS) and the private archive bucket.
+- `src/snorkel/storage.py`: `LocalStorage`, `GatewayStorage` (prod: Supabase edge function authenticated by GitHub Actions OIDC, no secrets) and `S3Storage` (R2 escape hatch).
+- `supabase/migrations/`: swim-log table (RLS) and the private archive bucket. `supabase/functions/archive-gateway/`: the storage gateway. Supabase project ref `dujjlhiytnrtsebxshhw`; see `docs/setup.md`.
 - `.github/workflows/`: `ci.yml`, `archive.yml` (15-min cron), `keepalive.yml`.
 
 ## Conventions
