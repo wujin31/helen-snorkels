@@ -73,19 +73,19 @@ sources:
     dataset: scripps-pier-automated-shore-sta-1
     hours: 2
 
-  sccoos.habs:
+  sccoos.habs:                  # weekly CalHABMAP samples at the pier
     every_minutes: 1440
-    url: https://habs.sccoos.org/scripps-pier
+    url: "https://erddap.sccoos.org/erddap/tabledap/HABs-ScrippsPier.csv?&time%3E=now-60days"
 
   water_quality.sdbeachinfo:
     every_minutes: 60
     urls:                       # TODO: replace with the station/API endpoint once probed
       - https://www.sdbeachinfo.com/
 
-  water_quality.swimguide:
-    every_minutes: 360
+  water_quality.swimguide:      # JSON API behind theswimguide.org/beach/<id>
+    every_minutes: 60
     urls:
-      - https://www.theswimguide.org/beach/1986   # La Jolla Cove
+      - https://www.theswimguide.org/server/beaches/1986/advisories   # La Jolla Cove
 
   coastwatch.viirs:
     every_minutes: 1440

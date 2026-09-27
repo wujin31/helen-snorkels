@@ -144,3 +144,8 @@ def test_non_image_is_an_error(spots: list[SpotConfig], sources: SourcesConfig) 
     [item] = cam.capture(ctx)
     assert isinstance(item, ItemError)
     assert "not an image" in item.error
+
+
+def test_find_m3u8_decodes_unicode_escapes() -> None:
+    page = '"src": "https://live.test/hls/cam.stream/playlist.m3u8?t=abc\\u0026e=123"'
+    assert cam.find_m3u8(page) == ["https://live.test/hls/cam.stream/playlist.m3u8?t=abc&e=123"]

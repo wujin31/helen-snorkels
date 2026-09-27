@@ -27,6 +27,8 @@ from snorkel.fetch.base import (
     unique,
 )
 
+MAX_STATIC_DIM = 512  # longest non-time dimension kept (spectra have 64 frequencies)
+
 
 def subset_recent(ds: Any, cutoff: datetime) -> Any:
     """Slice every `*Time` dimension down to entries at or after `cutoff`.
@@ -54,11 +56,23 @@ def dataset_subset_bytes(url: str, cutoff: datetime) -> tuple[bytes, dict[str, A
     import xarray as xr
 
     with xr.open_dataset(url, engine="netcdf4") as ds:
-        subset = subset_recent(ds, cutoff).load()
+        subset = subset_recent(ds, cutoff)
+        # Drop bulky bookkeeping with no time axis, e.g. `sourceFilename`
+        # (tens of thousands of raw file names) in buoy files.
+        bulky = [
+            name
+            for name, var in subset.variables.items()
+            if any(
+                not str(d).endswith("Time") and subset.sizes[d] > MAX_STATIC_DIM for d in var.dims
+            )
+        ]
+        subset = subset.drop_vars(bulky).load()
     # Encodings inherited from the server (chunking, fill values, packing)
-    # can conflict on write; let xarray pick fresh ones.
+    # can conflict on write; keep only time units so bounds stay consistent.
     for variable in subset.variables.values():
-        variable.encoding = {}
+        variable.encoding = {
+            k: v for k, v in variable.encoding.items() if k in ("units", "calendar")
+        }
     meta = {name: int(size) for name, size in subset.sizes.items() if str(name).endswith("Time")}
     with tempfile.TemporaryDirectory() as tmp:
         path = Path(tmp) / "subset.nc"

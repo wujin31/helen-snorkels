@@ -42,8 +42,13 @@ FROZEN_MAX_BITS = 2  # dHash distance at or below which two frames count as iden
 FROZEN_WINDOW = timedelta(minutes=60)
 
 
+UNICODE_ESCAPE_RE = re.compile(r"\\u([0-9a-fA-F]{4})")
+
+
 def find_m3u8(page_html: str) -> list[str]:
-    text = html.unescape(page_html.replace("\\/", "/"))
+    """Stream URLs in a page, including JSON-escaped ones (\\/ and \\u0026)."""
+    text = UNICODE_ESCAPE_RE.sub(lambda m: chr(int(m.group(1), 16)), page_html)
+    text = html.unescape(text.replace("\\/", "/"))
     return unique(M3U8_RE.findall(text))
 
 

@@ -143,10 +143,10 @@ def test_water_quality_pages(spots: list[SpotConfig], sources: SourcesConfig) ->
     def handler(request: httpx.Request) -> httpx.Response:
         return httpx.Response(200, text="<html>Open</html>")
 
-    ctx = make_ctx(handler, spots, sources, "water_quality.swimguide")
+    ctx = make_ctx(handler, spots, sources, "water_quality.sdbeachinfo")
     [item] = ok_items(water_quality.capture_pages(ctx))
     assert item.ext == "html"
-    assert item.variant == "www-theswimguide-org-beach-1986"
+    assert item.variant == "www-sdbeachinfo-com"
 
 
 def test_unconfigured_sources_skip(spots: list[SpotConfig], sources: SourcesConfig) -> None:
@@ -155,8 +155,9 @@ def test_unconfigured_sources_skip(spots: list[SpotConfig], sources: SourcesConf
 
     with pytest.raises(SkipSource):
         coastwatch.capture_viirs(make_ctx(handler, spots, sources, "coastwatch.viirs"))
+    unconfigured = [s.model_copy(update={"cdip_mop_id": None}) for s in spots]
     with pytest.raises(SkipSource):
-        cdip.capture_mop_nowcast(make_ctx(handler, spots, sources, "cdip.mop_nowcast"))
+        cdip.capture_mop_nowcast(make_ctx(handler, unconfigured, sources, "cdip.mop_nowcast"))
 
 
 def test_coastwatch_griddap_url() -> None:

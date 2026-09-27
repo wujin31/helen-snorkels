@@ -17,4 +17,6 @@ def capture_pier(ctx: FetchContext) -> list[Item]:
 
 
 def capture_habs(ctx: FetchContext) -> list[Item]:
-    return get_many(ctx, [HttpItem(url=str(ctx.require("url")), ext="html")])
+    url = str(ctx.require("url"))
+    ext = "csv" if ".csv" in url else "html"
+    return get_many(ctx, [HttpItem(url=url, ext=ext, variant="HABs-ScrippsPier")])

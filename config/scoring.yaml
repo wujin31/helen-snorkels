@@ -1,0 +1,65 @@
+# v0 scoring rules. Every number here is a PRIOR TO VALIDATE against her logs
+# and the archive; nothing is calibrated yet. Spot-specific thresholds live in
+# spots.yaml.
+
+preferences:                 # hers; ask and adjust
+  min_vis_ft: 10             # "Yes" needs at least this much estimated vis
+  max_difficulty: moderate   # easy | moderate | advanced
+  earliest_local: "06:30"    # best-window search starts here (or sunrise)
+  latest_end_before_sunset_min: 60
+
+staleness_hours:             # older than this and a source counts as stale
+  waves: 4
+  wind: 3
+  tides: 72                  # predictions are good for days
+  water_temp: 12
+  chlorophyll: 24
+  water_quality: 30          # the county posts roughly daily; sampling is weekly
+  rain: 6
+  alerts: 3
+
+gates:
+  rain_mm_24h: 2.5           # ~0.1 in in a day starts the county's 72 h advisory
+  rain_advisory_hours: 72
+  hazard_alerts:             # NWS events that make it a No
+    - High Surf Warning
+    - High Surf Advisory
+    - Tsunami Warning
+    - Tsunami Advisory
+  caution_alerts:            # NWS events that cap the verdict at Maybe
+    - Beach Hazards Statement
+    - Rip Current Statement
+  comfortable_fraction: 0.7  # Yes needs Hs and wind at or under 70% of the spot threshold
+
+visibility:                  # proxy until the pier-cam CV exists
+  base_ft: 20                # clean, calm, low-chlorophyll La Jolla day
+  half_life_h: 24            # swell stirs the bottom for a day or two after it drops
+  orbital_ft_per_ms: 22      # vis lost per m/s of decayed near-bottom orbital velocity
+  chl_threshold_ug_l: 2.0
+  chl_ft_per_ug_l: 1.0
+  chl_max_penalty_ft: 12
+  rain_recent_days: 5        # rain after the gate lifts still clouds nearshore water
+  rain_recent_penalty_ft: 3
+  wind_threshold_kt: 8
+  wind_ft_per_kt: 0.5
+  min_ft: 2
+  max_ft: 40
+  spread_fraction: 0.35      # +/- band around the estimate while it's a proxy
+
+window:                      # hourly sub-scores for the best-window search
+  incoming_bonus: 1.0
+  slack_high_bonus: 0.5
+  outgoing_penalty: 0.5
+  below_min_tide_penalty: 3.0
+  wind_weight: 2.0           # score -= weight * (wind / spot max wind)^2
+  slot_minutes: 30
+  min_minutes: 90
+  max_minutes: 180
+
+wetsuit_f:                   # water temp (°F) lower bound -> suggestion
+  - [72, "Rash guard or shorty"]
+  - [68, "3/2 mm shorty or springsuit"]
+  - [64, "3/2 mm full suit"]
+  - [60, "4/3 mm full suit"]
+  - [56, "5/4 mm full suit + hood"]
+  - [-100, "5/4 mm + hood, boots and gloves"]
