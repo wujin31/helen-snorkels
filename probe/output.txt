@@ -1,85 +1,20 @@
 
+======== player-only: https://hdontap.com/stream/018408/scripps-pier-underwater-live-webcam/embed/
+ frame https://hdontap.com/stream/018408/scripps-pier-underwater-live-webcam/embed/
+   {'title': 'Scripps Pier Underwater Live Webcam - HDOnTap', 'docHeight': 844, 'videos': [{'box': [0, 0, 390, 219], 'playsinline': True, 'controls': False, 'autoplay': False, 'muted': False, 'paused': True, 'readyState': 4, 'noPiP': False, 'noRemote': False, 'cls': 'vjs-tech'}], 'libs': ['videojs'], 'ads': True, 'text': 'We use essential cookies to make our site work. With your consent, we may also use non-essential cookies to improve user experience, personalize content, customize advertisements, and analyze website traffic. For these reasons, we may share'}
+  after tap: [{'paused': False, 't': 6, 'rs': 4}]
 
-======== Player config on the stream page ========
-                "portalEmbedId": "scripps_pier-underwater-HDOT",
-portal.hdontap.com/s/embed
-storage.hdontap.com/wowza_stream_thumbnails/snapshot_hosb1_cat-cafe_sandiego_lorex.stream.jpg
-storage.hdontap.com/wowza_stream_thumbnails/snapshot_hosb1_ct-bats-cam2.stream_bUvuy3F.jpg
-storage.hdontap.com/wowza_stream_thumbnails/snapshot_hosb1_mrosd_midpeninsula-ptz.stream_s3wkKCB.jpg
-storage.hdontap.com/wowza_stream_thumbnails/snapshot_hosb1_pgc_elk.stream_Em9Ux97.jpg
-storage.hdontap.com/wowza_stream_thumbnails/snapshot_hosb1_sloth-ptz_rpz.stream_j5jcSnB.jpg
-storage.hdontap.com/wowza_stream_thumbnails/snapshot_hosb2_ap_enrico-ptz.stream.jpg
-storage.hdontap.com/wowza_stream_thumbnails/snapshot_hosb2_ap_whiterock_bison-ptz.stream.jpg
-storage.hdontap.com/wowza_stream_thumbnails/snapshot_hosb2_kpi-deer_feeder.stream.jpg
-storage.hdontap.com/wowza_stream_thumbnails/snapshot_hosb2_usfw-kodiak_island_bears.stream.jpg
-storage.hdontap.com/wowza_stream_thumbnails/snapshot_hosb2_vcranch-middle_pasture.stream.jpg
-storage.hdontap.com/wowza_stream_thumbnails/snapshot_hosb6_flamingo_rpz.stream_vyPQhtZ.jpg
-storage.hdontap.com/wowza_stream_thumbnails/snapshot_hosb6_greenhorn_arena-ptz.stream.jpg
-storage.hdontap.com/wowza_stream_thumbnails/snapshot_hosb6_greenhorn_saloon-ptz.stream.jpg
-storage.hdontap.com/wowza_stream_thumbnails/snapshot_hosb6_hdontap_delmar_rivermouth_ptz.stream.jpg
-storage.hdontap.com/wowza_stream_thumbnails/snapshot_hosb6_jll_falcon_ptz-cam.stream.jpg
-storage.hdontap.com/wowza_stream_thumbnails/snapshot_hosb6_scripps_penguins-above_water-ptz.stream_V2wc5Qw.jpg
-storage.hdontap.com/wowza_stream_thumbnails/snapshot_hosb6_scripps_pier-underwater.stream_TLrFUyC.jpg
-storage.hdontap.com/wowza_stream_thumbnails/snapshot_hosb6na_millers-landing_fixed-cam.stream.jpg
-storage.hdontap.com/wowza_stream_thumbnails/snapshot_hosbdvr1_hlfm_osprey-cam_ptz.stream.jpg
-storage.hdontap.com/wowza_stream_thumbnails/snapshot_hosbdvr2_eaglecountry_river2-cam.stream.jpg
+======== stream page: https://hdontap.com/stream/018408/scripps-pier-underwater-live-webcam/
+ frame https://hdontap.com/stream/018408/scripps-pier-underwater-live-webcam/
+   {'title': 'Scripps Pier Underwater Live Webcam - HDOnTap', 'docHeight': 844, 'videos': [{'box': [0, 50, 390, 219], 'playsinline': True, 'controls': False, 'autoplay': False, 'muted': False, 'paused': True, 'readyState': 4, 'noPiP': False, 'noRemote': False, 'cls': 'vjs-tech'}], 'libs': ['videojs'], 'ads': True, 'text': 'We use essential cookies to make our site work. With your consent, we may also use non-essential cookies to improve user experience, personalize content, customize advertisements, and analyze website traffic. For these reasons, we may share'}
+  after tap: [{'paused': False, 't': 6, 'rs': 4}]
 
+======== pierviz: https://coollab.ucsd.edu/pierviz/
+ frame https://coollab.ucsd.edu/pierviz/
+   {'title': 'Scripps Pier Live Cam | Coastal Ocean Observing Lab', 'docHeight': 3419, 'videos': [], 'libs': [], 'ads': True, 'text': 'Skip to content Navigation Donate Now (opens in a new tab) =>> Update as of 7/14/26 ==>> The Pier Camera is back online thanks to a generous gift from Santa Cruz Paleo, a new sponsor of the camera, AND your personal donations! Plus Deep Sea'}
+ frame https://portal.hdontap.com/s/embed/?stream=scripps_pier-underwater-CUST&ratio=16:9&fluid=t
+   {'title': 'HDOnTap Live Stream', 'docHeight': 219, 'videos': [{'box': [0, 0, 390, 219], 'playsinline': True, 'controls': False, 'autoplay': True, 'muted': True, 'paused': False, 'readyState': 4, 'noPiP': False, 'noRemote': False, 'cls': 'vjs-tech'}], 'libs': ['videojs'], 'ads': False, 'text': 'Pause Stream Type ●LIVE Fullscreen'}
+  tap: Locator.tap: Timeout 5000ms exceeded.
+Call log:
+  - waiting for locator("video, .vjs-big-play-button, [aria-label*=Play i], button[title*=Play i]").first
 
-======== Headers: https://portal.hdontap.com/s/embed/?stream=scripps_pier-underwater-HDOT ========
-HTTP/2 200 
-content-type: text/html; charset=utf-8
-content-security-policy: frame-ancestors 'self' https://hdontap.com https://*.hdontap.com
-5444
-<title>HDOnTap Live Stream</title> <meta name="viewport" content="width=device-width,initial-scale=1"> <lin
-
-
-======== Headers: https://portal.hdontap.com/s/embed?stream=scripps_pier-underwater-HDOT ========
-HTTP/2 301 
-content-type: text/html
-location: https://portal.hdontap.com/s/embed/?stream=scripps_pier-underwater-HDOT
-HTTP/2 200 
-content-type: text/html; charset=utf-8
-content-security-policy: frame-ancestors 'self' https://hdontap.com https://*.hdontap.com
-5444
-<title>HDOnTap Live Stream</title> <meta name="viewport" content="width=device-width,initial-scale=1"> <lin
-
-
-======== Headers: https://portal.hdontap.com/s/embed/?stream=scripps_pier-underwater-CUST ========
-HTTP/2 200 
-content-type: text/html; charset=utf-8
-content-security-policy: frame-ancestors 'self' https://pierviz.ucsd.edu https://coollab.ucsd.edu https://aquarium.ucsd.edu https://scripps.ucsd.edu https://deepsea.com https://www.deepsea.com https://hdontap.com https://*.hdontap.com
-5444
-<title>HDOnTap Live Stream</title> <meta name="viewport" content="width=device-width,initial-scale=1"> <lin
-
-
-======== Thumbnail headers ========
-HTTP/2 200 
-content-type: image/jpeg
-content-length: 26781
-cache-control: public, max-age=120
-last-modified: Sun, 27 Sep 2026 21:32:32 GMT
-age: 40
-HTTP/2 200 
-content-type: image/jpeg
-content-length: 8834
-cache-control: public, max-age=120
-last-modified: Sun, 27 Sep 2026 21:32:43 GMT
-age: 65
-
-
-======== Iframe load from https://wujin31.github.io/helen-snorkels/ ========
-
---- https://portal.hdontap.com/s/embed/?stream=scripps_pier-underwater-HDOT
-frame: https://wujin31.github.io/helen-snorkels/embed-test.html
-frame: chrome-error://chromewebdata/
-   {'title': '', 'videos': [], 'text': ''}
-failed https://portal.hdontap.com/s/embed/?stream=scripps_pier-underwater-HDOT net::ERR_BLOCKED_BY_RESPONSE
-console[error] Framing 'https://portal.hdontap.com/' violates the following Content Security Policy directive: "frame-ancestors 'self' https://hdontap.com https://*.hdontap.com". The request has been blocked.
-
-
---- https://portal.hdontap.com/s/embed/?stream=scripps_pier-underwater-CUST
-frame: https://wujin31.github.io/helen-snorkels/embed-test.html
-frame: chrome-error://chromewebdata/
-   {'title': '', 'videos': [], 'text': ''}
-failed https://portal.hdontap.com/s/embed/?stream=scripps_pier-underwater-CUST net::ERR_BLOCKED_BY_RESPONSE
-console[error] Framing 'https://portal.hdontap.com/' violates the following Content Security Policy directive: "frame-ancestors 'self' https://pierviz.ucsd.edu https://coollab.ucsd.edu https://aquarium.ucsd.edu https://scripps.ucsd.edu
