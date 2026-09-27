@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+dist/
+build/
+
+# Local archive output (frames and raw snapshots never go in git)
+.archive/
+*.jpg
+!web/public/**/*.jpg
+*.nc
+!tests/fixtures/**/*.nc
+
+# Node / web
+node_modules/
+web/dist/
+
+# Env / secrets
+.env
+.env.*
+!.env.example
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
