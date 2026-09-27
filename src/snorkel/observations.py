@@ -48,12 +48,16 @@ class WaveObs(BaseModel):
     tp_s: float | None = None
     dp_deg: float | None = None
     """Peak direction, degrees true, coming from."""
+    energy_m2_hz: list[float] | None = None
+    """Spectral energy density per frequency band (CDIP sources only)."""
 
 
 class WaveSeries(BaseModel):
     source: Literal["mop", "buoy", "openmeteo"]
     site: str
     obs: list[WaveObs]
+    freqs_hz: list[float] | None = None
+    bandwidths_hz: list[float] | None = None
 
 
 class WindObs(BaseModel):

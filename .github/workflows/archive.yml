@@ -54,15 +54,9 @@ jobs:
       - name: Install ffmpeg (cam HLS frames)
         run: command -v ffmpeg || (sudo apt-get update -qq && sudo apt-get install -y -qq --no-install-recommends ffmpeg)
 
-      - run: uv sync --locked --extra browser
-
-      # Headless Chromium is the cam's last-resort strategy. Once a direct
-      # snapshot or HLS URL is confirmed, these two steps can go.
-      - uses: actions/cache@v4
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ hashFiles('uv.lock') }}
-      - run: uv run playwright install --with-deps --only-shell chromium
+      # The cam comes from the HDOnTap embed (then the page's HLS URL) via
+      # ffmpeg; the headless-browser fallback isn't installed in production.
+      - run: uv sync --locked
 
       - name: Archive
         run: |

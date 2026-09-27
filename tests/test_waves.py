@@ -51,3 +51,42 @@ def test_decayed_mean_weights_recent_samples_more() -> None:
     value = decayed_mean(samples, now, half_life_h=24)
     assert value == pytest.approx(10 * 0.25 / 1.25)
     assert decayed_mean([], now, 24) is None
+
+
+def test_spectral_single_band_matches_bulk() -> None:
+    from snorkel.features.waves import spectral_orbital_velocity
+
+    hs, period, depth, df = 0.8, 12.0, 5.0, 0.005
+    density = (hs / 4) ** 2 / df  # one band holding all the variance: Hs = 4*sqrt(S*df)
+    spectral = spectral_orbital_velocity([density], [1 / period], [df], depth)
+    assert spectral == pytest.approx(bottom_orbital_velocity(hs, period, depth), rel=1e-9)
+
+
+def test_spectral_counts_short_chop_less_than_swell() -> None:
+    from snorkel.features.waves import spectral_orbital_velocity
+
+    df = 0.01
+    swell = spectral_orbital_velocity([1.0], [1 / 14], [df], 8.0)
+    chop = spectral_orbital_velocity([1.0], [1 / 4], [df], 8.0)
+    assert swell > 2 * chop  # ~2.3x at 8 m for equal surface energy
+    assert spectral_orbital_velocity([float("nan"), 0.0], [0.1, 0.2], [df, df], 5) == 0.0
+
+
+def test_spectral_on_a_real_mop_spectrum() -> None:
+    from pathlib import Path
+
+    from snorkel.features.waves import spectral_orbital_velocity
+    from snorkel.parse.cdip import parse_waves
+
+    nc = Path(__file__).parent / "fixtures/cdip.mop_nowcast/D0482.nc"
+    series = parse_waves(nc.read_bytes(), "mop", "D0482")
+    last = series.obs[-1]
+    assert last.energy_m2_hz and series.freqs_hz and series.bandwidths_hz
+    spectral = spectral_orbital_velocity(
+        last.energy_m2_hz, series.freqs_hz, series.bandwidths_hz, 5
+    )
+    bulk = bottom_orbital_velocity(last.hs_m, last.tp_s or 10, 5)
+    # Same sea state, same order of magnitude; the spectrum spreads energy
+    # over periods, so it shouldn't match the peak-period shortcut exactly.
+    assert 0.1 < spectral < 1.5
+    assert 0.5 < spectral / bulk < 1.5

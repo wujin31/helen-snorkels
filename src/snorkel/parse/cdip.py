@@ -26,8 +26,14 @@ def parse_waves(content: bytes, source: Literal["mop", "buoy"], site: str) -> Wa
             hs = ds["waveHs"].values
             tp = ds["waveTp"].values if "waveTp" in ds.variables else np.full(len(hs), np.nan)
             dp = ds["waveDp"].values if "waveDp" in ds.variables else np.full(len(hs), np.nan)
+            has_spectra = all(
+                v in ds.variables for v in ("waveEnergyDensity", "waveFrequency", "waveBandwidth")
+            )
+            energy = ds["waveEnergyDensity"].values if has_spectra else None
+            freqs = ds["waveFrequency"].values.astype(float).tolist() if has_spectra else None
+            bands = ds["waveBandwidth"].values.astype(float).tolist() if has_spectra else None
     obs = []
-    for t, h, p, d in zip(times, hs, tp, dp, strict=True):
+    for i, (t, h, p, d) in enumerate(zip(times, hs, tp, dp, strict=True)):
         if not math.isfinite(float(h)):
             continue
         when = np.datetime64(t, "s").astype("datetime64[s]").item().replace(tzinfo=UTC)
@@ -37,6 +43,7 @@ def parse_waves(content: bytes, source: Literal["mop", "buoy"], site: str) -> Wa
                 hs_m=float(h),
                 tp_s=float(p) if math.isfinite(float(p)) else None,
                 dp_deg=float(d) if math.isfinite(float(d)) else None,
+                energy_m2_hz=energy[i].astype(float).tolist() if energy is not None else None,
             )
         )
-    return WaveSeries(source=source, site=site, obs=obs)
+    return WaveSeries(source=source, site=site, obs=obs, freqs_hz=freqs, bandwidths_hz=bands)

@@ -2,8 +2,9 @@
 
 Visibility drops when wave orbital motion stirs sediment off the bottom, and
 long-period swell reaches the bottom far more than short chop of the same
-height. v0 uses a bulk (Hs, Tp) linear-theory estimate; Phase 4 replaces it
-with the full spectral sum from archived CDIP spectra.
+height. With a CDIP spectrum we sum the contribution of every frequency band
+(`spectral_orbital_velocity`); without one we fall back to a bulk (Hs, Tp)
+estimate. The two agree for a single-band spectrum.
 """
 
 from __future__ import annotations
@@ -39,6 +40,30 @@ def bottom_orbital_velocity(hs_m: float, tp_s: float, depth_m: float) -> float:
         return 0.0
     k = wavenumber(tp_s, depth_m)
     return math.pi * hs_m / (tp_s * math.sinh(k * depth_m))
+
+
+def spectral_orbital_velocity(
+    energy_m2_hz: Sequence[float],
+    freqs_hz: Sequence[float],
+    bandwidths_hz: Sequence[float],
+    depth_m: float,
+) -> float:
+    """Significant near-bottom orbital velocity (m/s) from a 1-D wave spectrum.
+
+    Each band's surface variance S·df is transferred to the bottom by linear
+    theory, u = w·a / sinh(k·h). Summing velocity variance and scaling to a
+    "significant" amplitude gives U_s = 2·sqrt(sum((w / sinh(k·h))^2 · S·df)),
+    which equals the bulk formula for one band with Hs = 4·sqrt(S·df).
+    """
+    total = 0.0
+    for s, f, df in zip(energy_m2_hz, freqs_hz, bandwidths_hz, strict=True):
+        if not (math.isfinite(s) and s > 0 and f > 0 and df > 0):
+            continue
+        kh = wavenumber(1 / f, depth_m) * depth_m
+        if kh > 30:  # this band doesn't reach the bottom at all
+            continue
+        total += (2 * math.pi * f / math.sinh(kh)) ** 2 * s * df
+    return 2 * math.sqrt(total)
 
 
 def exposure_weight(
