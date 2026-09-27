@@ -1,18 +1,20 @@
 name: Pacemaker
 
-# Bridge until GitHub's scheduler starts firing this repo's cron schedules
-# (for a brand-new repository that can take days). Dispatches the archive
-# every 15 minutes and the scorer hourly during the daylight window, then
-# re-dispatches itself before the 6-hour job limit. It stops by itself once
-# real scheduled runs appear. The archiver's cadence check skips anything
-# already captured, so an overlap with the real schedule is harmless.
+# Fills the gaps GitHub's scheduler leaves. Cron schedules on this repository
+# fire late, in bursts, or not at all for hours, so this job checks every
+# 5 minutes when Archive and Score last ran (from any trigger) and dispatches
+# whichever is overdue during its daylight window. When the scheduler is
+# healthy it finds nothing overdue and does nothing; the archiver's cadence
+# check makes an occasional overlap harmless.
 #
-# Start (or restart) it with: Actions -> Pacemaker -> Run workflow.
+# It runs around the clock as a chain, re-dispatching itself before the
+# 6-hour job limit. Archive and Score restart it if the chain ever breaks,
+# and it can be started by hand: Actions -> Pacemaker -> Run workflow.
 on:
   workflow_dispatch:
 
 permissions:
-  actions: write # dispatch archive/score/pacemaker (allowed with GITHUB_TOKEN)
+  actions: write # read run history; dispatch archive/score/pacemaker (allowed with GITHUB_TOKEN)
 
 concurrency:
   group: pacemaker
@@ -26,32 +28,37 @@ jobs:
       GH_TOKEN: ${{ github.token }}
       REPO: ${{ github.repository }}
     steps:
-      - name: Dispatch archive and score until the real schedule takes over
+      - name: Dispatch archive and score when they're overdue
         run: |
           set -uo pipefail
           end=$(( $(date +%s) + 330 * 60 ))
-          last_score=0
-          in_window() { # UTC hours the cron schedules cover (~5am-8pm Pacific)
+          in_window() { # UTC hours 12-23 and 0-$1, the cron schedules' span (~5am-8pm Pacific)
             local h=$((10#$(date -u +%H)))
             [ "$h" -ge 12 ] || [ "$h" -le "$1" ]
           }
+          minutes_since_last() { # latest run of workflow file $1, any event; huge if unknown
+            local created
+            created=$(gh api "repos/$REPO/actions/workflows/$1/runs?per_page=1" \
+              --jq '.workflow_runs[0].created_at // empty' 2>/dev/null) || created=""
+            if [ -z "$created" ]; then echo 99999; return; fi
+            echo $(( ($(date +%s) - $(date -d "$created" +%s)) / 60 ))
+          }
           while [ "$(date +%s)" -lt "$end" ]; do
-            since=$(date -u -d '-90 min' +%Y-%m-%dT%H:%M:%SZ)
-            recent=$(gh api "repos/$REPO/actions/runs?event=schedule&created=%3E%3D$since&per_page=1" --jq .total_count || echo 0)
-            if [ "${recent:-0}" -gt 0 ]; then
-              echo "GitHub's scheduler fired in the last 90 minutes; the pacemaker is no longer needed."
-              echo "Scheduler is live; pacemaker stopped." >> "$GITHUB_STEP_SUMMARY"
-              exit 0
-            fi
             if in_window 3; then
-              gh workflow run archive.yml --repo "$REPO" --ref main && echo "$(date -u +%H:%M) archive dispatched"
+              age=$(minutes_since_last archive.yml)
+              if [ "$age" -ge 14 ]; then
+                gh workflow run archive.yml --repo "$REPO" --ref main \
+                  && echo "$(date -u +%H:%M) archive dispatched (last run ${age} min ago)"
+              fi
             fi
-            now=$(date +%s)
-            if in_window 2 && [ $((now - last_score)) -ge 3540 ]; then
-              gh workflow run score.yml --repo "$REPO" --ref main && echo "$(date -u +%H:%M) score dispatched"
-              last_score=$now
+            if in_window 2; then
+              age=$(minutes_since_last score.yml)
+              if [ "$age" -ge 58 ]; then
+                gh workflow run score.yml --repo "$REPO" --ref main \
+                  && echo "$(date -u +%H:%M) score dispatched (last run ${age} min ago)"
+              fi
             fi
-            sleep 900
+            sleep 300
           done
           gh workflow run pacemaker.yml --repo "$REPO" --ref main
           echo "Re-dispatched the pacemaker for the next ~5.5 hours."

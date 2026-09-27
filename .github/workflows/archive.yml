@@ -20,6 +20,7 @@ on:
 permissions:
   contents: read
   id-token: write # the archive gateway authenticates this run by its OIDC token
+  actions: write # restart the pacemaker if its chain broke
 
 concurrency:
   group: archive
@@ -64,3 +65,14 @@ jobs:
           for source in $ONLY; do args+=(--only "$source"); done
           if [ "$FORCE" = "true" ]; then args+=(--force); fi
           uv run snorkel archive "${args[@]}"
+
+      - name: Keep the pacemaker running
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          active=$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/pacemaker.yml/runs?per_page=5" \
+            --jq '[.workflow_runs[] | select(.status != "completed")] | length' 2>/dev/null) || active=1
+          if [ "$active" = "0" ]; then
+            gh workflow run pacemaker.yml --repo "$GITHUB_REPOSITORY" --ref main && echo "Pacemaker restarted."
+          fi
