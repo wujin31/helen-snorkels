@@ -1,0 +1,57 @@
+name: Pacemaker
+
+# Bridge until GitHub's scheduler starts firing this repo's cron schedules
+# (for a brand-new repository that can take days). Dispatches the archive
+# every 15 minutes and the scorer hourly during the daylight window, then
+# re-dispatches itself before the 6-hour job limit. It stops by itself once
+# real scheduled runs appear. The archiver's cadence check skips anything
+# already captured, so an overlap with the real schedule is harmless.
+#
+# Start (or restart) it with: Actions -> Pacemaker -> Run workflow.
+on:
+  workflow_dispatch:
+
+permissions:
+  actions: write # dispatch archive/score/pacemaker (allowed with GITHUB_TOKEN)
+
+concurrency:
+  group: pacemaker
+  cancel-in-progress: false
+
+jobs:
+  beat:
+    runs-on: ubuntu-latest
+    timeout-minutes: 350
+    env:
+      GH_TOKEN: ${{ github.token }}
+      REPO: ${{ github.repository }}
+    steps:
+      - name: Dispatch archive and score until the real schedule takes over
+        run: |
+          set -uo pipefail
+          end=$(( $(date +%s) + 330 * 60 ))
+          last_score=0
+          in_window() { # UTC hours the cron schedules cover (~5am-8pm Pacific)
+            local h=$((10#$(date -u +%H)))
+            [ "$h" -ge 12 ] || [ "$h" -le "$1" ]
+          }
+          while [ "$(date +%s)" -lt "$end" ]; do
+            since=$(date -u -d '-90 min' +%Y-%m-%dT%H:%M:%SZ)
+            recent=$(gh api "repos/$REPO/actions/runs?event=schedule&created=%3E%3D$since&per_page=1" --jq .total_count || echo 0)
+            if [ "${recent:-0}" -gt 0 ]; then
+              echo "GitHub's scheduler fired in the last 90 minutes; the pacemaker is no longer needed."
+              echo "Scheduler is live; pacemaker stopped." >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+            fi
+            if in_window 3; then
+              gh workflow run archive.yml --repo "$REPO" --ref main && echo "$(date -u +%H:%M) archive dispatched"
+            fi
+            now=$(date +%s)
+            if in_window 2 && [ $((now - last_score)) -ge 3540 ]; then
+              gh workflow run score.yml --repo "$REPO" --ref main && echo "$(date -u +%H:%M) score dispatched"
+              last_score=$now
+            fi
+            sleep 900
+          done
+          gh workflow run pacemaker.yml --repo "$REPO" --ref main
+          echo "Re-dispatched the pacemaker for the next ~5.5 hours."
