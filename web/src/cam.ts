@@ -79,6 +79,7 @@ export function camSection(cam: CamInfo, now: Date): string {
     <div class="cam-foot">
       <h2 id="cam-title">${esc(cam.title)}</h2>
       <p class="cam-caption">${esc(cam.caption)}</p>
+      ${player ? "" : `<p class="cam-tip">Tip: once it's playing, go full screen and tap Picture in Picture to keep the cam floating over this page.</p>`}
     </div>
   </section>`;
 }
