@@ -16,6 +16,8 @@ uv run snorkel archive --storage local:.archive           # capture everything d
 uv run snorkel archive --storage local:.archive --force --only tides.observed
 uv run snorkel probe cdip.buoy --save-fixture             # hit one live source, save a fixture
 uv run snorkel check-storage --storage local:.archive     # storage round trip
+uv run snorkel score --out web/public/status.json         # fetch, score, write the page's data
+cd web && npm ci && npm test && npm run build             # page (Vite + TS, no framework)
 ```
 
 ## Layout
@@ -25,7 +27,11 @@ uv run snorkel check-storage --storage local:.archive     # storage round trip
 - `src/snorkel/archive.py`: runs due sources and writes to storage + the daily manifest.
 - `src/snorkel/storage.py`: `LocalStorage`, `GatewayStorage` (prod: Supabase edge function authenticated by GitHub Actions OIDC, no secrets) and `S3Storage` (R2 escape hatch).
 - `supabase/migrations/`: swim-log table (RLS) and the private archive bucket. `supabase/functions/archive-gateway/`: the storage gateway. Supabase project ref `dujjlhiytnrtsebxshhw`; see `docs/setup.md`.
-- `.github/workflows/`: `ci.yml`, `archive.yml` (15-min cron), `keepalive.yml`.
+- `src/snorkel/parse/`: pure parsers (raw bytes → `observations.py` models), tested on real fixtures.
+- `src/snorkel/pipeline.py`: gathers fresh `Conditions`; `score/rules.py`: v0 rules; `publish/status.py`: `status.json`.
+- `config/scoring.yaml`: every threshold and heuristic (priors to validate).
+- `web/`: the page. `src/render.ts` renders HTML strings from `status.json`, at build time (answer in first paint) and in the browser.
+- `.github/workflows/`: `ci.yml`, `archive.yml` (15-min cron), `score.yml` (hourly score + history + Pages deploy), `probe.yml` (live probes from `probe/**` branches), `keepalive.yml`.
 
 ## Conventions
 

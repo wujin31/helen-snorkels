@@ -1,0 +1,86 @@
+name: Score
+
+# Hourly across ~5am-7pm Pacific: fetch fresh conditions, score every spot,
+# append the call to the public history (data branch), and redeploy the page
+# with the answer baked into its HTML. :47 lands a fresh call by ~5:50 am PDT.
+on:
+  schedule:
+    - cron: "47 12-23,0-2 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write # history on the data branch
+  pages: write
+  id-token: write
+
+concurrency:
+  group: score
+  cancel-in-progress: false
+
+jobs:
+  score:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    env:
+      SNORKEL_CONTACT: ${{ vars.SNORKEL_CONTACT }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - run: uv sync --locked
+
+      - name: Score
+        run: uv run snorkel score --out web/public/status.json --history history-rows.jsonl
+
+      - name: Append history to the data branch
+        run: |
+          month=$(date -u +%Y-%m)
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git ls-remote --exit-code --heads origin data >/dev/null; then
+            git clone --quiet --depth 1 --branch data "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" data-branch
+          else
+            mkdir data-branch && git -C data-branch init --quiet -b data
+            git -C data-branch remote add origin "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git"
+            printf '# Snorkel Status history\n\nOne JSON row per spot per scoring run (`history/YYYY-MM.jsonl`), and the latest `status.json`. Written by the Score workflow; the future accuracy record.\n' > data-branch/README.md
+          fi
+          mkdir -p data-branch/history
+          cat history-rows.jsonl >> "data-branch/history/$month.jsonl"
+          cp web/public/status.json data-branch/status.json
+          git -C data-branch add -A
+          git -C data-branch commit --quiet -m "History $(date -u +%Y-%m-%dT%H:%MZ)"
+          git -C data-branch push --quiet origin data
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+        working-directory: web
+      - run: npm run build
+        working-directory: web
+
+      - name: Check Pages is enabled
+        id: pages
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh api "repos/${{ github.repository }}/pages" --silent 2>/dev/null; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning::GitHub Pages is off. Settings -> Pages -> Source: GitHub Actions (see docs/setup.md)."
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/upload-pages-artifact@v3
+        if: steps.pages.outputs.enabled == 'true'
+        with:
+          path: web/dist
+      - id: deploy
+        if: steps.pages.outputs.enabled == 'true'
+        uses: actions/deploy-pages@v4

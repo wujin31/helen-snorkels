@@ -226,8 +226,9 @@ def score_spot(
     wq = cond.water_quality.get(spot.id)
     if is_fresh(wq, "water_quality", cfg, now) and wq and wq.value:
         if wq.value.status in ("advisory", "closure"):
-            detail = f" ({wq.value.detail})" if wq.value.detail else ""
-            gates.append(f"County water-quality {wq.value.status}{detail}")
+            what = "closure" if wq.value.status == "closure" else "advisory"
+            where = f" at {wq.value.detail}" if wq.value.detail else ""
+            gates.append(f"County water-quality {what}{where}")
         elif wq.value.status == "open":
             factors.append(Factor(label="Water quality", effect="+", detail="No county advisory"))
         else:
@@ -462,7 +463,7 @@ def _reason(
     if vis:
         parts.append(f"~{vis[0]}–{vis[1]} ft vis")
     if sc.hs_ft is not None:
-        swell = f"{sc.hs_ft:.0f} ft" if sc.hs_ft >= 1 else "<1 ft"
+        swell = "<1 ft" if sc.hs_ft < 1 else f"{sc.hs_ft:.1f}".removesuffix(".0") + " ft"
         direction = compass(sc.swell_dir_deg)
         period = f" at {sc.tp_s:.0f} s" if sc.tp_s else ""
         parts.append(f"{swell} {direction} swell{period}".replace("  ", " "))

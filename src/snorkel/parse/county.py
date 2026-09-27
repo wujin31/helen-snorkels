@@ -11,9 +11,10 @@ from snorkel.observations import WaterQuality
 
 Status = Literal["open", "advisory", "closure", "unknown"]
 
-# PriorityMax on each site: the most severe active event. Confirmed against the
-# page's legend and its advisory/closure counts (see docs/sources.md).
-PRIORITY_STATUS: dict[int, Status] = {0: "open"}
+# PriorityMax on each site is its most severe active event. Decoded from the
+# page's own counts on 2026-09-27 (78 sites at 1, 8 at 2 = "8 advisories",
+# 4 at 4 = "4 closures"); 3 is the page's "warning", treated as an advisory.
+PRIORITY_STATUS: dict[int, Status] = {1: "open", 2: "advisory", 3: "advisory", 4: "closure"}
 
 
 class CountySite(BaseModel):
@@ -58,7 +59,7 @@ def status_for(site_ids: list[str], sites: list[CountySite]) -> WaterQuality:
         current = WaterQuality(
             status=status,
             station=site_id,
-            detail=f"{site.beach} · {site.location}".strip(" ·"),
+            detail=site.location or site.beach,
         )
         if worst is None or order[current.status] > order[worst.status]:
             worst = current

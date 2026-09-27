@@ -23,7 +23,10 @@ def score_all(
     sun_today = sun_times(lat, lon, today)
     sun_tomorrow = sun_times(lat, lon, today + timedelta(days=1))
     statuses = [score_spot(s, cond, cfg, sun_today, sun_tomorrow) for s in spots]
-    return build_status(statuses, cond, cfg, sun_today)
+    # After the last usable light, the page is about tomorrow morning.
+    tail = timedelta(minutes=cfg.preferences.latest_end_before_sunset_min)
+    day_sun = sun_tomorrow if cond.now > sun_today.sunset - tail else sun_today
+    return build_status(statuses, cond, cfg, day_sun)
 
 
 def empty_conditions(now: datetime) -> Conditions:

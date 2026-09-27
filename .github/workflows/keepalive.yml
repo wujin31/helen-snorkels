@@ -18,6 +18,6 @@ jobs:
       - env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          for workflow in archive.yml keepalive.yml; do
+          for workflow in archive.yml score.yml keepalive.yml; do
             gh api -X PUT "repos/${{ github.repository }}/actions/workflows/$workflow/enable"
           done

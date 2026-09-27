@@ -90,3 +90,21 @@ def test_sccoos_pier_latest_good_values() -> None:
 def test_sccoos_rejects_non_csv() -> None:
     with pytest.raises(ValueError):
         sccoos.parse_pier(b"<html>error</html>")
+
+
+def test_county_sites_and_status() -> None:
+    from snorkel.parse import county
+
+    sites = county.parse_sites(read("water_quality.county/sites.json"))
+    assert len(sites) == 90
+    by_id = {s.id: s for s in sites}
+    assert by_id["105"].beach == "La Jolla Cove" and by_id["105"].priority == 1
+    assert by_id["51"].location == "Children's Pool" and by_id["51"].priority == 2
+
+    assert county.status_for(["105"], sites).status == "open"
+    childrens_pool = county.status_for(["105", "51"], sites)
+    assert childrens_pool.status == "advisory"
+    assert childrens_pool.detail == "Children's Pool"
+    assert county.status_for(["110"], sites).status == "closure"
+    with pytest.raises(ValueError, match="not found"):
+        county.status_for(["9999"], sites)

@@ -117,11 +117,11 @@ def test_calm_clean_morning_is_a_yes(cove: SpotConfig, cfg: ScoringConfig) -> No
 
 
 def test_water_quality_advisory_is_a_no(cove: SpotConfig, cfg: ScoringConfig) -> None:
-    wq = {cove.id: ok("wq", WaterQuality(status="advisory", station="EH-010", detail="bacteria"))}
+    wq = {cove.id: ok("wq", WaterQuality(status="advisory", station="105", detail="La Jolla Cove"))}
     status = score(cove, conditions(cove, water_quality=wq), cfg)
     assert status.verdict == "no"
     assert status.confidence == "high"
-    assert status.reason == "County water-quality advisory (bacteria)"
+    assert status.reason == "County water-quality advisory at La Jolla Cove"
     assert status.window is None
 
 
