@@ -1,8 +1,6 @@
 from __future__ import annotations
 
-import base64
 import io
-import json
 from datetime import timedelta
 
 import httpx
@@ -68,33 +66,6 @@ def test_snapshot_strategy(spots: list[SpotConfig], sources: SourcesConfig) -> N
     assert item.meta["frozen"] is False
 
 
-def test_embed_strategy(
-    spots: list[SpotConfig], sources: SourcesConfig, monkeypatch: pytest.MonkeyPatch
-) -> None:
-    stream = "https://live.test/hls/cam.stream/playlist.m3u8?t=abc&e=123"
-    payload = base64.b64encode(json.dumps({"streamSrc": stream, "autoStart": True}).encode())
-
-    def handler(request: httpx.Request) -> httpx.Response:
-        assert request.headers["referer"] == "https://coollab.ucsd.edu/"
-        return httpx.Response(200, content=payload)
-
-    grabbed: list[str] = []
-
-    def fake_ffmpeg(url: str, referer: str | None, timeout_s: float = 45) -> bytes:
-        grabbed.append(url)
-        return jpeg()
-
-    monkeypatch.setattr(cam, "ffmpeg_frame", fake_ffmpeg)
-    [item] = cam.capture(make_ctx(handler, spots, sources, "cam.scripps_pier"))
-    assert isinstance(item, RawSnapshot)
-    assert item.meta["strategy"] == "embed"
-    assert grabbed == [stream]
-
-
-def test_parse_embed_accepts_plain_json() -> None:
-    assert cam.parse_embed('{"streamSrc": "https://x/p.m3u8"}') == "https://x/p.m3u8"
-
-
 def test_hls_strategy_from_page(
     spots: list[SpotConfig], sources: SourcesConfig, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -110,7 +81,7 @@ def test_hls_strategy_from_page(
         return jpeg()
 
     monkeypatch.setattr(cam, "ffmpeg_frame", fake_ffmpeg)
-    ctx = make_ctx(handler, spots, sources, "cam.scripps_pier", embed_url=None)
+    ctx = make_ctx(handler, spots, sources, "cam.scripps_pier")
     [item] = cam.capture(ctx)
     assert isinstance(item, RawSnapshot)
     assert item.meta["strategy"] == "hls"
@@ -127,7 +98,7 @@ def test_all_strategies_failing_is_one_error(
         raise ImportError("playwright")
 
     monkeypatch.setattr(cam, "browser_probe", no_browser)
-    [item] = cam.capture(make_ctx(handler, spots, sources, "cam.scripps_pier", embed_url=None))
+    [item] = cam.capture(make_ctx(handler, spots, sources, "cam.scripps_pier"))
     assert isinstance(item, ItemError)
     assert "playwright not installed" in item.error
 
@@ -139,7 +110,7 @@ def test_browser_screenshot_fallback(
         return httpx.Response(200, text="<html></html>")
 
     monkeypatch.setattr(cam, "browser_probe", lambda page_url, timeout_s=60: ([], jpeg()))
-    [item] = cam.capture(make_ctx(handler, spots, sources, "cam.scripps_pier", embed_url=None))
+    [item] = cam.capture(make_ctx(handler, spots, sources, "cam.scripps_pier"))
     assert isinstance(item, RawSnapshot)
     assert item.meta["strategy"] == "browser-screenshot"
 

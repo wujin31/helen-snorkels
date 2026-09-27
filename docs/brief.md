@@ -192,6 +192,7 @@ Club promos, signup, and donation links mixed into conditions; static per-spot v
 6. **Honest freshness.** "Updated 6:02 · cam live" vs. "Cam offline: estimate from wave + satellite data." Stale data looks stale.
 7. **Fast and installable.** Pre-computed JSON (answer in first paint), PWA / add to home screen, dark mode for dawn, readable in glare, big tap targets.
 8. **Two-tap post-swim log.** Spot (pre-selected), vis slider in ft, 1–5 rating, optional note.
+   *Cut 2026-09-27: no user interaction. Ground truth comes from the pier cam and dive reports.*
 9. **Useful touches.** Wetsuit recommendation from water temp; "around this week" (leopard shark season, bat rays, bloom warning); a one-sentence morning summary.
 10. **Tone.** Calm, oceanic, no marketing, no clutter. Nothing on the page that isn't helping her decide.
 

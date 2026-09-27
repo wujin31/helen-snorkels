@@ -5,8 +5,6 @@
 | Piece | Where | Notes |
 |---|---|---|
 | Supabase project `snorkel-status` | ref `dujjlhiytnrtsebxshhw`, region us-west-1, free tier | Migrations in `supabase/migrations/` are applied |
-| `swim_logs` table | Postgres, row-level security on | Unreadable to clients; written only through `log_swim()` |
-| `log_keys` table | Postgres, RLS on, no policies | bcrypt hashes of private log keys; invisible to clients |
 | `archive` bucket | Supabase Storage, private | Cam frames, raw snapshots, manifests |
 | `archive-gateway` edge function | `https://dujjlhiytnrtsebxshhw.supabase.co/functions/v1/archive-gateway` | Source in `supabase/functions/archive-gateway/` |
 | Archive workflow | `.github/workflows/archive.yml` | Every 15 min in daylight, from `main` |
@@ -56,22 +54,6 @@ blocks in commits authored by the repo owner (see CLAUDE.md).
 Settings → Pages → Build and deployment → Source: **GitHub Actions**. Until
 then the Score workflow still scores and records history, and skips the
 deploy with a warning.
-
-## The swim log
-
-No accounts and no email. A private link, `https://wujin31.github.io/helen-snorkels/#key=…`,
-opened once on her phone stores a long random key in the browser (and strips
-it from the URL). The page then shows **Log a swim**, which calls the
-`log_swim()` Postgres function with that key. The function checks the key
-against a bcrypt hash in `log_keys` and inserts the row; `recent_swims()`
-reads her last few back. Nothing else can read or write `swim_logs`.
-
-- New key (e.g. a lost phone): insert a new row in `log_keys` with
-  `extensions.crypt('<key>', extensions.gen_salt('bf', 10))`, and set
-  `revoked_at` on the old one.
-- Supabase's security advisor flags the two functions as "SECURITY DEFINER
-  callable by anon" and `log_keys` as "RLS with no policies". Both are the
-  design: the functions are the only door, and they check the key.
 
 ## Looking at the archive
 

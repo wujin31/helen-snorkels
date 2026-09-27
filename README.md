@@ -17,7 +17,6 @@ the Scripps Pier underwater cam.
   NWS hazards, rain, waves, wind gates; a visibility estimate from wave
   physics, pier turbidity and chlorophyll; the best window by tide and wind),
   published to GitHub Pages with the answer baked into the HTML.
-- **Swim log:** two taps from her phone via a private link.
 
 ## Develop
 

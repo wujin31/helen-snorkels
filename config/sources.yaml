@@ -93,11 +93,19 @@ sources:
     enabled_env: CAM_CAPTURE_ENABLED   # set the repo variable to "false" to stop capture
     timeout_s: 150
     min_sun_elevation_deg: 2    # underwater at 4 m needs real daylight
-    # The same embed the Shore Stations' own PierViz page uses; returns the stream URL.
-    embed_url: https://portal.hdontap.com/backend/embed/scripps_pier-underwater-CUST?r=aHR0cHM6Ly9jb29sbGFiLnVjc2QuZWR1
-    embed_referer: https://coollab.ucsd.edu/
-    page_url: https://hdontap.com/stream/018408/scripps-pier-underwater-live-webcam/
-    snapshot_url: null          # TODO: a published still, if HDOnTap/Scripps offer one
+    # HDOnTap's public player page (9 KB); its config carries the stream URL.
+    page_url: https://hdontap.com/stream/018408/scripps-pier-underwater-live-webcam/embed/
+    snapshot_url: null          # HDOnTap's ~27 KB thumbnail exists but is too small for the pilings
+    # What the page shows (status.json `cam`):
+    title: Scripps Pier underwater cam
+    caption: Underwater at Scripps Pier, about 1 km up the beach from Marine Room.
+    watch_url: https://hdontap.com/stream/018408/scripps-pier-underwater-live-webcam/
+    info_url: https://coollab.ucsd.edu/pierviz/
+    # An inline player for the page. HDOnTap lets only hdontap.com frame its
+    # player, and Scripps' copy only UCSD sites, so this stays null until
+    # Scripps adds this site (docs/scripps-cam-request.md); then it's
+    # https://portal.hdontap.com/s/embed/?stream=scripps_pier-underwater-CUST
+    site_embed_url: null
     hls_url: null               # optional fixed stream URL; otherwise discovered
     width: 960
     jpeg_quality: 75

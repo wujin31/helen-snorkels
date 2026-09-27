@@ -6,7 +6,7 @@ services on 2026-09-27 with `probe.yml` (branches `probe/discovery-*`).
 
 | Source id | What | Archive cadence | Used by v0 scorer |
 |---|---|---|---|
-| `cam.scripps_pier` | One still from the Scripps Pier underwater cam via the HDOnTap embed endpoint that the Shore Stations' PierViz page uses (`scripps_pier-underwater-CUST`), decoded with ffmpeg; falls back to the public page's HLS URL, then a headless browser | 15 min, sun ≥ 2° | Not yet (Phase 3 CV) |
+| `cam.scripps_pier` | One still from the Scripps Pier underwater cam: the HLS URL in HDOnTap's public player page (`/embed/`), decoded with ffmpeg; falls back to a headless browser | 15 min, sun ≥ 2° | Not yet (Phase 3 CV) |
 | `tides.predictions` | NOAA CO-OPS 9410230, 6-min + highs/lows, MLLW | 6 h | Tide curve, trend, best window |
 | `tides.observed` | CO-OPS water level, water temp, wind, air temp | 1 h | Pier wind (primary), water temp (fallback) |
 | `weather.ndbc_ljpc1` | NDBC LJPC1 (same pier station), trimmed to 6 h | 1 h | Pier wind (fallback) |
@@ -56,8 +56,17 @@ services on 2026-09-27 with `probe.yml` (branches `probe/discovery-*`).
 
 - **Swim Guide:** its JSON API requires authentication; the county is the
   primary source anyway.
-- **HDOnTap thumbnails:** a static `snapshot_…jpg` exists, but its refresh
-  rate is unknown; the embed stream gives a guaranteed-current frame.
+- **HDOnTap thumbnails:** `storage.hdontap.com/wowza_stream_thumbnails/snapshot_hosb6_scripps_pier-underwater.stream_….jpg`
+  refreshes about every minute (`max-age=120`) but is ~27 KB, too small for the
+  pilings.
+- **An inline player on the page:** HDOnTap's players forbid it
+  (probe `probe/embed-check`, 2026-09-27). `hdontap.com/stream/…/embed/` sends
+  `X-Frame-Options: DENY`; `portal.hdontap.com/s/embed/?stream=scripps_pier-underwater-HDOT`
+  allows only `*.hdontap.com`; Scripps' `…-CUST` copy allows only
+  `pierviz.ucsd.edu`, `coollab.ucsd.edu`, `aquarium.ucsd.edu`, `scripps.ucsd.edu`
+  and `deepsea.com`. The page links to the stream instead until Scripps adds
+  this site (`docs/scripps-cam-request.md`). Capture no longer sends a PierViz
+  `Referer`; it reads the public player page like any visitor.
 
 ## Probing
 
