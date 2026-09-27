@@ -11,7 +11,7 @@ from snorkel.features.tides import height_at
 from snorkel.observations import SourceResult, TideExtreme
 from snorkel.score.conditions import Conditions
 from snorkel.score.config import DIFFICULTY_ORDER, ScoringConfig
-from snorkel.score.models import SpotStatus
+from snorkel.score.models import SpotStatus, TimeWindow
 from snorkel.sun import LOCAL_TZ, SunTimes
 from snorkel.units import c_to_f, m_to_ft
 
@@ -19,7 +19,6 @@ DISCLAIMER = (
     "Conditions change quickly. Check with the lifeguards on site, and trust your own read "
     "of surge, currents and wildlife once you're there."
 )
-LIVE_CAM_URL = "https://coollab.ucsd.edu/pierviz/"
 VERDICT_RANK = {"yes": 0, "maybe": 1, "unknown": 2, "no": 3}
 
 SOURCE_LABELS = {
@@ -71,6 +70,28 @@ class DayConditions(BaseModel):
     tide_turns: list[TideTurn] = Field(default_factory=list)
 
 
+class CamReading(BaseModel):
+    """What the pier cam showed at one moment (from the cam model)."""
+
+    time: datetime
+    vis_ft: tuple[int, int] | None = None
+    pilings_visible: int | None = None
+    pilings_total: int | None = None
+
+
+class CamInfo(BaseModel):
+    """The live cam section: where to watch it and when it's worth watching."""
+
+    title: str
+    caption: str
+    watch_url: str
+    info_url: str | None = None
+    embed_url: str | None = None  # set only when the player allows this site to frame it
+    light: list[TimeWindow] = Field(default_factory=list)  # today and tomorrow
+    reading: CamReading | None = None
+    readings_today: list[CamReading] = Field(default_factory=list)
+
+
 class StatusDoc(BaseModel):
     version: int = 1
     generated_at: datetime
@@ -81,7 +102,7 @@ class StatusDoc(BaseModel):
     day: DayConditions
     sources: list[SourceHealth]
     disclaimer: str = DISCLAIMER
-    live_cam_url: str = LIVE_CAM_URL
+    cam: CamInfo | None = None
 
 
 def short_name(name: str) -> str:
@@ -220,6 +241,7 @@ def build_status(
     cond: Conditions,
     cfg: ScoringConfig,
     sun: SunTimes,
+    cam: CamInfo | None = None,
 ) -> StatusDoc:
     best = best_bet(spots, cfg)
     ranked = sorted(
@@ -232,6 +254,7 @@ def build_status(
         spots=ranked,
         day=day_conditions(cond, cfg, sun),
         sources=source_health(cond, cfg),
+        cam=cam,
     )
 
 

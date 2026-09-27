@@ -8,20 +8,17 @@ stops capture without a code change.
 
 Strategies, in order of preference:
 1. `snapshot_url`: a published still, if one exists (lightest on everyone).
-2. Embed: the HDOnTap embed endpoint the Shore Stations' own PierViz page
-   uses returns the current stream URL; ffmpeg decodes a single frame.
-3. HLS: `hls_url`, or an .m3u8 found in the public stream page's HTML.
-4. Browser: headless Chromium loads the public page, watches its network
+2. HLS: `hls_url`, or the .m3u8 in HDOnTap's public player page (`page_url`);
+   ffmpeg decodes a single frame. Requests say who we are and where we came
+   from; nothing pretends to be another site.
+3. Browser: headless Chromium loads the public page, watches its network
    requests for the stream URL (then ffmpeg), or screenshots the <video>.
 """
 
 from __future__ import annotations
 
-import base64
-import binascii
 import html
 import io
-import json
 import re
 import shutil
 import subprocess
@@ -54,16 +51,6 @@ def find_m3u8(page_html: str) -> list[str]:
     text = UNICODE_ESCAPE_RE.sub(lambda m: chr(int(m.group(1), 16)), page_html)
     text = html.unescape(text.replace("\\/", "/"))
     return unique(M3U8_RE.findall(text))
-
-
-def parse_embed(text: str) -> str:
-    """Stream URL from the embed backend's reply (base64-encoded JSON, or plain JSON)."""
-    text = text.strip()
-    try:
-        data = json.loads(base64.b64decode(text + "=" * (-len(text) % 4), validate=True))
-    except (binascii.Error, ValueError):
-        data = json.loads(text)
-    return str(data["streamSrc"])
 
 
 def dhash(gray: Image.Image, size: int = 8) -> str:
@@ -209,22 +196,6 @@ def capture(ctx: FetchContext) -> list[Item]:
             source_url, strategy = snapshot_url, "snapshot"
         except Exception as exc:
             attempts.append(f"snapshot: {describe_error(exc)}")
-
-    embed_url = ctx.params.get("embed_url")
-    if raw is None and embed_url:
-        referer = ctx.params.get("embed_referer")
-        try:
-            response = get_with_retry(
-                ctx.client,
-                embed_url,
-                headers={"Referer": referer} if referer else None,
-                sleep=ctx.sleep,
-            )
-            stream = parse_embed(response.text)
-            raw, source_url = _try_hls([stream], referer, attempts)
-            strategy = "embed" if raw else None
-        except Exception as exc:
-            attempts.append(f"embed: {describe_error(exc)}")
 
     if raw is None:
         candidates: list[str] = [ctx.params["hls_url"]] if ctx.params.get("hls_url") else []
