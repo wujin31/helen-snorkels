@@ -64,8 +64,10 @@ services on 2026-09-27 with `probe.yml` (branches `probe/discovery-*`).
   `X-Frame-Options: DENY`; `portal.hdontap.com/s/embed/?stream=scripps_pier-underwater-HDOT`
   allows only `*.hdontap.com`; Scripps' `…-CUST` copy allows only
   `pierviz.ucsd.edu`, `coollab.ucsd.edu`, `aquarium.ucsd.edu`, `scripps.ucsd.edu`
-  and `deepsea.com`. The page links to the stream instead until Scripps adds
-  this site (`docs/scripps-cam-request.md`). Capture no longer sends a PierViz
+  and `deepsea.com`. Until Scripps adds this site (`docs/scripps-cam-request.md`)
+  the page links to HDOnTap's player-only page, which on a phone plays inline
+  and allows Picture in Picture (probe, 2026-09-27). PierViz's `-CUST` player
+  autoplays muted and inline with no ads, which is what the page gets once allowed. Capture no longer sends a PierViz
   `Referer`; it reads the public player page like any visitor.
 
 ## Probing

@@ -99,12 +99,15 @@ sources:
     # What the page shows (status.json `cam`):
     title: Scripps Pier underwater cam
     caption: Underwater at Scripps Pier, about 1 km up the beach from Marine Room.
-    watch_url: https://hdontap.com/stream/018408/scripps-pier-underwater-live-webcam/
+    # HDOnTap's player-only page: on a phone the video fills the top of the
+    # screen, plays inline and allows Picture in Picture.
+    watch_url: https://hdontap.com/stream/018408/scripps-pier-underwater-live-webcam/embed/
     info_url: https://coollab.ucsd.edu/pierviz/
     # An inline player for the page. HDOnTap lets only hdontap.com frame its
     # player, and Scripps' copy only UCSD sites, so this stays null until
     # Scripps adds this site (docs/scripps-cam-request.md); then it's
-    # https://portal.hdontap.com/s/embed/?stream=scripps_pier-underwater-CUST
+    # https://portal.hdontap.com/s/embed/?stream=scripps_pier-underwater-CUST&ratio=16:9&fluid=t
+    # (what PierViz uses: autoplays muted and inline on phones, no ads).
     site_embed_url: null
     hls_url: null               # optional fixed stream URL; otherwise discovered
     width: 960

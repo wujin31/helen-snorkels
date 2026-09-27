@@ -89,6 +89,7 @@ describe("cam", () => {
     expect(html).toContain("Watch live");
     expect(html).not.toContain("cam-player");
     expect(html).not.toContain("<img");
+    expect(html).toContain("Picture in Picture"); // how to keep it on screen with the page
   });
 
   it("says when a dark cam wakes up", () => {
