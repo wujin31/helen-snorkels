@@ -11,6 +11,7 @@
 | `archive-gateway` edge function | `https://dujjlhiytnrtsebxshhw.supabase.co/functions/v1/archive-gateway` | Source in `supabase/functions/archive-gateway/` |
 | Archive workflow | `.github/workflows/archive.yml` | Every 15 min in daylight, from `main` |
 | Score workflow | `.github/workflows/score.yml` | Hourly: scores, appends history to the `data` branch, deploys the page |
+| Pacemaker | `.github/workflows/pacemaker.yml` | Stopgap that dispatches archive/score until GitHub's cron starts firing for this new repo; stops itself |
 | Page | https://wujin31.github.io/helen-snorkels/ | GitHub Pages, once enabled (below) |
 
 ## How the archiver writes without secrets
@@ -35,6 +36,18 @@ Settings → Secrets and variables → Actions → Variables:
 | `CAM_CAPTURE_ENABLED` | Set to `false` to pause cam capture (e.g. if Scripps asks) |
 | `SNORKEL_CONTACT` | An email for the User-Agent; NWS asks API clients for one |
 | `SNORKEL_STORAGE` | Override storage, e.g. `s3:<bucket>` plus `S3_*` secrets, if we move to R2 |
+
+## If scheduled runs stop
+
+GitHub can take days to start firing cron schedules on a brand-new
+repository, and occasionally pauses them. `pacemaker.yml` bridges the gap: it
+dispatches the archive every 15 min and the scorer hourly in daylight,
+re-dispatches itself every ~5.5 h, and exits once a real scheduled run has
+fired in the last 90 minutes. Restart it any time from Actions → Pacemaker →
+Run workflow.
+
+Schedules run as whoever last edited the cron lines, so change `schedule:`
+blocks in commits authored by the repo owner (see CLAUDE.md).
 
 ## One switch to flip: GitHub Pages
 
