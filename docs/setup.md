@@ -11,7 +11,7 @@
 | `archive-gateway` edge function | `https://dujjlhiytnrtsebxshhw.supabase.co/functions/v1/archive-gateway` | Source in `supabase/functions/archive-gateway/` |
 | Archive workflow | `.github/workflows/archive.yml` | Every 15 min in daylight, from `main` |
 | Score workflow | `.github/workflows/score.yml` | Hourly: scores, appends history to the `data` branch, deploys the page |
-| Pacemaker | `.github/workflows/pacemaker.yml` | Stopgap that dispatches archive/score until GitHub's cron starts firing for this new repo; stops itself |
+| Pacemaker | `.github/workflows/pacemaker.yml` | Always-on chain that dispatches archive/score whenever GitHub's cron leaves a gap (below) |
 | Page | https://wujin31.github.io/helen-snorkels/ | GitHub Pages, once enabled (below) |
 
 ## How the archiver writes without secrets
@@ -39,12 +39,14 @@ Settings → Secrets and variables → Actions → Variables:
 
 ## If scheduled runs stop
 
-GitHub can take days to start firing cron schedules on a brand-new
-repository, and occasionally pauses them. `pacemaker.yml` bridges the gap: it
-dispatches the archive every 15 min and the scorer hourly in daylight,
-re-dispatches itself every ~5.5 h, and exits once a real scheduled run has
-fired in the last 90 minutes. Restart it any time from Actions → Pacemaker →
-Run workflow.
+GitHub's cron schedules on this repository fire late, in bursts, or not at
+all for hours. `pacemaker.yml` covers the gaps: it runs around the clock as a
+chain (re-dispatching itself every ~5.5 h), and every 5 minutes it dispatches
+Archive if its last run is 14+ minutes old and Score if its last run is 58+
+minutes old, within their daylight windows. When the scheduler is healthy it
+finds nothing overdue. Archive and Score restart the pacemaker at the end of
+every run if its chain ever broke, so the two keep each other going. Start it
+by hand any time from Actions → Pacemaker → Run workflow.
 
 Schedules run as whoever last edited the cron lines, so change `schedule:`
 blocks in commits authored by the repo owner (see CLAUDE.md).

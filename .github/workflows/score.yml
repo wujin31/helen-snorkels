@@ -12,6 +12,7 @@ permissions:
   contents: write # history on the data branch
   pages: write
   id-token: write
+  actions: write # restart the pacemaker if its chain broke
 
 concurrency:
   group: score
@@ -87,3 +88,14 @@ jobs:
       - id: deploy
         if: steps.pages.outputs.enabled == 'true'
         uses: actions/deploy-pages@v4
+
+      - name: Keep the pacemaker running
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          active=$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/pacemaker.yml/runs?per_page=5" \
+            --jq '[.workflow_runs[] | select(.status != "completed")] | length' 2>/dev/null) || active=1
+          if [ "$active" = "0" ]; then
+            gh workflow run pacemaker.yml --repo "$GITHUB_REPOSITORY" --ref main && echo "Pacemaker restarted."
+          fi
