@@ -26,6 +26,9 @@ jobs:
       url: ${{ steps.deploy.outputs.page_url }}
     env:
       SNORKEL_CONTACT: ${{ vars.SNORKEL_CONTACT }}
+      # The archive, for falling back to the archiver's latest CDIP snapshots
+      # when CDIP refuses this runner (authenticated by the run's OIDC token).
+      SNORKEL_STORAGE: ${{ vars.SNORKEL_STORAGE || 'gateway:https://dujjlhiytnrtsebxshhw.supabase.co/functions/v1/archive-gateway' }}
     steps:
       - uses: actions/checkout@v4
 
