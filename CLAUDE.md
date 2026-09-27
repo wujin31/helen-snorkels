@@ -29,9 +29,10 @@ cd web && npm ci && npm test && npm run build             # page (Vite + TS, no 
 - `supabase/migrations/`: the private archive bucket (the swim log was cut in `0004`). `supabase/functions/archive-gateway/`: the storage gateway. Supabase project ref `dujjlhiytnrtsebxshhw`; see `docs/setup.md`.
 - `src/snorkel/parse/`: pure parsers (raw bytes → `observations.py` models), tested on real fixtures.
 - `src/snorkel/pipeline.py`: gathers fresh `Conditions`; `score/rules.py`: v0 rules; `publish/status.py`: `status.json`.
+- `src/snorkel/cv/`: the pier-cam model. `pier_cam.py` finds the pilings (dark column bands, nearest = widest) and reads visibility from their contrast; `store.py` runs it against the private archive. Settings in `config/cam_model.yaml`. Frames never leave the archive: no frame, crop or per-frame reading in git, logs or probe output; tests use synthetic frames.
 - `config/scoring.yaml`: every threshold and heuristic (priors to validate).
 - `web/`: the page. `src/render.ts` renders HTML strings from `status.json`, at build time (answer in first paint) and in the browser: verdict, then the live cam (`src/cam.ts`), then details.
-- `.github/workflows/`: `ci.yml`, `archive.yml` (15-min cron), `score.yml` (hourly score + history + Pages deploy), `probe.yml` (live probes from `probe/**` branches), `keepalive.yml`.
+- `.github/workflows/`: `ci.yml`, `archive.yml` (15-min cron), `score.yml` (hourly score + history + Pages deploy), `pacemaker.yml` (fills cron gaps), `cam-calibrate.yml` (manual), `probe.yml` (live probes from `probe/**` branches), `keepalive.yml`.
 
 ## Conventions
 

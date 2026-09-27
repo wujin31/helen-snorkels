@@ -17,6 +17,9 @@ the Scripps Pier underwater cam.
   NWS hazards, rain, waves, wind gates; a visibility estimate from wave
   physics, pier turbidity and chlorophyll; the best window by tide and wind),
   published to GitHub Pages with the answer baked into the HTML.
+- **Cam model** (with each score): finds the pier pilings in the archived
+  frames on its own and reads visibility from how many still stand out. Kept
+  private until the Shore Stations team OKs showing it.
 
 ## Develop
 

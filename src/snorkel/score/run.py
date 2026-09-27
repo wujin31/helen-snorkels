@@ -4,8 +4,9 @@ from __future__ import annotations
 
 from datetime import date, datetime, timedelta
 
+from snorkel.cv.pier_cam import FrameReading
 from snorkel.models import SourcesConfig, SpotConfig
-from snorkel.publish.status import CamInfo, StatusDoc, build_status
+from snorkel.publish.status import CamInfo, CamReading, StatusDoc, build_status
 from snorkel.score.conditions import Conditions
 from snorkel.score.config import ScoringConfig
 from snorkel.score.models import TimeWindow
@@ -20,7 +21,10 @@ def score_all(
     spots: list[SpotConfig],
     sources: SourcesConfig,
     cfg: ScoringConfig,
+    cam_readings: list[FrameReading] | None = None,
 ) -> StatusDoc:
+    """Score every spot. `cam_readings` are published only when passed in, which
+    the CLI does only once the cam model's `publish` flag is on."""
     today = cond.now.astimezone(LOCAL_TZ).date()
     lat, lon = sources.location.lat, sources.location.lon
     sun_today = sun_times(lat, lon, today)
@@ -29,7 +33,29 @@ def score_all(
     # After the last usable light, the page is about tomorrow morning.
     tail = timedelta(minutes=cfg.preferences.latest_end_before_sunset_min)
     day_sun = sun_tomorrow if cond.now > sun_today.sunset - tail else sun_today
-    return build_status(statuses, cond, cfg, day_sun, cam=cam_info(sources, today))
+    cam = cam_info(sources, today)
+    if cam is not None and cam_readings:
+        cam.readings_today = [
+            r for r in map(public_reading, cam_readings) if r and _local_day(r.time) == today
+        ]
+        cam.reading = cam.readings_today[-1] if cam.readings_today else None
+    return build_status(statuses, cond, cfg, day_sun, cam=cam)
+
+
+def _local_day(t: datetime) -> date:
+    return t.astimezone(LOCAL_TZ).date()
+
+
+def public_reading(reading: FrameReading) -> CamReading | None:
+    """What the page may show of a reading: the bracket, never the raw measurements."""
+    if reading.qc or reading.vis_ft is None:
+        return None
+    return CamReading(
+        time=reading.time,
+        vis_ft=reading.vis_ft,
+        pilings_visible=reading.pilings_visible,
+        pilings_total=reading.pilings_total,
+    )
 
 
 def cam_info(sources: SourcesConfig, today: date) -> CamInfo | None:

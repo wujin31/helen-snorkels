@@ -6,7 +6,7 @@ import os
 from collections import Counter
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Annotated
+from typing import TYPE_CHECKING, Annotated
 
 import typer
 
@@ -16,7 +16,10 @@ from snorkel.fetch import SOURCES
 from snorkel.fetch.base import FetchContext, ItemError, SkipSource
 from snorkel.http import make_client
 from snorkel.models import CaptureRecord
-from snorkel.storage import storage_from_spec
+from snorkel.storage import Storage, storage_from_spec
+
+if TYPE_CHECKING:
+    from snorkel.cv.pier_cam import FrameReading
 
 app = typer.Typer(no_args_is_help=True, add_completion=False)
 
@@ -170,7 +173,8 @@ def score(
             print(f"archive fallback unavailable: {exc}")
     with make_client() as client:
         cond = gather(client, when, spots, sources, storage=archive)
-    doc = score_all(cond, spots, sources, cfg)
+    cam_readings = _cam_model(archive, when) if archive is not None else None
+    doc = score_all(cond, spots, sources, cfg, cam_readings=cam_readings)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(doc.model_dump_json(indent=1))
     print(doc.summary)
@@ -184,6 +188,59 @@ def score(
         with history.open("a") as fh:
             for row in history_rows(doc):
                 fh.write(json.dumps(row) + "\n")
+
+
+def _cam_model(archive: Storage, when: datetime) -> list[FrameReading] | None:
+    """Read new cam frames into the private log. Returns readings to publish, if allowed.
+
+    Job logs are public, so this prints why there's no reading, never a reading.
+    """
+    from datetime import timedelta
+
+    from snorkel.cv.pier_cam import load_cam_model
+    from snorkel.cv.store import catch_up, read_logged
+
+    try:
+        cam_cfg = load_cam_model()
+        latest = catch_up(archive, cam_cfg, when)
+    except Exception as exc:  # the cam model must never block scoring
+        print(f"cam model unavailable: {type(exc).__name__}: {exc}")
+        return None
+    if latest is None:
+        print("cam model: no fresh frame")
+    else:
+        print(f"cam model: {latest.qc or 'read the latest frame'} (private)")
+    if not cam_cfg.publish:
+        return None
+    day = when.date()
+    return read_logged(archive, day - timedelta(days=1)) + read_logged(archive, day)
+
+
+@app.command("cam-calibrate")
+def cam_calibrate(
+    storage: Annotated[
+        str | None, typer.Option(help="gateway:<url> or local:<dir>. Default: $SNORKEL_STORAGE")
+    ] = None,
+) -> None:
+    """Find the pier-cam pilings in recent archived frames. Prints geometry only."""
+    from snorkel.cv.pier_cam import load_cam_model
+    from snorkel.cv.store import calibration_candidates, frame_records, recalibrate
+
+    target = storage_from_spec(storage)
+    cfg = load_cam_model()
+    now = datetime.now(UTC)
+    records = frame_records(target, now, days=cfg.calibration.days)
+    usable = calibration_candidates(records, cfg)
+    print(
+        f"{len(records)} archived frames in {cfg.calibration.days + 1} days; {len(usable)} usable"
+    )
+    rois = recalibrate(target, cfg, now)
+    if rois is None:
+        print("nothing to calibrate from")
+        raise typer.Exit(1)
+    print(f"{len(rois.pilings)} pilings found in the {rois.frames} clearest frames")
+    for p in rois.pilings:
+        print(f"  {p.distance_ft:>3.0f} ft: columns {p.piling.x0:.3f}-{p.piling.x1:.3f}")
 
 
 @app.command("discover-mops")
