@@ -12,7 +12,12 @@ from datetime import UTC, date, datetime, time, timedelta
 from typing import Literal
 
 from snorkel.features.tides import height_at, trend_at
-from snorkel.features.waves import bottom_orbital_velocity, decayed_mean, exposure_weight
+from snorkel.features.waves import (
+    bottom_orbital_velocity,
+    decayed_mean,
+    exposure_weight,
+    spectral_orbital_velocity,
+)
 from snorkel.models import SpotConfig
 from snorkel.observations import (
     Alert,
@@ -298,9 +303,18 @@ def score_spot(
                     o.dp_deg, spot.exposure_deg.exposed, spot.exposure_deg.sheltered
                 )
             )
-            ub = bottom_orbital_velocity(
-                o.hs_m * weight, o.tp_s or DEFAULT_TP_S, spot.bottom_depth_m
-            )
+            if o.energy_m2_hz and waves.freqs_hz and waves.bandwidths_hz:
+                # Full spectrum: each band reaches the bottom by its own amount.
+                ub = spectral_orbital_velocity(
+                    [e * weight**2 for e in o.energy_m2_hz],
+                    waves.freqs_hz,
+                    waves.bandwidths_hz,
+                    spot.bottom_depth_m,
+                )
+            else:
+                ub = bottom_orbital_velocity(
+                    o.hs_m * weight, o.tp_s or DEFAULT_TP_S, spot.bottom_depth_m
+                )
             samples.append((o.time, ub))
         orbital = decayed_mean(samples, now, cfg.visibility.half_life_h)
         sc.orbital_ms = round(orbital, 3) if orbital is not None else None
