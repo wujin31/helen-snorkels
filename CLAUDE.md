@@ -44,3 +44,4 @@ cd web && npm ci && npm test && npm run build             # page (Vite + TS, no 
 - **Never say "safe"** in user-facing copy. Say "conditions look good" and keep the short lifeguard note.
 - **Nothing private in git:** no frames, raw snapshots, swim logs, or secrets. The repo is public.
 - Every threshold and heuristic is a *prior to validate*; keep them in config, not code.
+- **Cron lines must be committed as the repo owner.** GitHub runs a schedule as whoever last edited its cron syntax; a commit authored by an account without access to this repo (e.g. a local `git commit` from a Claude session) leaves the schedule silently never firing. Change `schedule:` blocks through the GitHub API/MCP (commits authored as `wujin31`), not local commits.
