@@ -1,0 +1,54 @@
+# Spot registry. Schema: docs/brief.md §4, validated by snorkel.models.SpotConfig.
+# Every number here is a prior to be validated against her logs and the archive.
+# `null` IDs are still to be looked up (see docs/sources.md); fetchers skip them.
+
+- id: la-jolla-cove
+  name: La Jolla Cove
+  lat: 32.8506
+  lon: -117.2713
+  tier: 1
+  difficulty: easy
+  access: shore
+  bottom_depth_m: 5
+  shore_normal_deg: 10          # the cove opens roughly north
+  cdip_mop_id: null             # TODO: nearest MOP alongshore point (D0xxx)
+  cdip_buoy: "201"              # Scripps Nearshore
+  tide_station: "9410230"       # NOAA CO-OPS La Jolla (Scripps Pier)
+  water_quality_ids: []         # TODO: sdbeachinfo / Swim Guide station(s)
+  exposure_deg:
+    exposed: [250, 330]
+    sheltered: [150, 230]
+  thresholds: { max_hs_ft: 2.5, max_wind_kt: 10 }
+  tide_rules: { prefer: incoming }
+  min_tide_ft: null
+  seasonal_closures: []
+  cam: null
+  notes: >-
+    Rocky reef and kelp; easiest access. Exposed to W/NW swell, protected from
+    south swell. Frequent bacteria advisories (sea lions, birds). Best mornings,
+    incoming tide.
+
+- id: marine-room
+  name: Marine Room / La Jolla Shores
+  lat: 32.8532                  # approx. reef off the Marine Room; verify
+  lon: -117.2598
+  tier: 1
+  difficulty: moderate          # Shores all levels; Marine Room reef advanced
+  access: shore
+  bottom_depth_m: 4
+  shore_normal_deg: 280         # beach faces roughly west-northwest
+  cdip_mop_id: null             # TODO
+  cdip_buoy: "201"
+  tide_station: "9410230"
+  water_quality_ids: []         # TODO
+  exposure_deg:
+    exposed: [190, 290]         # prior: surge on south swell
+    sheltered: [300, 340]
+  thresholds: { max_hs_ft: 2.5, max_wind_kt: 10 }
+  tide_rules: { prefer: incoming }
+  min_tide_ft: 1.0              # prior: low tide limits entry and depth
+  seasonal_closures: []
+  cam: scripps_pier_underwater
+  notes: >-
+    Sand flats to rocky reef. Leopard sharks in summer and fall. Surge on south
+    swell. The Scripps Pier underwater cam is about 1 km north.

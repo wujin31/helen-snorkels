@@ -1,0 +1,105 @@
+# Archiver sources: how often each one is captured, and its parameters.
+#
+# The archive workflow wakes every 15 min in daylight; a source runs when at
+# least `every_minutes` have passed since its last successful capture (read
+# from the day's manifest), so delayed or skipped cron runs self-correct.
+# Cadences are deliberately polite. Nothing here hits a source more than once
+# per 15 minutes.
+#
+# Values marked TODO are unknown until probed against the live services; a
+# source with a missing required parameter is recorded as "skipped".
+
+location:                       # sun-elevation gate reference (Scripps Pier)
+  lat: 32.8666
+  lon: -117.2571
+
+sources:
+  tides.predictions:
+    every_minutes: 360
+    days_back: 1
+    days_ahead: 3
+
+  tides.observed:               # water level, water temp and wind at 9410230
+    every_minutes: 60
+    hours: 6
+
+  weather.ndbc_ljpc1:           # same station as 9410230, NDBC's copy
+    every_minutes: 60
+    url: https://www.ndbc.noaa.gov/data/realtime2/LJPC1.txt
+    keep_hours: 6               # the file holds 45 days; keep only recent rows
+
+  weather.openmeteo_forecast:
+    every_minutes: 60
+    url: https://api.open-meteo.com/v1/forecast
+    past_days: 3
+    forecast_days: 3
+
+  weather.openmeteo_marine:
+    every_minutes: 60
+    url: https://marine-api.open-meteo.com/v1/marine
+    past_days: 3
+    forecast_days: 3
+
+  weather.nws_grid:             # hourly forecast grid incl. precipitation
+    every_minutes: 180
+    points:                     # NWS /points rejects ocean points, so use land
+      - [32.8420, -117.2650]    # La Jolla village
+
+  weather.nws_alerts:           # high surf / beach hazards / rip current statements
+    every_minutes: 60
+    points:
+      - [32.8420, -117.2650]    # land zone (beach hazards, high surf)
+      - [32.8506, -117.2713]    # nearshore marine zone
+
+  cdip.buoy:                    # realtime spectra + SST, OPeNDAP subset
+    every_minutes: 30
+    dods: https://thredds.cdip.ucsd.edu/thredds/dodsC
+    hours: 3
+
+  cdip.mop_nowcast:             # MOP alongshore nowcast incl. spectra, OPeNDAP subset
+    every_minutes: 60
+    dods: https://thredds.cdip.ucsd.edu/thredds/dodsC
+    mop_path: cdip/model/MOP_alongshore
+    hours: 3
+
+  cdip.mop_forecast:            # whole forecast file, as issued
+    every_minutes: 720
+    fileserver: https://thredds.cdip.ucsd.edu/thredds/fileServer
+    mop_path: cdip/model/MOP_alongshore
+
+  sccoos.pier:
+    every_minutes: 30
+    erddap: https://erddap.cencoos.org/erddap
+    dataset: scripps-pier-automated-shore-sta-1
+    hours: 2
+
+  sccoos.habs:
+    every_minutes: 1440
+    url: https://habs.sccoos.org/scripps-pier
+
+  water_quality.sdbeachinfo:
+    every_minutes: 60
+    urls:                       # TODO: replace with the station/API endpoint once probed
+      - https://www.sdbeachinfo.com/
+
+  water_quality.swimguide:
+    every_minutes: 360
+    urls:
+      - https://www.theswimguide.org/beach/1986   # La Jolla Cove
+
+  coastwatch.viirs:
+    every_minutes: 1440
+    erddap: https://coastwatch.noaa.gov/erddap
+    datasets: []                # TODO: e.g. [{id: noaacwNPPVIIRSkd490Sector??Daily, var: kd_490}]
+    box_deg: 0.05               # half-width of the box sampled around each spot
+
+  cam.scripps_pier:
+    every_minutes: 15
+    enabled_env: CAM_CAPTURE_ENABLED   # set the repo variable to "false" to stop capture
+    timeout_s: 150
+    min_sun_elevation_deg: 2    # underwater at 4 m needs real daylight
+    page_url: https://hdontap.com/stream/018408/scripps-pier-underwater-live-webcam/
+    snapshot_url: null          # TODO: a published still, if HDOnTap/Scripps offer one
+    hls_url: null               # optional fixed stream URL; otherwise discovered
+    width: 960
+    jpeg_quality: 75

@@ -1,0 +1,23 @@
+name: Keepalive
+
+# GitHub disables scheduled workflows in a public repo after 60 days without
+# repository activity. Re-enabling them monthly keeps the archiver running
+# through quiet stretches.
+on:
+  schedule:
+    - cron: "17 9 1 * *"
+  workflow_dispatch:
+
+permissions:
+  actions: write
+
+jobs:
+  keepalive:
+    runs-on: ubuntu-latest
+    steps:
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for workflow in archive.yml keepalive.yml; do
+            gh api -X PUT "repos/${{ github.repository }}/actions/workflows/$workflow/enable"
+          done

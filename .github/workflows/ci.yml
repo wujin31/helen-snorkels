@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  python:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - run: uv sync --locked
+      - run: uv run ruff check
+      - run: uv run ruff format --check
+      - run: uv run pyright
+      - run: uv run pytest
+
+  gateway:
+    # Real round trip through the archive gateway using this run's OIDC token,
+    # plus checks that it refuses anonymous and wrong-audience requests.
+    # Fork PRs can't mint OIDC tokens, so this only runs on pushes.
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      GATEWAY: https://dujjlhiytnrtsebxshhw.supabase.co/functions/v1/archive-gateway
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - run: uv sync --locked
+      - name: Round trip
+        run: uv run snorkel check-storage --storage "gateway:$GATEWAY"
+      - name: Refuses anonymous writes
+        run: |
+          code=$(curl -s -o /dev/null -w '%{http_code}' -X PUT "$GATEWAY/object/state/healthcheck/anon.txt" -d x)
+          echo "anonymous PUT -> $code"
+          test "$code" = 401
+      - name: Refuses tokens minted for another audience
+        run: |
+          token=$(curl -sf -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+            "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=someone-else" | jq -r .value)
+          code=$(curl -s -o /dev/null -w '%{http_code}' -X PUT \
+            -H "Authorization: Bearer $token" "$GATEWAY/object/state/healthcheck/wrong-aud.txt" -d x)
+          echo "wrong-audience PUT -> $code"
+          test "$code" = 401
