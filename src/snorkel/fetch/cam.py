@@ -9,8 +9,10 @@ stops capture without a code change.
 Strategies, in order of preference:
 1. `snapshot_url`: a published still, if one exists (lightest on everyone).
 2. HLS: `hls_url`, or the .m3u8 in HDOnTap's public player page (`page_url`);
-   ffmpeg decodes a single frame. Requests say who we are and where we came
-   from; nothing pretends to be another site.
+   ffmpeg decodes a few frames from the segment it downloads anyway (no extra
+   requests). Their median is the archived still, free of passing fish and
+   particles, and the change between them measures surge. Requests say who
+   we are and where we came from; nothing pretends to be another site.
 3. Browser: headless Chromium loads the public page, watches its network
    requests for the stream URL (then ffmpeg), or screenshots the <video>.
 """
@@ -22,9 +24,12 @@ import io
 import re
 import shutil
 import subprocess
+import tempfile
 from datetime import timedelta
+from pathlib import Path
 from typing import Any
 
+import numpy as np
 from PIL import Image, ImageStat
 
 from snorkel.fetch.base import (
@@ -41,6 +46,9 @@ from snorkel.sun import sun_elevation
 M3U8_RE = re.compile(r"""https?://[^\s"'<>\\]+?\.m3u8[^\s"'<>\\]*""")
 FROZEN_MAX_BITS = 2  # dHash distance at or below which two frames count as identical
 FROZEN_WINDOW = timedelta(minutes=60)
+# Mean absolute change (0-255 grey levels) between consecutive frames below
+# which a clip counts as frozen. Live water always has particles and noise.
+FROZEN_MOTION = 0.05
 
 
 UNICODE_ESCAPE_RE = re.compile(r"\\u([0-9a-fA-F]{4})")
@@ -90,38 +98,74 @@ def process_frame(raw: bytes, width: int, quality: int) -> tuple[bytes, dict[str
     return out.getvalue(), meta
 
 
-def ffmpeg_frame(url: str, referer: str | None, timeout_s: float = 45) -> bytes:
+def _fit(image: Image.Image, width: int) -> Image.Image:
+    image = image.convert("RGB")
+    if image.width > width:
+        height = round(image.height * width / image.width)
+        image = image.resize((width, height), Image.Resampling.LANCZOS)
+    return image
+
+
+def process_frames(raws: list[bytes], width: int, quality: int) -> tuple[bytes, dict[str, Any]]:
+    """Median of a short clip as one JPEG, plus QC stats and clip motion.
+
+    One frame behaves like `process_frame` (motion unknown).
+    """
+    if len(raws) == 1:
+        jpeg, meta = process_frame(raws[0], width, quality)
+        return jpeg, {**meta, "n_frames": 1, "motion": None}
+    frames = [_fit(Image.open(io.BytesIO(raw)), width) for raw in raws]
+    size = frames[0].size
+    frames = [f if f.size == size else f.resize(size) for f in frames]
+    stack = np.stack([np.asarray(f, dtype=np.uint8) for f in frames])
+    median = Image.fromarray(np.median(stack, axis=0).round().astype(np.uint8), "RGB")
+    grays = np.stack([np.asarray(f.convert("L"), dtype=np.float32) for f in frames])
+    motion = float(np.abs(np.diff(grays, axis=0)).mean())
+    jpeg, meta = process_frame(_encode(median), width, quality)
+    return jpeg, {**meta, "n_frames": len(frames), "motion": round(motion, 3)}
+
+
+def _encode(image: Image.Image) -> bytes:
+    out = io.BytesIO()
+    image.save(out, "PNG")
+    return out.getvalue()
+
+
+def ffmpeg_frames(
+    url: str, referer: str | None, count: int = 8, fps: float = 2, timeout_s: float = 45
+) -> list[bytes]:
+    """Decode `count` frames at `fps` from the live edge of an HLS stream."""
     exe = shutil.which("ffmpeg")
     if not exe:
         raise RuntimeError("ffmpeg not installed")
     headers = f"User-Agent: {user_agent()}\r\n"
     if referer:
         headers += f"Referer: {referer}\r\n"
-    cmd = [
-        exe,
-        "-hide_banner",
-        "-loglevel",
-        "error",
-        "-nostdin",
-        "-headers",
-        headers,
-        "-i",
-        url,
-        "-frames:v",
-        "1",
-        "-f",
-        "image2",
-        "-c:v",
-        "mjpeg",
-        "-q:v",
-        "2",
-        "pipe:1",
-    ]
-    proc = subprocess.run(cmd, capture_output=True, timeout=timeout_s, check=False)
-    if proc.returncode != 0 or not proc.stdout:
+    with tempfile.TemporaryDirectory() as tmp:
+        cmd = [
+            exe,
+            "-hide_banner",
+            "-loglevel",
+            "error",
+            "-nostdin",
+            "-headers",
+            headers,
+            "-i",
+            url,
+            "-vf",
+            f"fps={fps}",
+            "-frames:v",
+            str(count),
+            "-q:v",
+            "2",
+            str(Path(tmp) / "f%02d.jpg"),
+        ]
+        proc = subprocess.run(cmd, capture_output=True, timeout=timeout_s, check=False)
+        frames = [p.read_bytes() for p in sorted(Path(tmp).glob("f*.jpg"))]
+    if proc.returncode != 0 or not frames:
         stderr = proc.stderr.decode(errors="replace").strip()[-300:]
         raise RuntimeError(f"ffmpeg exit {proc.returncode}: {stderr}")
-    return proc.stdout
+    return frames
 
 
 def browser_probe(page_url: str, timeout_s: float = 60) -> tuple[list[str], bytes | None]:
@@ -161,11 +205,11 @@ def browser_probe(page_url: str, timeout_s: float = 60) -> tuple[list[str], byte
 
 
 def _try_hls(
-    candidates: list[str], referer: str | None, attempts: list[str]
-) -> tuple[bytes | None, str | None]:
+    candidates: list[str], referer: str | None, attempts: list[str], count: int
+) -> tuple[list[bytes] | None, str | None]:
     for url in candidates:
         try:
-            return ffmpeg_frame(url, referer), url
+            return ffmpeg_frames(url, referer, count=count), url
         except Exception as exc:
             attempts.append(f"hls {url[:80]}: {describe_error(exc)}")
     return None, None
@@ -183,21 +227,22 @@ def _last_hash(ctx: FetchContext) -> str | None:
 def capture(ctx: FetchContext) -> list[Item]:
     width = int(ctx.params.get("width", 960))
     quality = int(ctx.params.get("jpeg_quality", 75))
+    count = int(ctx.params.get("clip_frames", 8))
     page_url: str | None = ctx.params.get("page_url")
     attempts: list[str] = []
-    raw: bytes | None = None
+    raws: list[bytes] | None = None
     source_url: str | None = None
     strategy: str | None = None
 
     snapshot_url = ctx.params.get("snapshot_url")
     if snapshot_url:
         try:
-            raw = get_with_retry(ctx.client, snapshot_url, sleep=ctx.sleep).content
+            raws = [get_with_retry(ctx.client, snapshot_url, sleep=ctx.sleep).content]
             source_url, strategy = snapshot_url, "snapshot"
         except Exception as exc:
             attempts.append(f"snapshot: {describe_error(exc)}")
 
-    if raw is None:
+    if raws is None:
         candidates: list[str] = [ctx.params["hls_url"]] if ctx.params.get("hls_url") else []
         if not candidates and page_url:
             try:
@@ -205,17 +250,17 @@ def capture(ctx: FetchContext) -> list[Item]:
                 candidates = find_m3u8(page.text)
             except Exception as exc:
                 attempts.append(f"page: {describe_error(exc)}")
-        raw, source_url = _try_hls(candidates, page_url, attempts)
-        strategy = "hls" if raw else None
+        raws, source_url = _try_hls(candidates, page_url, attempts, count)
+        strategy = "hls" if raws else None
 
-    if raw is None and page_url:
+    if raws is None and page_url:
         try:
             streams, screenshot = browser_probe(page_url)
-            raw, source_url = _try_hls(streams, page_url, attempts)
-            if raw is not None:
+            raws, source_url = _try_hls(streams, page_url, attempts, count)
+            if raws is not None:
                 strategy = "browser-hls"
             elif screenshot is not None:
-                raw, source_url, strategy = screenshot, page_url, "browser-screenshot"
+                raws, source_url, strategy = [screenshot], page_url, "browser-screenshot"
             else:
                 attempts.append("browser: no stream request or <video> found")
         except ImportError:
@@ -223,19 +268,23 @@ def capture(ctx: FetchContext) -> list[Item]:
         except Exception as exc:
             attempts.append(f"browser: {describe_error(exc)}")
 
-    if raw is None:
+    if raws is None:
         return [ItemError(error="; ".join(attempts) or "no capture strategy", url=page_url)]
 
     try:
-        jpeg, meta = process_frame(raw, width, quality)
+        jpeg, meta = process_frames(raws, width, quality)
     except Exception as exc:
         return [ItemError(error=f"not an image: {describe_error(exc)}", url=source_url)]
 
     previous_hash = _last_hash(ctx)
+    same = previous_hash is not None and hamming(previous_hash, meta["dhash"]) <= FROZEN_MAX_BITS
+    motion = meta.get("motion")
     meta.update(
         strategy=strategy,
         sun_elevation=round(sun_elevation(ctx.location.lat, ctx.location.lon, ctx.now), 1),
-        frozen=previous_hash is not None
-        and hamming(previous_hash, meta["dhash"]) <= FROZEN_MAX_BITS,
+        same_as_previous=same,
+        # A clip that doesn't move is a stuck stream. A single still can only be
+        # compared with the last one, which murky, featureless water also matches.
+        frozen=motion < FROZEN_MOTION if motion is not None else same,
     )
     return [RawSnapshot(content=jpeg, ext="jpg", url=source_url or "", meta=meta)]

@@ -4,6 +4,7 @@ import io
 from datetime import timedelta
 
 import httpx
+import numpy as np
 import pytest
 from PIL import Image
 
@@ -74,18 +75,50 @@ def test_hls_strategy_from_page(
     def handler(request: httpx.Request) -> httpx.Response:
         return httpx.Response(200, text=f'<video src="{stream}"></video>')
 
-    grabbed: list[tuple[str, str | None]] = []
+    grabbed: list[tuple[str, str | None, int]] = []
 
-    def fake_ffmpeg(url: str, referer: str | None, timeout_s: float = 45) -> bytes:
-        grabbed.append((url, referer))
-        return jpeg()
+    def fake_ffmpeg(
+        url: str, referer: str | None, count: int = 8, fps: float = 2, timeout_s: float = 45
+    ) -> list[bytes]:
+        grabbed.append((url, referer, count))
+        return [jpeg(color=(40, 120 + i, 160)) for i in range(count)]
 
-    monkeypatch.setattr(cam, "ffmpeg_frame", fake_ffmpeg)
+    monkeypatch.setattr(cam, "ffmpeg_frames", fake_ffmpeg)
     ctx = make_ctx(handler, spots, sources, "cam.scripps_pier")
     [item] = cam.capture(ctx)
     assert isinstance(item, RawSnapshot)
     assert item.meta["strategy"] == "hls"
-    assert grabbed == [(stream, sources.sources["cam.scripps_pier"]["page_url"])]
+    assert item.meta["n_frames"] == 8
+    assert item.meta["motion"] > 0 and item.meta["frozen"] is False
+    assert grabbed == [(stream, sources.sources["cam.scripps_pier"]["page_url"], 8)]
+
+
+def test_clip_median_drops_passing_things() -> None:
+    base = Image.new("RGB", (320, 180), (30, 90, 110))
+    frames = []
+    for i in range(5):
+        frame = base.copy()
+        frame.paste((250, 250, 250), (20 + 60 * i, 60, 60 + 60 * i, 100))  # a fish swims by
+        out = io.BytesIO()
+        frame.save(out, "PNG")
+        frames.append(out.getvalue())
+    content, meta = cam.process_frames(frames, width=320, quality=90)
+    still = np.asarray(Image.open(io.BytesIO(content)).convert("L"))
+    assert max(int(still[80, 40 + 60 * i]) for i in range(5)) < 90  # no fish left
+    assert meta["n_frames"] == 5 and meta["motion"] > 1
+
+
+def test_a_clip_that_does_not_move_is_frozen(
+    spots: list[SpotConfig], sources: SourcesConfig, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(200, text='"https://edge.test/cam/playlist.m3u8"')
+
+    same = jpeg()
+    monkeypatch.setattr(cam, "ffmpeg_frames", lambda url, referer, count=8, **_: [same] * count)
+    [item] = cam.capture(make_ctx(handler, spots, sources, "cam.scripps_pier"))
+    assert isinstance(item, RawSnapshot)
+    assert item.meta["motion"] == 0 and item.meta["frozen"] is True
 
 
 def test_all_strategies_failing_is_one_error(
@@ -133,7 +166,8 @@ def test_frozen_stream_is_flagged(spots: list[SpotConfig], sources: SourcesConfi
     ]
     [item] = cam.capture(ctx)
     assert isinstance(item, RawSnapshot)
-    assert item.meta["frozen"] is True
+    assert item.meta["frozen"] is True  # one still: only the comparison with the last is possible
+    assert item.meta["same_as_previous"] is True
 
 
 def test_non_image_is_an_error(spots: list[SpotConfig], sources: SourcesConfig) -> None:

@@ -6,7 +6,7 @@ services on 2026-09-27 with `probe.yml` (branches `probe/discovery-*`).
 
 | Source id | What | Archive cadence | Used by v0 scorer |
 |---|---|---|---|
-| `cam.scripps_pier` | One still from the Scripps Pier underwater cam: the HLS URL in HDOnTap's public player page (`/embed/`), decoded with ffmpeg; falls back to a headless browser | 15 min, sun ≥ 2° | Not yet (Phase 3 CV) |
+| `cam.scripps_pier` | One still from the Scripps Pier underwater cam: the HLS URL in HDOnTap's public player page (`/embed/`); ffmpeg decodes 8 frames at 2 fps from the segment it reads and the median is archived, with clip motion; falls back to a headless browser | 15 min, sun ≥ 2° | Cam model reads every frame into the private archive; published only once Scripps OKs it (`config/cam_model.yaml` `publish`) |
 | `tides.predictions` | NOAA CO-OPS 9410230, 6-min + highs/lows, MLLW | 6 h | Tide curve, trend, best window |
 | `tides.observed` | CO-OPS water level, water temp, wind, air temp | 1 h | Pier wind (primary), water temp (fallback) |
 | `weather.ndbc_ljpc1` | NDBC LJPC1 (same pier station), trimmed to 6 h | 1 h | Pier wind (fallback) |
