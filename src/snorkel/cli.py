@@ -38,7 +38,11 @@ def _summary(records: list[CaptureRecord]) -> str:
         "|---|---|---|---|---|",
     ]
     for r in records:
-        detail = (r.error or r.key or "").replace("|", "/")[:160]
+        detail = r.error or r.key or ""
+        qc = {k: r.meta[k] for k in ("strategy", "brightness", "frozen", "rows") if k in r.meta}
+        if qc:
+            detail += f" {qc}"
+        detail = detail.replace("|", "/")[:200]
         lines.append(
             f"| {r.source} | {r.variant or ''} | {r.status} | {r.bytes or ''} | {detail} |"
         )
@@ -131,6 +135,36 @@ def probe(
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_bytes(item.content)
             print(f"  saved {path}")
+
+
+@app.command("discover-mops")
+def discover_mops(
+    window: Annotated[int, typer.Option(help="MOPs to scan either side of the bisection")] = 20,
+) -> None:
+    """Find the CDIP MOP alongshore points nearest each configured spot."""
+    from snorkel.discover import list_mop_ids, nearest_mops, read_mop_site
+
+    with make_client() as client:
+        ids = list_mop_ids(client)
+    print(f"{len(ids)} MOP nowcast files ({ids[0]}..{ids[-1]})" if ids else "no MOP files found")
+    for spot in load_spots():
+        print(f"\n{spot.id} ({spot.lat}, {spot.lon}):")
+        for site in nearest_mops(spot.lat, spot.lon, ids, read_mop_site, window=window):
+            km = site.distance_km(spot.lat, spot.lon)
+            print(f"  {site.id}  {site.lat:.5f}, {site.lon:.5f}  {km:.2f} km  {site.meta}")
+
+
+@app.command()
+def sniff(
+    url: Annotated[str, typer.Argument(help="Page to load headlessly")],
+    wait: Annotated[float, typer.Option(help="Seconds to keep listening")] = 20,
+) -> None:
+    """List every request a page makes (find hidden JSON/API and stream URLs)."""
+    from snorkel.discover import sniff_requests
+
+    for resource_type, method, request_url in sniff_requests(url, wait):
+        if resource_type not in {"image", "font", "stylesheet"}:
+            print(f"{resource_type:10} {method:5} {request_url}")
 
 
 if __name__ == "__main__":

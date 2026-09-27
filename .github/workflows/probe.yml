@@ -1,0 +1,34 @@
+name: Probe
+
+# Dev tool for reaching the live data hosts from a GitHub runner. Push a branch
+# named probe/<anything> containing probe/run.sh; this runs it and commits
+# probe/output.txt and any fixtures it saved back to that branch.
+on:
+  push:
+    branches: ["probe/**"]
+    paths: ["probe/run.sh"]
+
+permissions:
+  contents: write
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - run: command -v ffmpeg || (sudo apt-get update -qq && sudo apt-get install -y -qq --no-install-recommends ffmpeg)
+      - run: uv sync --locked --extra browser
+      - run: uv run playwright install --with-deps --only-shell chromium
+      - name: Run probe/run.sh
+        run: bash probe/run.sh > probe/output.txt 2>&1 || echo "run.sh exited $?" >> probe/output.txt
+      - name: Commit results
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A probe tests/fixtures
+          git commit -q -m "Probe results [skip ci]" || exit 0
+          git push
