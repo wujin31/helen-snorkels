@@ -14,6 +14,7 @@ from snorkel.observations import (
     SourceResult,
     TidePoint,
     Tides,
+    Turbidity,
     WaterQuality,
     WaveObs,
     WaveSeries,
@@ -243,3 +244,17 @@ def test_windows_on_dst_days_stay_in_local_daylight(
 def test_compass() -> None:
     assert [compass(d) for d in (0, 44, 225, 290, 350)] == ["N", "NE", "SW", "W", "N"]
     assert compass(None) == ""
+
+
+def test_murky_pier_turbidity_pulls_vis_down_most_near_the_pier(cfg: ScoringConfig) -> None:
+    spots = {s.id: s for s in load_spots()}
+    murky = ok("turb", Turbidity(time=NOW, ntu=3.0))
+    for spot_id in ("marine-room", "la-jolla-cove"):
+        spot = spots[spot_id]
+        clear = score(spot, conditions(spot), cfg)
+        cloudy = score(spot, conditions(spot, turbidity=murky), cfg)
+        assert clear.vis_ft and cloudy.vis_ft and cloudy.vis_ft[1] < clear.vis_ft[1]
+    near = score(spots["marine-room"], conditions(spots["marine-room"], turbidity=murky), cfg)
+    far = score(spots["la-jolla-cove"], conditions(spots["la-jolla-cove"], turbidity=murky), cfg)
+    assert near.vis_ft and far.vis_ft and near.vis_ft[1] < far.vis_ft[1]
+    assert any(f.label == "Turbidity" and f.effect == "-" for f in near.factors)

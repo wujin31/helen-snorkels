@@ -19,7 +19,6 @@ SOURCES: dict[str, SourceFn] = {
     "cdip.mop_forecast": cdip.capture_mop_forecast,
     "sccoos.pier": sccoos.capture_pier,
     "sccoos.habs": sccoos.capture_habs,
-    "water_quality.sdbeachinfo": water_quality.capture_pages,
-    "water_quality.swimguide": water_quality.capture_pages,
+    "water_quality.county": water_quality.capture_county,
     "coastwatch.viirs": coastwatch.capture_viirs,
 }

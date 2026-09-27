@@ -77,20 +77,15 @@ sources:
     every_minutes: 1440
     url: "https://erddap.sccoos.org/erddap/tabledap/HABs-ScrippsPier.csv?&time%3E=now-60days"
 
-  water_quality.sdbeachinfo:
+  water_quality.county:         # sdbeachinfo.com's site list with advisory levels
     every_minutes: 60
-    urls:                       # TODO: replace with the station/API endpoint once probed
-      - https://www.sdbeachinfo.com/
-
-  water_quality.swimguide:      # JSON API behind theswimguide.org/beach/<id>
-    every_minutes: 60
-    urls:
-      - https://www.theswimguide.org/server/beaches/1986/advisories   # La Jolla Cove
+    api_version: null           # discovered from the app's JS when null or stale
 
   coastwatch.viirs:
     every_minutes: 1440
     erddap: https://coastwatch.noaa.gov/erddap
-    datasets: []                # TODO: e.g. [{id: noaacwNPPVIIRSkd490Sector??Daily, var: kd_490}]
+    datasets:                   # 750 m sector "VY" covers 0-45N, 120-60W
+      - {id: noaacwNPPVIIRSkd490SectorVYDaily, var: kd_490, altitude: true, lat_descending: true}
     box_deg: 0.05               # half-width of the box sampled around each spot
 
   cam.scripps_pier:
@@ -98,6 +93,9 @@ sources:
     enabled_env: CAM_CAPTURE_ENABLED   # set the repo variable to "false" to stop capture
     timeout_s: 150
     min_sun_elevation_deg: 2    # underwater at 4 m needs real daylight
+    # The same embed the Shore Stations' own PierViz page uses; returns the stream URL.
+    embed_url: https://portal.hdontap.com/backend/embed/scripps_pier-underwater-CUST?r=aHR0cHM6Ly9jb29sbGFiLnVjc2QuZWR1
+    embed_referer: https://coollab.ucsd.edu/
     page_url: https://hdontap.com/stream/018408/scripps-pier-underwater-live-webcam/
     snapshot_url: null          # TODO: a published still, if HDOnTap/Scripps offer one
     hls_url: null               # optional fixed stream URL; otherwise discovered

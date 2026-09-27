@@ -80,6 +80,11 @@ class Chlorophyll(BaseModel):
     chl_ug_l: float
 
 
+class Turbidity(BaseModel):
+    time: datetime
+    ntu: float
+
+
 class PrecipObs(BaseModel):
     time: datetime
     mm: float

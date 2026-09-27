@@ -11,6 +11,7 @@ from snorkel.observations import (
     PrecipObs,
     SourceResult,
     Tides,
+    Turbidity,
     WaterQuality,
     WaterTemp,
     WaveSeries,
@@ -32,6 +33,7 @@ class Conditions:
     """Hourly precipitation per spot id, past days and forecast."""
     water_temp: SourceResult[WaterTemp] | None = None
     chlorophyll: SourceResult[Chlorophyll] | None = None
+    turbidity: SourceResult[Turbidity] | None = None
     water_quality: dict[str, SourceResult[WaterQuality]] = field(default_factory=dict)
     alerts: SourceResult[list[Alert]] | None = None
 
@@ -41,6 +43,7 @@ class Conditions:
             self.wind_obs,
             self.water_temp,
             self.chlorophyll,
+            self.turbidity,
             self.alerts,
         ]
         groups = [self.waves, self.wind_forecast, self.precip, self.water_quality]

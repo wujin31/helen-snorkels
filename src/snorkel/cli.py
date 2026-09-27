@@ -137,6 +137,44 @@ def probe(
             print(f"  saved {path}")
 
 
+@app.command()
+def score(
+    out: Annotated[Path, typer.Option(help="Where to write status.json")] = Path("status.json"),
+    history: Annotated[
+        Path | None, typer.Option(help="Append one row per spot to this JSONL file")
+    ] = None,
+    now: Annotated[
+        str | None, typer.Option(help="Pretend it's this ISO time (UTC default)")
+    ] = None,
+) -> None:
+    """Fetch fresh conditions, score every spot, write status.json."""
+    import json
+
+    from snorkel.pipeline import gather
+    from snorkel.publish.status import history_rows
+    from snorkel.score.config import load_scoring
+    from snorkel.score.run import score_all
+
+    when = _parse_now(now)
+    spots, sources, cfg = load_spots(), load_sources(), load_scoring()
+    with make_client() as client:
+        cond = gather(client, when, spots, sources)
+    doc = score_all(cond, spots, sources, cfg)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(doc.model_dump_json(indent=1))
+    print(doc.summary)
+    for spot in doc.spots:
+        print(f"  {spot.name}: {spot.verdict} ({spot.confidence}) · {spot.reason}")
+    for health in doc.sources:
+        if health.stale:
+            print(f"  stale: {health.label}: {health.error or 'old data'}")
+    if history:
+        history.parent.mkdir(parents=True, exist_ok=True)
+        with history.open("a") as fh:
+            for row in history_rows(doc):
+                fh.write(json.dumps(row) + "\n")
+
+
 @app.command("discover-mops")
 def discover_mops(
     window: Annotated[int, typer.Option(help="MOPs to scan either side of the bisection")] = 20,

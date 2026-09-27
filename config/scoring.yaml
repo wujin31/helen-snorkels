@@ -14,6 +14,7 @@ staleness_hours:             # older than this and a source counts as stale
   tides: 72                  # predictions are good for days
   water_temp: 12
   chlorophyll: 24
+  turbidity: 6
   water_quality: 30          # the county posts roughly daily; sampling is weekly
   rain: 6
   alerts: 3
@@ -45,6 +46,12 @@ visibility:                  # proxy until the pier-cam CV exists
   min_ft: 2
   max_ft: 40
   spread_fraction: 0.35      # +/- band around the estimate while it's a proxy
+
+turbidity:                   # Scripps Pier ECO turbidity sensor (~1 km from the Marine Room)
+  vis_ft_at_1_ntu: 9         # vis_ft = vis_ft_at_1_ntu / ntu^exponent (prior)
+  exponent: 0.9
+  weight_near_pier: 0.6      # blend weight vs the wave proxy at spots with `cam` set
+  weight_elsewhere: 0.3
 
 window:                      # hourly sub-scores for the best-window search
   incoming_bonus: 1.0

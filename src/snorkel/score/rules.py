@@ -360,7 +360,21 @@ def score_spot(
         penalty += recent_rain_penalty
         if window_wind is not None:
             penalty += v.wind_ft_per_kt * max(0.0, window_wind - v.wind_threshold_kt)
-        vis_mid = min(v.max_ft, max(v.min_ft, v.base_ft - penalty))
+        vis_mid = v.base_ft - penalty
+        turb = cond.turbidity
+        if is_fresh(turb, "turbidity", cfg, now) and turb and turb.value:
+            tc = cfg.turbidity
+            measured = tc.vis_ft(turb.value.ntu)
+            weight = tc.weight_near_pier if spot.cam else tc.weight_elsewhere
+            vis_mid = weight * measured + (1 - weight) * vis_mid
+            factors.append(
+                Factor(
+                    label="Turbidity",
+                    effect="+" if measured >= 15 else "~" if measured >= 8 else "-",
+                    detail=f"{turb.value.ntu:.1f} NTU at Scripps Pier (~{measured:.0f} ft)",
+                )
+            )
+        vis_mid = min(v.max_ft, max(v.min_ft, vis_mid))
         spread = vis_mid * v.spread_fraction
         vis = (max(1, round(vis_mid - spread)), round(vis_mid + spread))
 

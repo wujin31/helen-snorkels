@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from collections.abc import Callable
 from urllib.parse import unquote
 
 import httpx
@@ -139,14 +140,71 @@ def test_sccoos_pier_url_uses_relative_time() -> None:
     )
 
 
-def test_water_quality_pages(spots: list[SpotConfig], sources: SourcesConfig) -> None:
-    def handler(request: httpx.Request) -> httpx.Response:
-        return httpx.Response(200, text="<html>Open</html>")
+JS = (
+    'controller.callDataAction("ScreenDataSetGetSiteById", '
+    '"screenservices/CoSD_Beach_Water_CW/MainFlow/HomeBlockNew/ScreenDataSetGetSiteById", '
+    '"NEWAPI", callContext);'
+)
+SITES = {
+    "Id": "31",
+    "BeachName": "La Jolla Cove",
+    "LocationName": "La Jolla Cove",
+    "PriorityMax": 0,
+}
 
-    ctx = make_ctx(handler, spots, sources, "water_quality.sdbeachinfo")
-    [item] = ok_items(water_quality.capture_pages(ctx))
-    assert item.ext == "html"
-    assert item.variant == "www-sdbeachinfo-com"
+
+def county_handler(
+    seen: list[httpx.Request], stale_first: bool
+) -> Callable[[httpx.Request], httpx.Response]:
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen.append(request)
+        if request.url.path.endswith("moduleversioninfo"):
+            return httpx.Response(200, json={"versionToken": "MOD"})
+        if request.url.path.endswith(".mvc.js"):
+            return httpx.Response(200, text=JS)
+        body = json.loads(request.content)
+        assert request.headers["x-csrftoken"] == water_quality.ANONYMOUS_CSRF
+        assert body["versionInfo"]["moduleVersion"] == "MOD"
+        if stale_first and body["versionInfo"]["apiVersion"] != "NEWAPI":
+            return httpx.Response(200, json={"versionInfo": {"hasApiVersionChanged": True}})
+        return httpx.Response(
+            200,
+            json={
+                "versionInfo": {"hasApiVersionChanged": False},
+                "data": {"List": {"List": [SITES]}},
+            },
+        )
+
+    return handler
+
+
+def test_county_sites(spots: list[SpotConfig], sources: SourcesConfig) -> None:
+    seen: list[httpx.Request] = []
+    ctx = make_ctx(county_handler(seen, stale_first=False), spots, sources, "water_quality.county")
+    [item] = ok_items(water_quality.capture_county(ctx))
+    assert item.variant == "sites"
+    assert item.meta == {"sites": 1, "api_version": "NEWAPI"}
+    assert json.loads(item.content)["data"]["List"]["List"][0]["BeachName"] == "La Jolla Cove"
+
+
+def test_county_rediscovers_a_stale_api_version(
+    spots: list[SpotConfig], sources: SourcesConfig
+) -> None:
+    seen: list[httpx.Request] = []
+    handler = county_handler(seen, stale_first=True)
+    ctx = make_ctx(handler, spots, sources, "water_quality.county", api_version="OLD")
+    [item] = ok_items(water_quality.capture_county(ctx))
+    posts = [r for r in seen if r.method == "POST"]
+    assert [json.loads(r.content)["versionInfo"]["apiVersion"] for r in posts] == ["OLD", "NEWAPI"]
+    assert item.meta["api_version"] == "NEWAPI"
+
+
+def test_county_failure_is_an_item_error(spots: list[SpotConfig], sources: SourcesConfig) -> None:
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(404)
+
+    [item] = water_quality.capture_county(make_ctx(handler, spots, sources, "water_quality.county"))
+    assert isinstance(item, ItemError)
 
 
 def test_unconfigured_sources_skip(spots: list[SpotConfig], sources: SourcesConfig) -> None:
@@ -154,7 +212,7 @@ def test_unconfigured_sources_skip(spots: list[SpotConfig], sources: SourcesConf
         raise AssertionError("should not fetch")
 
     with pytest.raises(SkipSource):
-        coastwatch.capture_viirs(make_ctx(handler, spots, sources, "coastwatch.viirs"))
+        coastwatch.capture_viirs(make_ctx(handler, spots, sources, "coastwatch.viirs", datasets=[]))
     unconfigured = [s.model_copy(update={"cdip_mop_id": None}) for s in spots]
     with pytest.raises(SkipSource):
         cdip.capture_mop_nowcast(make_ctx(handler, unconfigured, sources, "cdip.mop_nowcast"))

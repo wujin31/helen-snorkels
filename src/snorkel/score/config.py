@@ -44,6 +44,16 @@ class VisibilityConfig(BaseModel):
     spread_fraction: float
 
 
+class TurbidityConfig(BaseModel):
+    vis_ft_at_1_ntu: float
+    exponent: float
+    weight_near_pier: float
+    weight_elsewhere: float
+
+    def vis_ft(self, ntu: float) -> float:
+        return self.vis_ft_at_1_ntu / max(ntu, 0.05) ** self.exponent
+
+
 class WindowConfig(BaseModel):
     incoming_bonus: float
     slack_high_bonus: float
@@ -60,6 +70,7 @@ class ScoringConfig(BaseModel):
     staleness_hours: dict[str, float]
     gates: Gates
     visibility: VisibilityConfig
+    turbidity: TurbidityConfig
     window: WindowConfig
     wetsuit_f: list[tuple[float, str]]
 
