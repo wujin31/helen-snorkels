@@ -10,6 +10,7 @@ on:
 
 permissions:
   contents: write
+  id-token: write # this branch only: read frames from the archive gateway
 
 jobs:
   probe:
@@ -24,6 +25,8 @@ jobs:
       - run: uv sync --locked --extra browser
       - run: uv run playwright install --with-deps --only-shell chromium
       - name: Run probe/run.sh
+        env:
+          SNORKEL_STORAGE: gateway:https://dujjlhiytnrtsebxshhw.supabase.co/functions/v1/archive-gateway
         run: bash probe/run.sh > probe/output.txt 2>&1 || echo "run.sh exited $?" >> probe/output.txt
       - name: Commit results
         run: |
