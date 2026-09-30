@@ -1,8 +1,8 @@
 {
  "version": 1,
- "generated_at": "2026-09-30T22:10:47.894556Z",
+ "generated_at": "2026-09-30T22:38:37.446589Z",
  "timezone": "America/Los_Angeles",
- "summary": "Maybe Marine Room 3:30–5:00 pm. La Jolla Cove: county water-quality advisory at La Jolla Cove.",
+ "summary": "Maybe Marine Room 4:00–5:30 pm. La Jolla Cove: county water-quality advisory at La Jolla Cove.",
  "best_bet": "marine-room",
  "spots": [
   {
@@ -13,13 +13,13 @@
    "verdict": "maybe",
    "confidence": "medium",
    "vis_ft": [
-    9,
-    18
+    5,
+    10
    ],
-   "reason": "~9–18 ft vis, 1.9 ft NW swell at 7 s, ~7 kt wind",
+   "reason": "~5–10 ft vis, 1.9 ft NW swell at 7 s, ~7 kt wind",
    "window": {
-    "start": "2026-09-30T22:30:00Z",
-    "end": "2026-10-01T00:00:00Z"
+    "start": "2026-09-30T23:00:00Z",
+    "end": "2026-10-01T00:30:00Z"
    },
    "window_day": "today",
    "gates": [],
@@ -43,12 +43,12 @@
     {
      "label": "Plankton",
      "effect": "+",
-     "detail": "chlorophyll 0.6 µg/L at the pier"
+     "detail": "chlorophyll 0.9 µg/L at the pier"
     },
     {
      "label": "Turbidity",
-     "effect": "+",
-     "detail": "0.6 NTU at Scripps Pier (~15 ft)"
+     "effect": "-",
+     "detail": "1.5 NTU at Scripps Pier (~6 ft)"
     },
     {
      "label": "Tide",
@@ -67,21 +67,14 @@
     "swell_dir_deg": 294.4949951171875,
     "wave_source": "mop",
     "orbital_ms": 0.448,
-    "wind_kt": 9.3,
-    "gust_kt": 11.1,
+    "wind_kt": 6.8,
+    "gust_kt": 7.8,
     "wind_dir_deg": 239.0,
     "wind_onshore": false,
-    "tide_ft": 3.1,
+    "tide_ft": 2.5,
     "tide_trend": "outgoing"
    },
    "hourly": [
-    {
-     "time": "2026-09-30T22:30:00Z",
-     "score": -1.501,
-     "tide_ft": 2.36,
-     "tide_trend": "outgoing",
-     "wind_kt": 7.1
-    },
     {
      "time": "2026-09-30T23:00:00Z",
      "score": -1.501,
@@ -115,8 +108,8 @@
    "verdict": "no",
    "confidence": "high",
    "vis_ft": [
-    5,
-    11
+    4,
+    8
    ],
    "reason": "County water-quality advisory at La Jolla Cove",
    "window": null,
@@ -140,12 +133,12 @@
     {
      "label": "Plankton",
      "effect": "+",
-     "detail": "chlorophyll 0.6 µg/L at the pier"
+     "detail": "chlorophyll 0.9 µg/L at the pier"
     },
     {
      "label": "Turbidity",
-     "effect": "+",
-     "detail": "0.6 NTU at Scripps Pier (~15 ft)"
+     "effect": "-",
+     "detail": "1.5 NTU at Scripps Pier (~6 ft)"
     },
     {
      "label": "Tide",
@@ -164,21 +157,14 @@
     "swell_dir_deg": 332.02423095703125,
     "wave_source": "mop",
     "orbital_ms": 0.665,
-    "wind_kt": 9.3,
-    "gust_kt": 11.1,
+    "wind_kt": 6.8,
+    "gust_kt": 7.8,
     "wind_dir_deg": 239.0,
     "wind_onshore": false,
-    "tide_ft": 3.1,
+    "tide_ft": 2.5,
     "tide_trend": "outgoing"
    },
    "hourly": [
-    {
-     "time": "2026-09-30T22:30:00Z",
-     "score": -1.501,
-     "tide_ft": 2.36,
-     "tide_trend": "outgoing",
-     "wind_kt": 7.1
-    },
     {
      "time": "2026-09-30T23:00:00Z",
      "score": -1.501,
@@ -212,8 +198,8 @@
   "water_temp_f": 70.1,
   "water_temp_source": "sccoos",
   "wetsuit": "3/2 mm shorty or springsuit",
-  "turbidity_ntu": 0.55,
-  "chlorophyll_ug_l": 0.64,
+  "turbidity_ntu": 1.54,
+  "chlorophyll_ug_l": 0.89,
   "alerts": [
    "Coastal Flood Advisory"
   ],
@@ -482,8 +468,8 @@
    "label": "Tide predictions (NOAA 9410230)",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-09-30T22:10:47.894556Z",
-   "valid_at": "2026-09-30T22:10:47.894556Z",
+   "fetched_at": "2026-09-30T22:38:37.446589Z",
+   "valid_at": "2026-09-30T22:38:37.446589Z",
    "error": null
   },
   {
@@ -491,8 +477,8 @@
    "label": "Pier wind (NOAA 9410230)",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-09-30T22:10:47.894556Z",
-   "valid_at": "2026-09-30T22:06:00Z",
+   "fetched_at": "2026-09-30T22:38:37.446589Z",
+   "valid_at": "2026-09-30T22:30:00Z",
    "error": null
   },
   {
@@ -500,8 +486,8 @@
    "label": "Water temperature",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-09-30T22:10:47.894556Z",
-   "valid_at": "2026-09-30T21:52:00Z",
+   "fetched_at": "2026-09-30T22:38:37.446589Z",
+   "valid_at": "2026-09-30T22:24:00Z",
    "error": null
   },
   {
@@ -509,8 +495,8 @@
    "label": "Chlorophyll (SCCOOS pier)",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-09-30T22:10:47.894556Z",
-   "valid_at": "2026-09-30T21:52:00Z",
+   "fetched_at": "2026-09-30T22:38:37.446589Z",
+   "valid_at": "2026-09-30T22:24:00Z",
    "error": null
   },
   {
@@ -518,8 +504,8 @@
    "label": "Turbidity (SCCOOS pier)",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-09-30T22:10:47.894556Z",
-   "valid_at": "2026-09-30T21:52:00Z",
+   "fetched_at": "2026-09-30T22:38:37.446589Z",
+   "valid_at": "2026-09-30T22:24:00Z",
    "error": null
   },
   {
@@ -527,8 +513,8 @@
    "label": "NWS alerts",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-09-30T22:10:47.894556Z",
-   "valid_at": "2026-09-30T22:10:47.894556Z",
+   "fetched_at": "2026-09-30T22:38:37.446589Z",
+   "valid_at": "2026-09-30T22:38:37.446589Z",
    "error": null
   },
   {
@@ -536,7 +522,7 @@
    "label": "Waves (mop) · la-jolla-cove",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-09-30T22:10:47.894556Z",
+   "fetched_at": "2026-09-30T22:38:37.446589Z",
    "valid_at": "2026-09-30T21:00:00Z",
    "error": null
   },
@@ -545,7 +531,7 @@
    "label": "Waves (mop) · marine-room",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-09-30T22:10:47.894556Z",
+   "fetched_at": "2026-09-30T22:38:37.446589Z",
    "valid_at": "2026-09-30T21:00:00Z",
    "error": null
   },
@@ -554,8 +540,8 @@
    "label": "Wind forecast (Open-Meteo) · la-jolla-cove",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-09-30T22:10:47.894556Z",
-   "valid_at": "2026-09-30T22:10:47.894556Z",
+   "fetched_at": "2026-09-30T22:38:37.446589Z",
+   "valid_at": "2026-09-30T22:38:37.446589Z",
    "error": null
   },
   {
@@ -563,8 +549,8 @@
    "label": "Wind forecast (Open-Meteo) · marine-room",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-09-30T22:10:47.894556Z",
-   "valid_at": "2026-09-30T22:10:47.894556Z",
+   "fetched_at": "2026-09-30T22:38:37.446589Z",
+   "valid_at": "2026-09-30T22:38:37.446589Z",
    "error": null
   },
   {
@@ -572,8 +558,8 @@
    "label": "Rain (Open-Meteo) · la-jolla-cove",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-09-30T22:10:47.894556Z",
-   "valid_at": "2026-09-30T22:10:47.894556Z",
+   "fetched_at": "2026-09-30T22:38:37.446589Z",
+   "valid_at": "2026-09-30T22:38:37.446589Z",
    "error": null
   },
   {
@@ -581,8 +567,8 @@
    "label": "Rain (Open-Meteo) · marine-room",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-09-30T22:10:47.894556Z",
-   "valid_at": "2026-09-30T22:10:47.894556Z",
+   "fetched_at": "2026-09-30T22:38:37.446589Z",
+   "valid_at": "2026-09-30T22:38:37.446589Z",
    "error": null
   },
   {
@@ -590,8 +576,8 @@
    "label": "Water quality · la-jolla-cove",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-09-30T22:10:47.894556Z",
-   "valid_at": "2026-09-30T22:10:47.894556Z",
+   "fetched_at": "2026-09-30T22:38:37.446589Z",
+   "valid_at": "2026-09-30T22:38:37.446589Z",
    "error": null
   },
   {
@@ -599,8 +585,8 @@
    "label": "Water quality · marine-room",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-09-30T22:10:47.894556Z",
-   "valid_at": "2026-09-30T22:10:47.894556Z",
+   "fetched_at": "2026-09-30T22:38:37.446589Z",
+   "valid_at": "2026-09-30T22:38:37.446589Z",
    "error": null
   }
  ],
