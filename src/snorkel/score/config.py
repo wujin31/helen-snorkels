@@ -36,6 +36,7 @@ class VisibilityConfig(BaseModel):
     ln_ntu_per_ln_chl: float
     typical_chl_ug_l: float
     min_orbital_ms: float
+    min_chl_ug_l: float
     chl_threshold_ug_l: float
     rain_recent_days: float
     rain_recent_penalty_ft: float
@@ -50,7 +51,7 @@ class VisibilityConfig(BaseModel):
         return math.exp(
             self.ln_ntu_intercept
             + self.ln_ntu_per_orbital_ms * max(orbital_ms, self.min_orbital_ms)
-            + self.ln_ntu_per_ln_chl * math.log(max(chl_ug_l, 0.05))
+            + self.ln_ntu_per_ln_chl * math.log(max(chl_ug_l, self.min_chl_ug_l))
         )
 
 

@@ -361,6 +361,7 @@ def test_calmer_than_the_fitted_range_is_not_read_clearer(cfg: ScoringConfig) ->
     v = cfg.visibility
     assert v.predicted_ntu(0.0, 0.65) == v.predicted_ntu(v.min_orbital_ms, 0.65)
     assert v.predicted_ntu(v.min_orbital_ms + 0.1, 0.65) > v.predicted_ntu(0.0, 0.65)
+    assert v.predicted_ntu(0.3, 0.05) == v.predicted_ntu(0.3, v.min_chl_ug_l)
 
 
 def test_pier_turbidity_only_counts_near_the_pier(cfg: ScoringConfig) -> None:
