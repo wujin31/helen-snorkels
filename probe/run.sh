@@ -147,53 +147,65 @@ for key in ("hs", "orb6", "orb12", "orb24", "orb48", "orb24_cove", "chl", "wind_
     dly = spearman([x[1] for x in dd], [x[0] for x in dd])
     print(f"  {key:11} {h[0]:+.2f} (n={h[1]}) | {dly[0]:+.2f} (n={dly[1]})")
 
-# The proxy as configured (no turbidity blend) vs vis from the sensor.
+# The proxy as configured, and refits, checked out of sample (fit Jul-Aug, test Sep-Oct).
 import yaml
 cfg = yaml.safe_load(open("config/scoring.yaml"))
 v, tc = cfg["visibility"], cfg["turbidity"]
 def measured(ntu): return min(v["max_ft"], tc["vis_ft_at_1_ntu"] / max(ntu, 0.05) ** tc["exponent"])
-def proxy(r, base=v["base_ft"], k=v["orbital_ft_per_ms"]):
-    if r["orb24"] is None: return None
-    p = k * r["orb24"]
+def penalties(r, chl_k=v["chl_ft_per_ug_l"], chl_thr=v["chl_threshold_ug_l"]):
+    p = 0.0
     if r["chl"] is not None:
-        p += min(v["chl_max_penalty_ft"], v["chl_ft_per_ug_l"] * max(0.0, r["chl"] - v["chl_threshold_ug_l"]))
+        p += min(v["chl_max_penalty_ft"], chl_k * max(0.0, r["chl"] - chl_thr))
     if r["rain5_mm"] >= 2.5: p += v["rain_recent_penalty_ft"]
     if r["wind_kt"] is not None: p += v["wind_ft_per_kt"] * max(0.0, r["wind_kt"] - v["wind_threshold_kt"])
-    return min(v["max_ft"], max(v["min_ft"], base - p))
-pm = [(proxy(r), measured(r["ntu"])) for r in rows if proxy(r) is not None]
-sp = spearman([a for a, _ in pm], [b for _, b in pm])
-mae = statistics.mean(abs(a - b) for a, b in pm)
-bias = statistics.mean(a - b for a, b in pm)
-inside = sum(1 for a, b in pm if a * (1 - v["spread_fraction"]) <= b <= a * (1 + v["spread_fraction"])) / len(pm)
-print(f"\nproxy as configured vs sensor vis: spearman {sp[0]:+.2f} (n={sp[1]}), MAE {mae:.1f} ft, bias {bias:+.1f} ft, sensor inside the +/-{v['spread_fraction']:.0%} band {inside:.0%}")
-meas = [b for _, b in pm]
-print("sensor vis ft: p10/p50/p90", [round(float(np.percentile(meas, q)), 1) for q in (10, 50, 90)])
-print("proxy vis ft:  p10/p50/p90", [round(float(np.percentile([a for a, _ in pm], q)), 1) for q in (10, 50, 90)])
-print("orb24 m/s: p10/p50/p90", [round(float(np.percentile([r["orb24"] for r in rows if r["orb24"] is not None], q)), 3) for q in (10, 50, 90)])
+    return p
+def clamp(x): return min(v["max_ft"], max(v["min_ft"], x))
+use = [r for r in rows if r["orb24"] is not None]
+split = datetime(2026, 9, 1, tzinfo=UTC)
+train = [r for r in use if r["t"] < split]
+test = [r for r in use if r["t"] >= split]
+print(f"\ntrain {len(train)} samples (Jul-Aug), test {len(test)} (Sep-Oct)")
 
-# Least squares: sensor vis ~ a - b * orb24 (hourly) and the same on log NTU.
-X = np.array([[1.0, r["orb24"]] for r in rows if r["orb24"] is not None])
-y = np.array([measured(r["ntu"]) for r in rows if r["orb24"] is not None])
-coef, *_ = np.linalg.lstsq(X, y, rcond=None)
-pred = X @ coef
-r2 = 1 - ((y - pred) ** 2).sum() / ((y - y.mean()) ** 2).sum()
-print(f"fit: vis = {coef[0]:.1f} {coef[1]:+.1f} * orb24   R^2 {r2:.2f}   (config: {v['base_ft']} - {v['orbital_ft_per_ms']} * orb)")
-for lo, hi in ((0, 0.1), (0.1, 0.2), (0.2, 0.3), (0.3, 0.45), (0.45, 9)):
-    sel = [measured(r["ntu"]) for r in rows if r["orb24"] is not None and lo <= r["orb24"] < hi]
-    if sel:
-        print(f"  orb24 {lo:.2f}-{hi:.2f}: n={len(sel):4d} sensor vis median {statistics.median(sel):5.1f} ft  p25 {np.percentile(sel,25):5.1f}  p75 {np.percentile(sel,75):5.1f}")
+def report(name, predict, data):
+    pm = [(predict(r), measured(r["ntu"])) for r in data]
+    sp = spearman([a for a, _ in pm], [b for _, b in pm])[0]
+    mae = statistics.mean(abs(a - b) for a, b in pm)
+    bias = statistics.mean(a - b for a, b in pm)
+    cov = {f: sum(1 for a, b in pm if a * (1 - f) <= b <= a * (1 + f)) / len(pm) for f in (0.25, 0.35, 0.45)}
+    # how often the Yes/No vis thresholds agree (10 ft yes floor, 6 ft no)
+    agree10 = sum(1 for a, b in pm if (a >= 10) == (b >= 10)) / len(pm)
+    print(f"  {name:34} spearman {sp:+.2f}  MAE {mae:5.1f}  bias {bias:+5.1f}  inside +/-25/35/45%: {cov[0.25]:.0%}/{cov[0.35]:.0%}/{cov[0.45]:.0%}  >=10ft agree {agree10:.0%}")
 
-# Murkiest days: what was going on?
-by = {}
-for r in rows:
-    by.setdefault(r["t"].date(), []).append(r)
-days = sorted(by.items(), key=lambda kv: -statistics.median([x["ntu"] for x in kv[1]]))
-print("\nmurkiest days (median NTU, hs ft, orb24, chl, wind kt, rain5 mm):")
-for day, v_ in days[:10]:
-    med = lambda k: statistics.median([x[k] for x in v_ if x[k] is not None]) if any(x[k] is not None for x in v_) else float("nan")
-    print(f"  {day} {med('ntu'):5.2f} NTU  hs {med('hs')*3.281 if med('hs')==med('hs') else float('nan'):4.1f} ft  orb {med('orb24'):.2f}  chl {med('chl'):.2f}  wind {med('wind_kt'):4.1f}  rain {med('rain5_mm'):.1f}")
-print("clearest days:")
-for day, v_ in days[-5:]:
-    med = lambda k: statistics.median([x[k] for x in v_ if x[k] is not None]) if any(x[k] is not None for x in v_) else float("nan")
-    print(f"  {day} {med('ntu'):5.2f} NTU  hs {med('hs')*3.281 if med('hs')==med('hs') else float('nan'):4.1f} ft  orb {med('orb24'):.2f}  chl {med('chl'):.2f}  wind {med('wind_kt'):4.1f}  rain {med('rain5_mm'):.1f}")
+def fit_linear(data, with_chl):
+    X = np.array([[1.0, r["orb24"]] + ([r["chl"] or 0.0] if with_chl else []) for r in data])
+    y = np.array([measured(r["ntu"]) + penalties(r, chl_k=0.0 if with_chl else v["chl_ft_per_ug_l"]) for r in data])
+    coef, *_ = np.linalg.lstsq(X, y, rcond=None)
+    return coef
+
+def fit_log(data):
+    X = np.array([[1.0, r["orb24"], r["chl"] or 0.0] for r in data])
+    y = np.array([math.log(max(r["ntu"], 0.05)) for r in data])
+    coef, *_ = np.linalg.lstsq(X, y, rcond=None)
+    return coef
+
+for label, data in (("in sample, all", use), ("out of sample, Sep-Oct", test)):
+    fitset = use if label.startswith("in") else train
+    a = fit_linear(fitset, False)
+    b = fit_linear(fitset, True)
+    g = fit_log(fitset)
+    print(f"\n{label}: linear fit base {a[0]:.1f}, {a[1]:.1f} ft per m/s | with chl: base {b[0]:.1f}, {b[1]:.1f} per m/s, {b[2]:.1f} per ug/L | log NTU = {g[0]:.2f} {g[1]:+.2f}*orb {g[2]:+.2f}*chl")
+    report("configured (20 - 22*orb)", lambda r: clamp(v["base_ft"] - v["orbital_ft_per_ms"] * r["orb24"] - penalties(r)), data)
+    report("refit base/slope", lambda r, a=a: clamp(a[0] - a[1] * r["orb24"] - penalties(r)), data)
+    report("refit base/slope + chl from 0", lambda r, b=b: clamp(b[0] - b[1] * r["orb24"] - b[2] * (r["chl"] or 0) - penalties(r, chl_k=0)), data)
+    report("log-NTU model -> prior ft", lambda r, g=g: clamp(measured(math.exp(g[0] + g[1] * r["orb24"] + g[2] * (r["chl"] or 0))) - penalties(r, chl_k=0)), data)
+    for base, k in ((35, 50), (38, 55), (40, 60)):
+        report(f"rounded {base} - {k}*orb", lambda r, base=base, k=k: clamp(base - k * r["orb24"] - penalties(r)), data)
+
+res = [measured(r["ntu"]) - clamp(40 - 60 * r["orb24"] - penalties(r)) for r in use]
+print("\nresiduals (sensor - 40-60*orb): p10/p25/p50/p75/p90", [round(float(np.percentile(res, q)), 1) for q in (10, 25, 50, 75, 90)])
+by_month = {}
+for r in use:
+    by_month.setdefault(r["t"].strftime("%Y-%m"), []).append(measured(r["ntu"]) - clamp(40 - 60 * r["orb24"] - penalties(r)))
+print("bias by month:", {m: round(statistics.mean(x), 1) for m, x in sorted(by_month.items())})
+
 PY
