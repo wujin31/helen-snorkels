@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import gzip
 import time
-from datetime import timedelta
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import pytest
@@ -172,3 +172,40 @@ def test_hung_source_times_out() -> None:
 def test_snapshot_key_slugs_variants() -> None:
     key = snapshot_key("tides.observed", "9410230_water level", MORNING, "json")
     assert key == "raw/tides.observed/2026/09/27/160000Z_9410230-water-level.json.gz"
+
+
+def test_purge_cam_deletes_frames_and_cam_state(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from datetime import date
+
+    from typer.testing import CliRunner
+
+    from snorkel.archive import append_manifest
+    from snorkel.cli import app
+
+    storage = LocalStorage(tmp_path)
+    frame = "frames/cam.scripps_pier/2026/09/28/160000Z.jpg"
+    storage.put(frame, b"\xff\xd8", "image/jpeg")
+    storage.put("state/cam_rois.json", b"{}", "application/json")
+    storage.put("state/cam_readings/2026-09-28.jsonl", b"{}\n", "application/x-ndjson")
+    storage.put("raw/tides.observed/2026/09/28/x.json.gz", b"keep", "application/gzip")
+    append_manifest(
+        storage,
+        date(2026, 9, 28),
+        [
+            CaptureRecord(
+                source="cam.scripps_pier",
+                run_at=datetime(2026, 9, 28, 16, tzinfo=UTC),
+                status="ok",
+                key=frame,
+            )
+        ],
+    )
+    result = CliRunner().invoke(
+        app, ["purge-cam", "--storage", f"local:{tmp_path}", "--since", "2026-09-28"]
+    )
+    assert result.exit_code == 0, result.output
+    assert "deleted 3 objects" in result.output
+    assert storage.get(frame) is None and storage.get("state/cam_rois.json") is None
+    assert storage.get("raw/tides.observed/2026/09/28/x.json.gz") == b"keep"

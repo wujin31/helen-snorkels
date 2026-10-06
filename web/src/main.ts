@@ -8,54 +8,10 @@ const app = document.getElementById("app")!;
 let doc: StatusDoc = JSON.parse(document.getElementById("status-data")!.textContent!);
 let lastCheck = 0;
 
-// Regions renderPage marks with ids; repainted around a playing cam player.
-const REGIONS = ["top", "banner", "verdict", "details", "foot"];
-
 function paint(next: StatusDoc): void {
   doc = next;
-  const html = renderPage(doc, new Date());
-  if (!repaintAroundPlayer(html)) {
-    app.innerHTML = html;
-    mountPlayer();
-  }
+  app.innerHTML = renderPage(doc, new Date());
   bind();
-}
-
-/** Swap everything but a playing player (moving an iframe reloads it). */
-function repaintAroundPlayer(html: string): boolean {
-  const current = app.querySelector<HTMLElement>("#cam");
-  if (!current?.querySelector(".cam-player iframe")) return false;
-  const tpl = document.createElement("template");
-  tpl.innerHTML = html;
-  const fresh = tpl.content.querySelector<HTMLElement>("#cam");
-  if (!fresh || fresh.dataset.state !== current.dataset.state || fresh.dataset.embed !== current.dataset.embed) {
-    return false;
-  }
-  for (const id of REGIONS) {
-    const next = tpl.content.querySelector(`#${id}`);
-    const old = app.querySelector(`#${id}`);
-    if (!next || !old) return false;
-    old.replaceWith(next);
-  }
-  for (const part of [".cam-overlay", ".cam-foot"]) {
-    const next = fresh.querySelector(part);
-    if (next) current.querySelector(part)?.replaceWith(next);
-  }
-  return true;
-}
-
-/** Only when the player allows this site (cam.embed_url); otherwise the link stays. */
-function mountPlayer(): void {
-  const slot = app.querySelector<HTMLElement>("#cam .cam-player");
-  const src = slot?.dataset.src;
-  if (!slot || !src || slot.querySelector("iframe")) return;
-  const frame = document.createElement("iframe");
-  frame.src = src;
-  frame.title = "Scripps Pier underwater cam, live";
-  frame.allow = "fullscreen; picture-in-picture";
-  frame.allowFullscreen = true;
-  frame.referrerPolicy = "strict-origin-when-cross-origin";
-  slot.replaceChildren(frame);
 }
 
 function bind(): void {

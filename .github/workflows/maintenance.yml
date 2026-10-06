@@ -1,0 +1,33 @@
+name: Maintenance
+
+# One-off chores against the private archive, run by hand from the Actions tab.
+#   purge-cam: delete every archived Scripps Pier cam frame and the old cam
+#              model's state (the cam was retired on 2026-10-06).
+on:
+  workflow_dispatch:
+    inputs:
+      task:
+        description: "What to run"
+        type: choice
+        options: [purge-cam]
+        required: true
+
+permissions:
+  contents: read
+  id-token: write # the archive gateway authenticates this run by its OIDC token
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      SNORKEL_STORAGE: ${{ vars.SNORKEL_STORAGE || 'gateway:https://dujjlhiytnrtsebxshhw.supabase.co/functions/v1/archive-gateway' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+      - run: uv sync --locked
+      - name: Purge cam frames
+        if: inputs.task == 'purge-cam'
+        run: uv run snorkel purge-cam

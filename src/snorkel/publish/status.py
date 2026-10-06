@@ -11,10 +11,11 @@ from snorkel.features.tides import height_at
 from snorkel.observations import SourceResult, TideExtreme
 from snorkel.score.conditions import Conditions
 from snorkel.score.config import DIFFICULTY_ORDER, ScoringConfig
-from snorkel.score.models import SpotStatus, TimeWindow
+from snorkel.score.models import SpotStatus
 from snorkel.sun import LOCAL_TZ, SunTimes
 from snorkel.units import c_to_f, m_to_ft
 
+CAM_URL = "https://coollab.ucsd.edu/pierviz/"  # Scripps' own page with the pier cam
 DISCLAIMER = (
     "Conditions change quickly. Check with the lifeguards on site, and trust your own read "
     "of surge, currents and wildlife once you're there."
@@ -70,28 +71,6 @@ class DayConditions(BaseModel):
     tide_turns: list[TideTurn] = Field(default_factory=list)
 
 
-class CamReading(BaseModel):
-    """What the pier cam showed at one moment (from the cam model)."""
-
-    time: datetime
-    vis_ft: tuple[int, int] | None = None
-    pilings_visible: int | None = None
-    pilings_total: int | None = None
-
-
-class CamInfo(BaseModel):
-    """The live cam section: where to watch it and when it's worth watching."""
-
-    title: str
-    caption: str
-    watch_url: str
-    info_url: str | None = None
-    embed_url: str | None = None  # set only when the player allows this site to frame it
-    light: list[TimeWindow] = Field(default_factory=list)  # today and tomorrow
-    reading: CamReading | None = None
-    readings_today: list[CamReading] = Field(default_factory=list)
-
-
 class StatusDoc(BaseModel):
     version: int = 1
     generated_at: datetime
@@ -102,7 +81,7 @@ class StatusDoc(BaseModel):
     day: DayConditions
     sources: list[SourceHealth]
     disclaimer: str = DISCLAIMER
-    cam: CamInfo | None = None
+    cam_url: str = CAM_URL
 
 
 def short_name(name: str) -> str:
@@ -212,8 +191,9 @@ def day_conditions(cond: Conditions, cfg: ScoringConfig, sun: SunTimes) -> DayCo
         day.water_temp_f = round(temp_f, 1)
         day.water_temp_source = cond.water_temp.value.source
         day.wetsuit = cfg.wetsuit(temp_f)
-    if cond.turbidity and cond.turbidity.ok and cond.turbidity.value:
-        day.turbidity_ntu = cond.turbidity.value.ntu
+    turb = cond.turbidity.value if cond.turbidity and cond.turbidity.ok else None
+    if turb and turb.ntu >= cfg.turbidity.min_valid_ntu:
+        day.turbidity_ntu = turb.ntu
     if cond.chlorophyll and cond.chlorophyll.ok and cond.chlorophyll.value:
         day.chlorophyll_ug_l = cond.chlorophyll.value.chl_ug_l
     if cond.alerts and cond.alerts.ok and cond.alerts.value:
@@ -241,7 +221,6 @@ def build_status(
     cond: Conditions,
     cfg: ScoringConfig,
     sun: SunTimes,
-    cam: CamInfo | None = None,
 ) -> StatusDoc:
     best = best_bet(spots, cfg)
     ranked = sorted(
@@ -254,7 +233,6 @@ def build_status(
         spots=ranked,
         day=day_conditions(cond, cfg, sun),
         sources=source_health(cond, cfg),
-        cam=cam,
     )
 
 

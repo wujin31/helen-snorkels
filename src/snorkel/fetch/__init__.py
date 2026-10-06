@@ -2,11 +2,10 @@
 
 from __future__ import annotations
 
-from snorkel.fetch import cam, cdip, coastwatch, sccoos, tides, water_quality, weather
+from snorkel.fetch import cdip, coastwatch, sccoos, tides, water_quality, weather
 from snorkel.fetch.base import SourceFn
 
 SOURCES: dict[str, SourceFn] = {
-    "cam.scripps_pier": cam.capture,
     "tides.predictions": tides.capture_predictions,
     "tides.observed": tides.capture_observed,
     "weather.ndbc_ljpc1": weather.capture_ndbc,
