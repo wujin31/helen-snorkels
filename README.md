@@ -17,7 +17,8 @@ waves, NOAA tides and weather, SCCOOS pier sensors, county water quality).
   private Supabase bucket.
 - **v0 scorer + page** (hourly): transparent rules per spot (water quality,
   NWS hazards, rain, waves, wind gates; a visibility estimate from wave
-  physics, pier turbidity and chlorophyll; the best window by tide and wind),
+  physics and chlorophyll, fitted to the Scripps Pier turbidity sensor and
+  blended with it near the pier; the best window by tide and wind),
   published to GitHub Pages with the answer baked into the HTML.
 
 ## Develop

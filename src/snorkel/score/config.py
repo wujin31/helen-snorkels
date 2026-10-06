@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 from pathlib import Path
 
 import yaml
@@ -29,12 +30,12 @@ class Gates(BaseModel):
 
 
 class VisibilityConfig(BaseModel):
-    base_ft: float
     half_life_h: float
-    orbital_ft_per_ms: float
+    ln_ntu_intercept: float
+    ln_ntu_per_orbital_ms: float
+    ln_ntu_per_ln_chl: float
+    typical_chl_ug_l: float
     chl_threshold_ug_l: float
-    chl_ft_per_ug_l: float
-    chl_max_penalty_ft: float
     rain_recent_days: float
     rain_recent_penalty_ft: float
     wind_threshold_kt: float
@@ -42,6 +43,14 @@ class VisibilityConfig(BaseModel):
     min_ft: float
     max_ft: float
     spread_fraction: float
+
+    def predicted_ntu(self, orbital_ms: float, chl_ug_l: float) -> float:
+        """Turbidity the pier sensor would likely read, from waves and plankton."""
+        return math.exp(
+            self.ln_ntu_intercept
+            + self.ln_ntu_per_orbital_ms * orbital_ms
+            + self.ln_ntu_per_ln_chl * math.log(max(chl_ug_l, 0.05))
+        )
 
 
 class TurbidityConfig(BaseModel):

@@ -1,8 +1,8 @@
 name: Archive
 
 # Day-one archiver: every 15 min across ~5am-8pm Pacific (UTC hours below
-# cover both PDT and PST). The script decides per source what's due and
-# gates the cam on sun elevation, so late or skipped cron runs are harmless.
+# cover both PDT and PST). The script decides per source what's due, so late
+# or skipped cron runs are harmless.
 on:
   schedule:
     - cron: "8,23,38,53 12-23,0-3 * * *"
@@ -42,7 +42,6 @@ jobs:
       S3_ACCESS_KEY_ID: ${{ secrets.S3_ACCESS_KEY_ID }}
       S3_SECRET_ACCESS_KEY: ${{ secrets.S3_SECRET_ACCESS_KEY }}
       SNORKEL_CONTACT: ${{ vars.SNORKEL_CONTACT }}
-      CAM_CAPTURE_ENABLED: ${{ vars.CAM_CAPTURE_ENABLED }}
       ONLY: ${{ inputs.only }}
       FORCE: ${{ inputs.force }}
     steps:
@@ -52,11 +51,6 @@ jobs:
         with:
           enable-cache: true
 
-      - name: Install ffmpeg (cam HLS frames)
-        run: command -v ffmpeg || (sudo apt-get update -qq && sudo apt-get install -y -qq --no-install-recommends ffmpeg)
-
-      # The cam comes from the HDOnTap embed (then the page's HLS URL) via
-      # ffmpeg; the headless-browser fallback isn't installed in production.
       - run: uv sync --locked
 
       - name: Archive
