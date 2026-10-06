@@ -1,6 +1,8 @@
 # Snorkel Status: San Diego Go/No-Go (Project Brief)
 
 > Handoff doc for Claude Code. It distills a planning conversation: goals, research, competitive landscape, technical strategy, design direction, and a build plan. **Read "Guiding principles" and "First sessions" before writing code.**
+>
+> **Changes since this brief (2026-10-06).** The swim log was cut: no user interaction. The Scripps Pier cam was dropped: permission to embed or analyze it wasn't granted, capture stopped and archived frames were deleted. Visibility now comes from wave physics, pier sensors, satellite water color and NWS forecasts, calibrated against public dive reports. Tier 2 and 3 spots are being added. Sections below that rely on the cam or her logs are historical.
 
 ---
 
@@ -192,6 +194,7 @@ Club promos, signup, and donation links mixed into conditions; static per-spot v
 6. **Honest freshness.** "Updated 6:02 · cam live" vs. "Cam offline: estimate from wave + satellite data." Stale data looks stale.
 7. **Fast and installable.** Pre-computed JSON (answer in first paint), PWA / add to home screen, dark mode for dawn, readable in glare, big tap targets.
 8. **Two-tap post-swim log.** Spot (pre-selected), vis slider in ft, 1–5 rating, optional note.
+   *Cut 2026-09-27: no user interaction. Ground truth comes from the pier cam and dive reports.*
 9. **Useful touches.** Wetsuit recommendation from water temp; "around this week" (leopard shark season, bat rays, bloom warning); a one-sentence morning summary.
 10. **Tone.** Calm, oceanic, no marketing, no clutter. Nothing on the page that isn't helping her decide.
 

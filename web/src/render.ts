@@ -58,40 +58,35 @@ function why(spot: SpotStatus): string {
   if (!items.length) return "";
   const source = spot.conditions.wave_source;
   const note = source
-    ? `<p class="fine">Waves: ${esc(source === "mop" ? "CDIP MOP model at this spot" : source === "buoy" ? "Scripps Nearshore buoy" : "Open-Meteo offshore model")}. Visibility is an estimate from waves, pier turbidity and chlorophyll; there's no cam reading yet.</p>`
+    ? `<p class="fine">Waves: ${esc(source === "mop" ? "CDIP MOP model at this spot" : source === "buoy" ? "Scripps Nearshore buoy" : "Open-Meteo offshore model")}. Visibility is an estimate from waves, pier turbidity, chlorophyll, rain and wind.</p>`
     : "";
   return `<details class="why"><summary>Why</summary>${factorList(items)}${note}</details>`;
 }
 
-function heroSpot(spot: SpotStatus): string {
-  const when = windowText(spot);
-  const vis = spot.vis_ft ? `<span class="chip">~${spot.vis_ft[0]}–${spot.vis_ft[1]} ft vis</span>` : "";
-  const reason = withoutVis(spot.reason);
-  return `
-  <section class="hero v-${spot.verdict}" aria-labelledby="hero-title" id="spot-${esc(spot.id)}">
-    <div class="hero-top">
-      ${verdictIcon(spot.verdict, 44)}
-      <h1 id="hero-title" class="verdict-word">${VERDICT_WORD[spot.verdict]}</h1>
-    </div>
-    <p class="hero-where">${esc(short(spot.name))}${when ? `<span class="hero-when">${esc(when)}</span>` : ""}</p>
-    ${reason ? `<p class="hero-reason">${esc(reason)}</p>` : ""}
-    <div class="hero-meta">${vis}${confidenceDots(spot.confidence)}</div>
-    ${readings(spot)}
-    ${why(spot)}
-  </section>`;
-}
-
-function heroOverall(doc: StatusDoc): string {
-  const anyNo = doc.spots.some((s) => s.verdict === "no");
-  const verdict = anyNo ? "no" : "unknown";
-  const title = anyNo ? "Not today" : "Can't tell right now";
-  return `
-  <section class="hero v-${verdict}" aria-labelledby="hero-title">
-    <div class="hero-top">
-      ${verdictIcon(verdict, 44)}
+/** The answer, first: verdict, where, when, and why in a line. */
+function verdictBar(doc: StatusDoc, featured: SpotStatus | null): string {
+  if (!featured) {
+    const verdict = doc.spots.some((s) => s.verdict === "no") ? "no" : "unknown";
+    const title = verdict === "no" ? "Not today" : "Can't tell right now";
+    return `
+  <section class="verdict v-${verdict}" id="verdict" aria-labelledby="hero-title">
+    ${verdictIcon(verdict, 40)}
+    <div class="verdict-text">
       <h1 id="hero-title" class="verdict-word">${title}</h1>
+      <p class="verdict-reason">${esc(doc.summary)}</p>
     </div>
-    <p class="hero-reason">${esc(doc.summary)}</p>
+  </section>`;
+  }
+  const when = windowText(featured);
+  const reason = withoutVis(featured.reason);
+  return `
+  <section class="verdict v-${featured.verdict}" id="verdict" aria-labelledby="hero-title">
+    ${verdictIcon(featured.verdict, 40)}
+    <div class="verdict-text">
+      <h1 id="hero-title"><span class="verdict-word">${VERDICT_WORD[featured.verdict]}</span> <span class="verdict-where">${esc(short(featured.name))}</span></h1>
+      ${when ? `<p class="verdict-when">${esc(when)}</p>` : ""}
+      ${reason ? `<p class="verdict-reason">${esc(reason)}</p>` : ""}
+    </div>
   </section>`;
 }
 
@@ -107,17 +102,23 @@ function factorList(factors: Factor[]): string {
     .join("")}</ul>`;
 }
 
-function spotCard(spot: SpotStatus): string {
+function spotCard(spot: SpotStatus, featured = false): string {
   const when = windowText(spot);
-  const sub = [spot.vis_ft ? `~${spot.vis_ft[0]}–${spot.vis_ft[1]} ft vis` : "", when ? `best ${when}` : ""].filter(Boolean).join(" · ");
+  const sub = featured
+    ? ""
+    : [spot.vis_ft ? `~${spot.vis_ft[0]}–${spot.vis_ft[1]} ft vis` : "", when ? `best ${when}` : ""].filter(Boolean).join(" · ");
+  const meta = featured
+    ? `<div class="spot-meta">${spot.vis_ft ? `<span class="chip">~${spot.vis_ft[0]}–${spot.vis_ft[1]} ft vis</span>` : ""}${confidenceDots(spot.confidence)}</div>`
+    : "";
   return `
-  <article class="spot v-${spot.verdict}" id="spot-${esc(spot.id)}">
+  <article class="spot${featured ? " featured" : ""} v-${spot.verdict}" id="spot-${esc(spot.id)}">
     <header class="spot-head">
       <h2>${esc(spot.name)}</h2>
       <span class="verdict-chip">${verdictIcon(spot.verdict, 20)}${VERDICT_WORD[spot.verdict]}</span>
     </header>
     <p class="spot-reason">${esc(withoutVis(spot.reason) || spot.reason)}</p>
     ${sub ? `<p class="spot-sub">${esc(sub)}</p>` : ""}
+    ${meta}
     ${readings(spot)}
     ${why(spot)}
   </article>`;
@@ -163,8 +164,8 @@ function freshness(doc: StatusDoc, now: Date | null): string {
     ? `<ul class="stale-list">${stale.map((s) => `<li>${esc(s.label)}${s.error ? ` <span class="fine">(${esc(shortError(s.error))})</span>` : ""}</li>`).join("")}</ul>`
     : `<p class="fine">All ${doc.sources.length} sources fresh.</p>`;
   return `
-  <footer class="foot">
-    <p>Updated ${esc(clock(doc.generated_at))}${esc(age)}. <a href="${esc(doc.live_cam_url)}" rel="noopener">Scripps Pier underwater cam ↗</a></p>
+  <footer class="foot" id="foot">
+    <p>Updated ${esc(clock(doc.generated_at))}${esc(age)}.${doc.cam_url ? ` <a href="${esc(doc.cam_url)}" rel="noopener">Scripps Pier cam ↗</a>` : ""}</p>
     <details class="sources"><summary>${stale.length ? `${stale.length} source${stale.length > 1 ? "s" : ""} stale or down` : "Data sources"}</summary>${staleList}
       <p class="fine">NOAA CO-OPS & NWS, CDIP (Scripps), SCCOOS, Open-Meteo, County of San Diego DEHQ. Estimates, not guarantees.</p>
     </details>
@@ -186,19 +187,21 @@ export function staleBanner(doc: StatusDoc, now: Date): string {
 export function renderPage(doc: StatusDoc, now: Date | null): string {
   const featured = doc.spots.find((s) => s.id === doc.best_bet) ?? null;
   const others = doc.spots.filter((s) => s !== featured);
-  const chartNow = now ?? new Date(doc.generated_at);
+  const clockNow = now ?? new Date(doc.generated_at);
   return `
-  <header class="top">
+  <header class="top" id="top">
     <span class="brand">Snorkel Status <span class="muted">· La Jolla</span></span>
     <span class="updated">Updated ${esc(clock(doc.generated_at))}</span>
   </header>
-  ${now ? staleBanner(doc, now) : ""}
+  <div id="banner">${now ? staleBanner(doc, now) : ""}</div>
   <main>
-    ${featured ? heroSpot(featured) : heroOverall(doc)}
-    <button class="log-open" type="button" hidden>Log a swim</button>
-    ${others.length ? `<h2 class="section-title">${featured ? "Other spots" : "Spots"}</h2><div class="spots">${others.map(spotCard).join("")}</div>` : ""}
-    ${tideSection(doc, chartNow)}
-    ${waterSection(doc)}
+    ${verdictBar(doc, featured)}
+    <div id="details">
+      ${featured ? spotCard(featured, true) : ""}
+      ${others.length ? `<h2 class="section-title">${featured ? "Other spots" : "Spots"}</h2><div class="spots">${others.map((s) => spotCard(s)).join("")}</div>` : ""}
+      ${tideSection(doc, clockNow)}
+      ${waterSection(doc)}
+    </div>
   </main>
   ${freshness(doc, now)}`;
 }

@@ -11,11 +11,25 @@ function clone(): StatusDoc {
 }
 
 describe("renderPage", () => {
-  it("leads with the best bet's verdict and window", () => {
+  it("leads with the best bet's verdict and window, then the details", () => {
     const html = renderPage(sample, null);
-    expect(html).toContain('id="hero-title" class="verdict-word">Maybe<');
-    expect(html).toContain("Marine Room<span class=\"hero-when\">7:00–8:30 am</span>");
+    expect(html).toContain('<span class="verdict-word">Maybe</span> <span class="verdict-where">Marine Room</span>');
+    expect(html).toContain('<p class="verdict-when">7:00–8:30 am</p>');
+    expect(html.indexOf('id="verdict"')).toBeLessThan(html.indexOf('id="details"'));
     expect(html).toContain("Other spots");
+  });
+
+  it("asks nothing of the reader and talks only to its own data", () => {
+    const html = renderPage(sample, new Date(sample.generated_at));
+    expect(html).not.toContain("Log a swim");
+    expect(html).not.toContain("supabase.co");
+    expect(html).not.toMatch(/<(form|input|textarea|dialog)\b/);
+  });
+
+  it("links to Scripps' own cam page and embeds nothing", () => {
+    const html = renderPage(sample, null);
+    expect(html).toContain('href="https://coollab.ucsd.edu/pierviz/"');
+    expect(html).not.toMatch(/<(iframe|video|img)\b/);
   });
 
   it("escapes every data string", () => {

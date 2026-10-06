@@ -58,7 +58,7 @@ class SpotConfig(BaseModel):
     tide_rules: TideRules = Field(default_factory=TideRules)
     min_tide_ft: float | None = None
     seasonal_closures: list[SeasonalClosure] = Field(default_factory=list)
-    cam: str | None = None
+    near_pier: bool = False  # close enough to Scripps Pier for its turbidity sensor to count
     notes: str = ""
 
 

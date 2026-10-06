@@ -53,7 +53,6 @@ export interface SpotStatus {
   conditions: SpotConditions;
   hourly: HourScore[];
   shore_normal_deg: number;
-  has_cam: boolean;
 }
 
 export interface SourceHealth {
@@ -99,5 +98,5 @@ export interface StatusDoc {
   day: DayConditions;
   sources: SourceHealth[];
   disclaimer: string;
-  live_cam_url: string;
+  cam_url?: string | null;
 }

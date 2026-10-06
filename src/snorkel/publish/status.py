@@ -15,11 +15,11 @@ from snorkel.score.models import SpotStatus
 from snorkel.sun import LOCAL_TZ, SunTimes
 from snorkel.units import c_to_f, m_to_ft
 
+CAM_URL = "https://coollab.ucsd.edu/pierviz/"  # Scripps' own page with the pier cam
 DISCLAIMER = (
     "Conditions change quickly. Check with the lifeguards on site, and trust your own read "
     "of surge, currents and wildlife once you're there."
 )
-LIVE_CAM_URL = "https://coollab.ucsd.edu/pierviz/"
 VERDICT_RANK = {"yes": 0, "maybe": 1, "unknown": 2, "no": 3}
 
 SOURCE_LABELS = {
@@ -81,7 +81,7 @@ class StatusDoc(BaseModel):
     day: DayConditions
     sources: list[SourceHealth]
     disclaimer: str = DISCLAIMER
-    live_cam_url: str = LIVE_CAM_URL
+    cam_url: str = CAM_URL
 
 
 def short_name(name: str) -> str:
@@ -191,8 +191,9 @@ def day_conditions(cond: Conditions, cfg: ScoringConfig, sun: SunTimes) -> DayCo
         day.water_temp_f = round(temp_f, 1)
         day.water_temp_source = cond.water_temp.value.source
         day.wetsuit = cfg.wetsuit(temp_f)
-    if cond.turbidity and cond.turbidity.ok and cond.turbidity.value:
-        day.turbidity_ntu = cond.turbidity.value.ntu
+    turb = cond.turbidity.value if cond.turbidity and cond.turbidity.ok else None
+    if turb and turb.ntu >= cfg.turbidity.min_valid_ntu:
+        day.turbidity_ntu = turb.ntu
     if cond.chlorophyll and cond.chlorophyll.ok and cond.chlorophyll.value:
         day.chlorophyll_ug_l = cond.chlorophyll.value.chl_ug_l
     if cond.alerts and cond.alerts.ok and cond.alerts.value:

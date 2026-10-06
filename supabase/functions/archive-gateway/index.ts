@@ -10,6 +10,7 @@
 //   GET  /archive-gateway/health          -> {"ok": true} (no auth)
 //   GET  /archive-gateway/object/<key>    -> object bytes, or 404
 //   PUT  /archive-gateway/object/<key>    -> upsert object bytes
+//   DELETE /archive-gateway/object/<key>  -> remove the object, or 404
 //
 // Deployed with verify_jwt = false because the caller's JWT is GitHub's, not
 // Supabase's; the check below replaces it.
@@ -86,6 +87,19 @@ async function putObject(key: string, req: Request): Promise<Response> {
   return json(200, { key, bytes: body.byteLength });
 }
 
+async function deleteObject(key: string): Promise<Response> {
+  const res = await fetch(`${SUPABASE_URL}/storage/v1/object/${BUCKET}`, {
+    method: "DELETE",
+    headers: { ...serviceHeaders, "content-type": "application/json" },
+    body: JSON.stringify({ prefixes: [key] }),
+  });
+  if (!res.ok) {
+    return json(502, { error: `storage ${res.status}`, detail: (await res.text()).slice(0, 300) });
+  }
+  const removed = (await res.json()) as unknown[];
+  return removed.length ? json(200, { key, deleted: true }) : json(404, { error: "not found", key });
+}
+
 Deno.serve(async (req: Request) => {
   const { pathname } = new URL(req.url);
   if (pathname.endsWith("/health")) return json(200, { ok: true });
@@ -100,5 +114,6 @@ Deno.serve(async (req: Request) => {
 
   if (req.method === "GET") return await getObject(key);
   if (req.method === "PUT") return await putObject(key, req);
+  if (req.method === "DELETE") return await deleteObject(key);
   return json(405, { error: "method not allowed" });
 });

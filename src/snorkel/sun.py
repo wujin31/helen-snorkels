@@ -1,4 +1,4 @@
-"""Sun position, for daylight-gating the cam and later the best-window math."""
+"""Sun position and times, for daylight gating and the best-window math."""
 
 from __future__ import annotations
 

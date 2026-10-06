@@ -1,6 +1,5 @@
 import "./styles.css";
 import { clock, ft } from "./format";
-import { logKey, openLogSheet } from "./log";
 import { renderPage } from "./render";
 import { tideScale, TIDE_BOX } from "./tide";
 import type { StatusDoc } from "./types";
@@ -8,7 +7,6 @@ import type { StatusDoc } from "./types";
 const app = document.getElementById("app")!;
 let doc: StatusDoc = JSON.parse(document.getElementById("status-data")!.textContent!);
 let lastCheck = 0;
-const key = logKey();
 
 function paint(next: StatusDoc): void {
   doc = next;
@@ -17,11 +15,6 @@ function paint(next: StatusDoc): void {
 }
 
 function bind(): void {
-  const logButton = app.querySelector<HTMLButtonElement>(".log-open");
-  if (logButton && key) {
-    logButton.hidden = false;
-    logButton.addEventListener("click", () => openLogSheet(doc, key));
-  }
   bindTide();
 }
 

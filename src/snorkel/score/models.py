@@ -62,4 +62,3 @@ class SpotStatus(BaseModel):
     conditions: SpotConditions = Field(default_factory=SpotConditions)
     hourly: list[HourScore] = Field(default_factory=list)
     shore_normal_deg: float
-    has_cam: bool = False

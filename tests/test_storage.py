@@ -13,6 +13,14 @@ def test_local_roundtrip(tmp_path: Path) -> None:
     assert storage.get("a/b.txt") == b"hi"
 
 
+def test_local_delete(tmp_path: Path) -> None:
+    storage = LocalStorage(tmp_path)
+    storage.put("frames/x.jpg", b"\xff", "image/jpeg")
+    assert storage.delete("frames/x.jpg") is True
+    assert storage.get("frames/x.jpg") is None
+    assert storage.delete("frames/x.jpg") is False
+
+
 def test_local_rejects_escaping_keys(tmp_path: Path) -> None:
     with pytest.raises(ValueError):
         LocalStorage(tmp_path).put("../evil", b"x", "text/plain")
@@ -47,6 +55,10 @@ def gateway_client(objects: dict[str, bytes], seen: list[httpx.Request]) -> http
         if request.method == "PUT":
             objects[key] = request.content
             return httpx.Response(200, json={"key": key})
+        if request.method == "DELETE":
+            if objects.pop(key, None) is None:
+                return httpx.Response(404, json={"error": "not found"})
+            return httpx.Response(200, json={"key": key, "deleted": True})
         if key in objects:
             return httpx.Response(200, content=objects[key])
         return httpx.Response(404, json={"error": "not found"})
@@ -111,3 +123,12 @@ def test_check_storage_command(tmp_path: Path) -> None:
     result = CliRunner().invoke(app, ["check-storage", "--storage", f"local:{tmp_path}"])
     assert result.exit_code == 0, result.output
     assert (tmp_path / "state/healthcheck/latest.txt").read_bytes().startswith(b"ok ")
+
+
+def test_gateway_delete() -> None:
+    objects = {"frames/a.jpg": b"\xff"}
+    seen: list[httpx.Request] = []
+    storage = GatewayStorage(GATEWAY, lambda: "tok", client=gateway_client(objects, seen))
+    assert storage.delete("frames/a.jpg") is True
+    assert storage.delete("frames/a.jpg") is False
+    assert objects == {}

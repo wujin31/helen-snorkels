@@ -6,7 +6,6 @@ services on 2026-09-27 with `probe.yml` (branches `probe/discovery-*`).
 
 | Source id | What | Archive cadence | Used by v0 scorer |
 |---|---|---|---|
-| `cam.scripps_pier` | One still from the Scripps Pier underwater cam via the HDOnTap embed endpoint that the Shore Stations' PierViz page uses (`scripps_pier-underwater-CUST`), decoded with ffmpeg; falls back to the public page's HLS URL, then a headless browser | 15 min, sun ≥ 2° | Not yet (Phase 3 CV) |
 | `tides.predictions` | NOAA CO-OPS 9410230, 6-min + highs/lows, MLLW | 6 h | Tide curve, trend, best window |
 | `tides.observed` | CO-OPS water level, water temp, wind, air temp | 1 h | Pier wind (primary), water temp (fallback) |
 | `weather.ndbc_ljpc1` | NDBC LJPC1 (same pier station), trimmed to 6 h | 1 h | Pier wind (fallback) |
@@ -56,13 +55,18 @@ services on 2026-09-27 with `probe.yml` (branches `probe/discovery-*`).
 
 - **Swim Guide:** its JSON API requires authentication; the county is the
   primary source anyway.
-- **HDOnTap thumbnails:** a static `snapshot_…jpg` exists, but its refresh
-  rate is unknown; the embed stream gives a guaranteed-current frame.
+- **The Scripps Pier underwater cam** (retired 2026-10-06). HDOnTap's players
+  refuse to be framed by other sites (`X-Frame-Options: DENY`; the portal
+  players' CSP `frame-ancestors` allows only `*.hdontap.com`, or only UCSD sites
+  for Scripps' copy), and permission to embed or analyze the stream wasn't
+  granted. Capture stopped and every archived frame was deleted
+  (`snorkel purge-cam`, via `maintenance.yml`). The page links to Scripps'
+  PierViz page instead.
 
 ## Probing
 
 `uv run snorkel probe <source> [--save-fixture]` hits one source now.
-`snorkel sniff <url>` lists the requests a page makes (how the county and
-cam endpoints were found). To run either from a GitHub runner, push a branch
+`snorkel sniff <url>` lists the requests a page makes (how the county
+endpoint was found). To run either from a GitHub runner, push a branch
 named `probe/<anything>` containing `probe/run.sh` (see
 `.github/workflows/probe.yml`).

@@ -9,7 +9,7 @@
 # Values marked TODO are unknown until probed against the live services; a
 # source with a missing required parameter is recorded as "skipped".
 
-location:                       # sun-elevation gate reference (Scripps Pier)
+location:                       # sun times for the best-window search (Scripps Pier)
   lat: 32.8666
   lon: -117.2571
 
@@ -87,17 +87,3 @@ sources:
     datasets:                   # 750 m sector "VY" covers 0-45N, 120-60W
       - {id: noaacwNPPVIIRSkd490SectorVYDaily, var: kd_490, altitude: true, lat_descending: true}
     box_deg: 0.05               # half-width of the box sampled around each spot
-
-  cam.scripps_pier:
-    every_minutes: 15
-    enabled_env: CAM_CAPTURE_ENABLED   # set the repo variable to "false" to stop capture
-    timeout_s: 150
-    min_sun_elevation_deg: 2    # underwater at 4 m needs real daylight
-    # The same embed the Shore Stations' own PierViz page uses; returns the stream URL.
-    embed_url: https://portal.hdontap.com/backend/embed/scripps_pier-underwater-CUST?r=aHR0cHM6Ly9jb29sbGFiLnVjc2QuZWR1
-    embed_referer: https://coollab.ucsd.edu/
-    page_url: https://hdontap.com/stream/018408/scripps-pier-underwater-live-webcam/
-    snapshot_url: null          # TODO: a published still, if HDOnTap/Scripps offer one
-    hls_url: null               # optional fixed stream URL; otherwise discovered
-    width: 960
-    jpeg_quality: 75

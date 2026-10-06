@@ -5,7 +5,8 @@ from __future__ import annotations
 import csv
 import io
 import math
-from datetime import datetime
+import statistics
+from datetime import datetime, timedelta
 
 from snorkel.observations import Chlorophyll, Turbidity, WaterTemp
 
@@ -34,6 +35,30 @@ def _latest(rows: list[dict[str, str]], column: str) -> tuple[datetime, float] |
     return None
 
 
+def _recent_median(
+    rows: list[dict[str, str]], column: str, hours: float = 3
+) -> tuple[datetime, float] | None:
+    """Median of the good readings in the `hours` before the latest one.
+
+    One sample can be a glitch (a bubble, fouling, a bad calibration step);
+    the median of a few hours of 10-minute samples isn't.
+    """
+    good: list[tuple[datetime, float]] = []
+    for row in rows:
+        try:
+            value = float(row.get(column, ""))
+        except ValueError:
+            continue
+        if math.isnan(value) or row.get(f"{column}_qc_agg", "2") not in GOOD_FLAGS:
+            continue
+        good.append((datetime.fromisoformat(row["time"].replace("Z", "+00:00")), value))
+    if not good:
+        return None
+    latest = max(t for t, _ in good)
+    recent = [v for t, v in good if latest - t <= timedelta(hours=hours)]
+    return latest, statistics.median(recent)
+
+
 def parse_pier(
     body: bytes,
 ) -> tuple[WaterTemp | None, Chlorophyll | None, Turbidity | None]:
@@ -44,7 +69,7 @@ def parse_pier(
     rows = list(csv.DictReader(io.StringIO("\n".join([lines[0], *lines[2:]]))))
     temp = _latest(rows, TEMPERATURE)
     chl = next((c for c in (_latest(rows, col) for col in CHLOROPHYLL) if c), None)
-    turb = _latest(rows, TURBIDITY)
+    turb = _recent_median(rows, TURBIDITY)
     return (
         WaterTemp(time=temp[0], temp_c=temp[1], source="sccoos") if temp else None,
         Chlorophyll(time=chl[0], chl_ug_l=chl[1]) if chl else None,

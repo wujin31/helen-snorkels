@@ -186,6 +186,36 @@ def score(
                 fh.write(json.dumps(row) + "\n")
 
 
+@app.command("purge-cam")
+def purge_cam(
+    storage: Annotated[
+        str | None, typer.Option(help="gateway:<url> or local:<dir>. Default: $SNORKEL_STORAGE")
+    ] = None,
+    since: Annotated[str, typer.Option(help="First day to look for cam frames")] = "2026-09-26",
+) -> None:
+    """Delete every archived Scripps Pier cam frame and the old cam model's state.
+
+    Frame keys come from the daily manifests (every capture was recorded there);
+    the manifest rows stay as a record that capture happened, minus the frames.
+    """
+    from datetime import date, timedelta
+
+    from snorkel.archive import read_manifest
+
+    target = storage_from_spec(storage)
+    day, today = date.fromisoformat(since), datetime.now(UTC).date()
+    keys: list[str] = []
+    while day <= today:
+        keys += [
+            r.key for r in read_manifest(target, day) if r.source == "cam.scripps_pier" and r.key
+        ]
+        keys += [f"state/cam_readings/{day.isoformat()}.jsonl"]
+        day += timedelta(days=1)
+    keys.append("state/cam_rois.json")
+    deleted = sum(1 for key in dict.fromkeys(keys) if target.delete(key))
+    print(f"deleted {deleted} objects ({len(keys)} checked)")
+
+
 @app.command("discover-mops")
 def discover_mops(
     window: Annotated[int, typer.Option(help="MOPs to scan either side of the bisection")] = 20,
