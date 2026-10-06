@@ -48,11 +48,14 @@ visibility:                  # proxy until the pier-cam CV exists
   max_ft: 40
   spread_fraction: 0.35      # +/- band around the estimate while it's a proxy
 
+pier: [32.8666, -117.2571]   # Scripps Pier, where the turbidity and chlorophyll sensors are
+
 turbidity:                   # Scripps Pier ECO turbidity sensor (~1 km from the Marine Room)
   vis_ft_at_1_ntu: 9         # vis_ft = vis_ft_at_1_ntu / ntu^exponent (prior)
   exponent: 0.9
   weight_near_pier: 0.6      # blend weight vs the wave proxy at spots with `cam` set
   weight_elsewhere: 0.3
+  max_distance_km: 6          # farther from Scripps Pier than this, its sensor says nothing about the spot
   min_valid_ntu: 0.15         # lower than nearshore water ever gets here: a sensor fault, so ignored
 
 window:                      # hourly sub-scores for the best-window search

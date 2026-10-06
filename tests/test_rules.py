@@ -320,3 +320,24 @@ def test_nws_high_rip_risk_caps_at_maybe(cove: SpotConfig, cfg: ScoringConfig) -
     assert any(f.label == "NWS surf forecast" and f.effect == "+" for f in calm.factors)
     rips = score(cove, conditions(cove, surf_forecast=forecast("High", (1, 2))), cfg)
     assert rips.verdict == "maybe" and "NWS high rip current risk" in rips.cautions
+
+
+def test_a_sheltered_spot_sees_a_share_of_the_open_coast_waves(cfg: ScoringConfig) -> None:
+    bay = next(s for s in load_spots() if s.id == "mission-point")
+    open_coast = {bay.id: ok("waves", waves(0.9, 10), NOW)}  # ~3 ft outside the jetties
+    status = score(bay, conditions(bay, waves=open_coast), cfg)
+    assert status.conditions.hs_ft is not None and status.conditions.hs_ft < 1
+    assert not any(g.startswith("Waves") for g in status.gates)
+    assert any(f.label == "Shelter" for f in status.factors)
+
+
+def test_pier_turbidity_only_counts_near_the_pier(cfg: ScoringConfig) -> None:
+    spots = {s.id: s for s in load_spots()}
+    murky = ok("turb", Turbidity(time=NOW, ntu=4.0), NOW)
+
+    def turbidity_used(spot: SpotConfig) -> bool:
+        status = score(spot, conditions(spot, turbidity=murky), cfg)
+        return any(f.label == "Turbidity" for f in status.factors)
+
+    assert turbidity_used(spots["marine-room"]) and turbidity_used(spots["la-jolla-cove"])
+    assert not turbidity_used(spots["swamis"]) and not turbidity_used(spots["sunset-cliffs"])

@@ -58,7 +58,10 @@ class SpotConfig(BaseModel):
     tide_rules: TideRules = Field(default_factory=TideRules)
     min_tide_ft: float | None = None
     seasonal_closures: list[SeasonalClosure] = Field(default_factory=list)
-    near_pier: bool = False  # close enough to Scripps Pier for its turbidity sensor to count
+    near_pier: bool = False  # beside Scripps Pier: its turbidity sensor counts for more here
+    area: str = "La Jolla"  # groups spots on the page
+    wave_factor: float = Field(default=1.0, gt=0, le=1)
+    """Share of the open-coast wave height that reaches a sheltered spot (bays, harbors)."""
     notes: str = ""
 
 

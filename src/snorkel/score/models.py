@@ -50,6 +50,7 @@ class SpotStatus(BaseModel):
     name: str
     tier: int
     difficulty: str
+    area: str = "La Jolla"
     verdict: Verdict
     confidence: Confidence
     vis_ft: tuple[int, int] | None = None

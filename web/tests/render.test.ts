@@ -66,6 +66,38 @@ describe("renderPage", () => {
   });
 });
 
+describe("spot list", () => {
+  function many(): StatusDoc {
+    const doc = clone();
+    const base = doc.spots[1];
+    const extra = [
+      { id: "swamis", name: "Swami's", area: "North County", verdict: "no" as const, difficulty: "moderate" },
+      { id: "sea-caves", name: "La Jolla Sea Caves", area: "La Jolla", verdict: "maybe" as const, difficulty: "advanced" },
+      { id: "sunset-cliffs", name: "Sunset Cliffs", area: "Point Loma & Mission Bay", verdict: "no" as const, difficulty: "advanced" },
+    ];
+    for (const e of extra) doc.spots.push({ ...structuredClone(base), ...e });
+    return doc;
+  }
+
+  it("groups other spots by area, La Jolla first, as rows that open", () => {
+    const html = renderPage(many(), null);
+    const la = html.indexOf('<h3 class="area">La Jolla</h3>');
+    const pl = html.indexOf('<h3 class="area">Point Loma &amp; Mission Bay</h3>');
+    const nc = html.indexOf('<h3 class="area">North County</h3>');
+    expect(la).toBeGreaterThan(-1);
+    expect(la).toBeLessThan(pl);
+    expect(pl).toBeLessThan(nc);
+    expect(html).toContain('<details class="row v-no" id="spot-swamis">');
+    expect(html.match(/<details class="row /g)?.length).toBe(4); // everything but the best bet
+  });
+
+  it("tags advanced spots and summarizes each row in one line", () => {
+    const html = renderPage(many(), null);
+    expect(html).toContain('La Jolla Sea Caves <span class="tag">Advanced</span>');
+    expect(html).toMatch(/id="spot-sea-caves">[\s\S]*?<span class="row-sub">~\d+–\d+ ft vis/);
+  });
+});
+
 describe("water panel", () => {
   it("shows the NWS surf forecast when there is one", () => {
     const doc = clone();

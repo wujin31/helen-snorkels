@@ -102,26 +102,61 @@ function factorList(factors: Factor[]): string {
     .join("")}</ul>`;
 }
 
-function spotCard(spot: SpotStatus, featured = false): string {
-  const when = windowText(spot);
-  const sub = featured
-    ? ""
-    : [spot.vis_ft ? `~${spot.vis_ft[0]}–${spot.vis_ft[1]} ft vis` : "", when ? `best ${when}` : ""].filter(Boolean).join(" · ");
-  const meta = featured
-    ? `<div class="spot-meta">${spot.vis_ft ? `<span class="chip">~${spot.vis_ft[0]}–${spot.vis_ft[1]} ft vis</span>` : ""}${confidenceDots(spot.confidence)}</div>`
-    : "";
+/** The best bet's full card, right under the answer. */
+function featuredCard(spot: SpotStatus): string {
+  const meta = `<div class="spot-meta">${spot.vis_ft ? `<span class="chip">~${spot.vis_ft[0]}–${spot.vis_ft[1]} ft vis</span>` : ""}${confidenceDots(spot.confidence)}</div>`;
   return `
-  <article class="spot${featured ? " featured" : ""} v-${spot.verdict}" id="spot-${esc(spot.id)}">
+  <article class="spot featured v-${spot.verdict}" id="spot-${esc(spot.id)}">
     <header class="spot-head">
       <h2>${esc(spot.name)}</h2>
       <span class="verdict-chip">${verdictIcon(spot.verdict, 20)}${VERDICT_WORD[spot.verdict]}</span>
     </header>
     <p class="spot-reason">${esc(withoutVis(spot.reason) || spot.reason)}</p>
-    ${sub ? `<p class="spot-sub">${esc(sub)}</p>` : ""}
     ${meta}
     ${readings(spot)}
     ${why(spot)}
   </article>`;
+}
+
+const AREA_ORDER = ["La Jolla", "Point Loma & Mission Bay", "North County"];
+
+/** One spot as a one-line row that opens to its full detail. */
+function spotRow(spot: SpotStatus): string {
+  const when = windowText(spot);
+  const go = spot.verdict === "yes" || spot.verdict === "maybe";
+  const sub = go
+    ? [spot.vis_ft ? `~${spot.vis_ft[0]}–${spot.vis_ft[1]} ft vis` : "", when].filter(Boolean).join(" · ")
+    : withoutVis(spot.reason) || spot.reason;
+  const tag = spot.difficulty === "advanced" ? ` <span class="tag">Advanced</span>` : "";
+  return `
+  <details class="row v-${spot.verdict}" id="spot-${esc(spot.id)}">
+    <summary>
+      ${verdictIcon(spot.verdict, 22)}
+      <span class="row-main"><span class="row-name">${esc(spot.name)}${tag}</span><span class="row-sub">${esc(sub)}</span></span>
+      <span class="row-verdict">${VERDICT_WORD[spot.verdict]}</span>
+    </summary>
+    <div class="row-body">
+      ${go ? `<p class="spot-reason">${esc(withoutVis(spot.reason) || spot.reason)}</p>` : ""}
+      ${readings(spot)}
+      ${why(spot)}
+    </div>
+  </details>`;
+}
+
+/** Every spot but the featured one, grouped by area in a fixed order. */
+function spotList(spots: SpotStatus[], featured: boolean): string {
+  if (!spots.length) return "";
+  const areas = [...new Set([...AREA_ORDER, ...spots.map((s) => s.area ?? "La Jolla")])];
+  const groups = areas
+    .map((area) => ({ area, spots: spots.filter((s) => (s.area ?? "La Jolla") === area) }))
+    .filter((g) => g.spots.length);
+  return `
+  <section class="spot-list" aria-labelledby="spots-title">
+    <h2 class="section-title" id="spots-title">${featured ? "Other spots" : "Spots"}</h2>
+    ${groups
+      .map((g) => `<h3 class="area">${esc(g.area)}</h3><div class="rows">${g.spots.map(spotRow).join("")}</div>`)
+      .join("")}
+  </section>`;
 }
 
 function waterSection(doc: StatusDoc): string {
@@ -200,8 +235,8 @@ export function renderPage(doc: StatusDoc, now: Date | null): string {
   <main>
     ${verdictBar(doc, featured)}
     <div id="details">
-      ${featured ? spotCard(featured, true) : ""}
-      ${others.length ? `<h2 class="section-title">${featured ? "Other spots" : "Spots"}</h2><div class="spots">${others.map((s) => spotCard(s)).join("")}</div>` : ""}
+      ${featured ? featuredCard(featured) : ""}
+      ${spotList(others, featured !== null)}
       ${tideSection(doc, clockNow)}
       ${waterSection(doc)}
     </div>

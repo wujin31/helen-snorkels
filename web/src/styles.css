@@ -118,6 +118,25 @@ h2 { font-size: 1.05rem; }
 .spot.featured { margin-top: 12px; }
 
 .spots { display: grid; gap: 12px; }
+.area { font-size: 0.95rem; margin: 14px 2px 6px; color: var(--ink-2); }
+.rows { display: grid; gap: 6px; }
+.row {
+  background: var(--surface); border: 1px solid var(--hair); border-left: 4px solid var(--v);
+  border-radius: 12px; margin: 0;
+}
+.row > summary {
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 10px; align-items: center;
+  padding: 10px 12px; min-height: 52px; color: var(--ink); font-weight: 400; list-style: none;
+}
+.row > summary::-webkit-details-marker { display: none; }
+.row > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; border-radius: 10px; }
+.row-main { display: grid; min-width: 0; }
+.row-name { font-weight: 650; }
+.row-sub { color: var(--ink-2); font-size: 0.88rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.row[open] .row-sub { white-space: normal; }
+.row-verdict { font-weight: 650; font-size: 0.92rem; }
+.row-body { padding: 0 12px 12px; border-top: 1px solid var(--hair); }
+.tag { font-size: 0.72rem; font-weight: 650; color: var(--ink-2); border: 1px solid var(--hair); border-radius: 999px; padding: 1px 6px; margin-left: 4px; vertical-align: 1px; }
 .spot, .panel {
   background: var(--surface); border-radius: var(--radius); padding: 14px 16px;
   box-shadow: var(--shadow); border: 1px solid var(--hair);
