@@ -40,6 +40,34 @@ services on 2026-09-27 with `probe.yml` (branches `probe/discovery-*`).
 - **CoastWatch sector:** the "VY" sector spans 0–45°N, 120–60°W. The West
   Coast node's ERDDAP blocks GitHub runner IPs, so the central node is used.
 
+## Visibility model (calibrated 2026-10-06)
+
+No public sensor measures visibility, and the dive-report archives that could
+(Just Get Wet / DiveViz) block automated reads until they say yes
+(`docs/dive-report-request.md`). The one measured clarity signal is the
+Scripps Pier ECO turbidity sensor, so the estimate is fitted to it: a
+backtest on `probe/calibrate` lined up 915 hourly daylight readings from
+Jul 4 to Oct 5 with the decayed near-bottom orbital velocity at MOP D0496
+(spectral, 4 m), pier chlorophyll, pier wind and Open-Meteo rain.
+
+| Against pier turbidity (Spearman) | hourly | daily |
+|---|---|---|
+| Near-bottom wave motion, 24 h half-life (12-48 h equal) | +0.51 | +0.58 |
+| Wave height at the spot | +0.50 | +0.53 |
+| Chlorophyll | +0.41 | +0.42 |
+| Wind | +0.04 | +0.08 |
+| Rain, last 5 days (only 3 rainy days) | -0.10 | -0.12 |
+
+The fitted model, `ln NTU = -1.80 + 3.5 * orbital + 0.49 * ln(chl)`, feeds the
+same turbidity-to-feet curve as the sensor (`config/scoring.yaml`). Fit on one
+half of the summer and tested on the other, it tracks the sensor at Spearman
+0.56-0.70 with a typical error of ~5 ft, and its +/-35% band holds the
+sensor's reading 72-76% of the time. The hand-set proxy it replaces read
+~10 ft low (band hit rate 19%). Caveats: the feet still rest on the
+turbidity-to-feet prior (9 ft at 1 NTU), the fit is at one sandy spot near
+the pier, and summer had no rain or bloom to test those terms. Dive reports
+are what would settle all three.
+
 ## Known access limits
 
 - **CDIP** sometimes answers GitHub-runner requests with "Access Denied. Please

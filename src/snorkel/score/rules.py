@@ -432,12 +432,14 @@ def score_spot(
     if window_wind is not None and window_wind > spot.thresholds.max_wind_kt:
         gates.append(f"Wind ~{window_wind:.0f} kt even at the best time")
 
-    # Visibility proxy.
+    # Visibility: the turbidity that wave motion and plankton predict (a model
+    # fitted to the Scripps Pier sensor), read off the same turbidity-to-feet
+    # curve as the sensor itself; recent rain and wind come off after.
     vis: tuple[int, int] | None = None
     vis_mid: float | None = None
     if orbital is not None:
         v = cfg.visibility
-        penalty = v.orbital_ft_per_ms * orbital
+        tc = cfg.turbidity
         detail = f"near-bottom motion {orbital:.2f} m/s"
         factors.append(
             Factor(
@@ -447,22 +449,21 @@ def score_spot(
             )
         )
         chl = cond.chlorophyll
+        chl_ug_l = v.typical_chl_ug_l
         if is_fresh(chl, "chlorophyll", cfg, now) and chl and chl.value:
-            excess = max(0.0, chl.value.chl_ug_l - v.chl_threshold_ug_l)
-            penalty += min(v.chl_max_penalty_ft, v.chl_ft_per_ug_l * excess)
+            chl_ug_l = chl.value.chl_ug_l
             factors.append(
                 Factor(
                     label="Plankton",
-                    effect="-" if excess > 0 else "+",
-                    detail=f"chlorophyll {chl.value.chl_ug_l:.1f} µg/L at the pier",
+                    effect="-" if chl_ug_l > v.chl_threshold_ug_l else "+",
+                    detail=f"chlorophyll {chl_ug_l:.1f} µg/L at the pier",
                 )
             )
-        penalty += recent_rain_penalty
+        penalty = recent_rain_penalty
         if window_wind is not None:
             penalty += v.wind_ft_per_kt * max(0.0, window_wind - v.wind_threshold_kt)
-        vis_mid = v.base_ft - penalty
+        vis_mid = min(v.max_ft, tc.vis_ft(v.predicted_ntu(orbital, chl_ug_l))) - penalty
         turb = cond.turbidity
-        tc = cfg.turbidity
         pier_km = distance_km((spot.lat, spot.lon), cfg.pier)
         if pier_km > tc.max_distance_km:
             turb = None  # the pier sensor says nothing about water this far away

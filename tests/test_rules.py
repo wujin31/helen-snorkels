@@ -207,6 +207,28 @@ def test_plankton_bloom_hurts_vis(cove: SpotConfig, cfg: ScoringConfig) -> None:
     assert status.vis_ft and status.vis_ft[1] < 20
 
 
+def test_visibility_model_keeps_the_pier_sensor_scale(cfg: ScoringConfig) -> None:
+    v, tc = cfg.visibility, cfg.turbidity
+
+    def ft(orbital: float, chl: float) -> float:
+        return tc.vis_ft(v.predicted_ntu(orbital, chl))
+
+    # The summer's median wave motion and chlorophyll at the pier read ~23 ft there.
+    assert 18 <= ft(0.28, v.typical_chl_ug_l) <= 28
+    assert ft(0.45, 0.65) < ft(0.28, 0.65) < ft(0.15, 0.65)
+    assert ft(0.2, 12.0) < 10  # a red tide, far outside the fitted range, stays sane
+    assert ft(0.2, 30.0) > 3
+
+
+def test_stale_chlorophyll_falls_back_to_a_typical_value(
+    cove: SpotConfig, cfg: ScoringConfig
+) -> None:
+    stale = SourceResult(source="chl", ok=False, fetched_at=NOW, error="sensor down")
+    status = score(cove, conditions(cove, chlorophyll=stale), cfg)
+    assert status.vis_ft is not None
+    assert not any(f.label == "Plankton" for f in status.factors)
+
+
 def test_window_prefers_incoming_tide(cove: SpotConfig, cfg: ScoringConfig) -> None:
     status = score(cove, conditions(cove), cfg)
     assert status.window is not None

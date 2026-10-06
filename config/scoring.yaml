@@ -33,25 +33,33 @@ gates:
     - Rip Current Statement
   comfortable_fraction: 0.7  # Yes needs Hs and wind at or under 70% of the spot threshold
 
-visibility:                  # proxy until the pier-cam CV exists
-  base_ft: 20                # clean, calm, low-chlorophyll La Jolla day
-  half_life_h: 24            # swell stirs the bottom for a day or two after it drops
-  orbital_ft_per_ms: 22      # vis lost per m/s of decayed near-bottom orbital velocity
-  chl_threshold_ug_l: 2.0
-  chl_ft_per_ug_l: 1.0
-  chl_max_penalty_ft: 12
+visibility:
+  # Predicted turbidity from near-bottom wave motion and plankton, read off the
+  # turbidity curve below: ln NTU = intercept + a * orbital + b * ln(chl).
+  # Fitted 2026-10-06 to the Scripps Pier ECO sensor, Jul 4 - Oct 5 (915 hourly
+  # daylight samples, MOP D0496 at 4 m). Out of sample (fit on one half of the
+  # summer, test on the other): Spearman 0.56-0.70 against the sensor, typical
+  # error ~5 ft, and the +/-35% band holds the sensor's value 72-76% of the
+  # time. The old hand-set proxy (20 ft - 22 ft per m/s) read ~10 ft low with
+  # the band holding it 19% of the time. probe/calibrate has the backtest.
+  ln_ntu_intercept: -1.80
+  ln_ntu_per_orbital_ms: 3.5
+  ln_ntu_per_ln_chl: 0.49    # power law, so it extrapolates sanely into blooms
+  typical_chl_ug_l: 0.65     # summer median at the pier; used when the sensor is stale
+  half_life_h: 24            # swell stirs the bottom for a day or two (12-48 h fit equally well)
+  chl_threshold_ug_l: 2.0    # above this the Plankton factor reads as a minus
   rain_recent_days: 5        # rain after the gate lifts still clouds nearshore water
   rain_recent_penalty_ft: 3
-  wind_threshold_kt: 8
-  wind_ft_per_kt: 0.5
+  wind_threshold_kt: 8       # surface chop. Turbidity doesn't track wind (Spearman 0.04),
+  wind_ft_per_kt: 0.5        # so this is an untested prior about the view from the surface
   min_ft: 2
   max_ft: 40
-  spread_fraction: 0.35      # +/- band around the estimate while it's a proxy
+  spread_fraction: 0.35      # +/- band: holds ~3/4 of sensor readings (backtest above)
 
 pier: [32.8666, -117.2571]   # Scripps Pier, where the turbidity and chlorophyll sensors are
 
 turbidity:                   # Scripps Pier ECO turbidity sensor (~1 km from the Marine Room)
-  vis_ft_at_1_ntu: 9         # vis_ft = vis_ft_at_1_ntu / ntu^exponent (prior)
+  vis_ft_at_1_ntu: 9         # vis_ft = vis_ft_at_1_ntu / ntu^exponent (prior; sets the scale of every estimate)
   exponent: 0.9
   weight_near_pier: 0.6      # blend weight vs the wave proxy at spots with `near_pier` set
   weight_elsewhere: 0.3

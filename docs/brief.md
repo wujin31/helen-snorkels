@@ -2,7 +2,7 @@
 
 > Handoff doc for Claude Code. It distills a planning conversation: goals, research, competitive landscape, technical strategy, design direction, and a build plan. **Read "Guiding principles" and "First sessions" before writing code.**
 >
-> **Changes since this brief (2026-10-06).** The swim log was cut: no user interaction. The Scripps Pier cam was dropped: permission to embed or analyze it wasn't granted, capture stopped and archived frames were deleted. Visibility now comes from wave physics, pier sensors and NWS forecasts. Satellite water color was tested and can't resolve La Jolla's clear water (`docs/sources.md`, Not used). Dive-report archives block automated access, so calibration against them waits on permission (`docs/dive-report-request.md`). Twelve spots across La Jolla, Point Loma and North County are live. Sections below that rely on the cam or her logs are historical.
+> **Changes since this brief (2026-10-06).** The swim log was cut: no user interaction. The Scripps Pier cam was dropped: permission to embed or analyze it wasn't granted, capture stopped and archived frames were deleted. Visibility now comes from wave physics and plankton, fitted to the Scripps Pier turbidity sensor (`docs/sources.md`), plus NWS forecasts. Satellite water color was tested and can't resolve La Jolla's clear water (`docs/sources.md`, Not used). Dive-report archives block automated access, so calibration against them waits on permission (`docs/dive-report-request.md`). Twelve spots across La Jolla, Point Loma and North County are live. Sections below that rely on the cam or her logs are historical.
 
 ---
 
