@@ -9,13 +9,13 @@ services on 2026-09-27 with `probe.yml` (branches `probe/discovery-*`).
 | `tides.predictions` | NOAA CO-OPS 9410230, 6-min + highs/lows, MLLW | 6 h | Tide curve, trend, best window |
 | `tides.observed` | CO-OPS water level, water temp, wind, air temp | 1 h | Pier wind (primary), water temp (fallback) |
 | `weather.ndbc_ljpc1` | NDBC LJPC1 (same pier station), trimmed to 6 h | 1 h | Pier wind (fallback) |
-| `weather.openmeteo_forecast` | Hourly wind, gusts, precipitation for both spots | 1 h | Window wind, rain gate |
-| `weather.openmeteo_marine` | Hourly waves/swell/SST for both spots | 1 h | Waves (last-resort fallback) |
+| `weather.openmeteo_forecast` | Hourly wind, gusts, precipitation at every spot | 1 h | Window wind, rain gate |
+| `weather.openmeteo_marine` | Hourly waves/swell/SST at every spot | 1 h | Waves (last-resort fallback) |
 | `weather.nws_srf` | NWS Surf Zone Forecast (SGX), San Diego County Coastal Areas segment: surf height, rip current risk, water temp, swell remarks for today and the next day | 3 h | High rip risk caps a spot at Maybe; surf and rip risk shown in Why and Water today |
 | `weather.nws_grid` | NWS SGX gridpoint forecast (land point) | 3 h | Archive only |
 | `weather.nws_alerts` | NWS active alerts at a land and a nearshore point | 1 h | High Surf → No; Beach Hazards / Rip Current → caps at Maybe |
 | `cdip.buoy` | Buoy 201 Scripps Nearshore, last 3 h incl. full spectra + SST | 30 min | Waves (fallback) |
-| `cdip.mop_nowcast` | MOP alongshore nowcast incl. spectra: **D0482** (Cove, 0.18 km, 10 m, normal 18°), **D0496** (Marine Room, 0.34 km, 10 m, normal 318°) | 1 h | Waves (primary), orbital velocity, decay |
+| `cdip.mop_nowcast` | MOP alongshore nowcast incl. spectra, one point per spot (`cdip_mop_id` in `config/spots.yaml`; e.g. **D0482** Cove, 0.18 km, 10 m, normal 18°; **D0496** Marine Room, 0.34 km, 10 m, normal 318°) | 1 h | Waves (primary), orbital velocity, decay |
 | `cdip.mop_forecast` | MOP forecast files, as issued | 12 h | Archive only (Phase 7) |
 | `sccoos.pier` | CeNCOOS ERDDAP `scripps-pier-automated-shore-sta-1`: temperature, chlorophyll (ECO), **turbidity (ECO, NTU)**, O₂, salinity | 30 min | Water temp, chlorophyll, turbidity → visibility |
 | `sccoos.habs` | SCCOOS ERDDAP `HABs-ScrippsPier` weekly samples (chlorophyll, domoic acid, cell counts) | daily | Archive only (bloom notes later) |
