@@ -1,0 +1,45 @@
+pier rows 43382
+D0496 obs 2420 {'rows': {'waveTime': 2420}}
+D0482 obs 2420 {'rows': {'waveTime': 2420}}
+wind hours 2348
+rain days 104 days with >=2.5 mm: 3
+samples 915
+
+Spearman vs pier NTU (hourly | daily medians):
+  hs          +0.50 (n=915) | +0.53 (n=94)
+  orb6        +0.52 (n=915) | +0.56 (n=94)
+  orb12       +0.52 (n=915) | +0.58 (n=94)
+  orb24       +0.51 (n=915) | +0.58 (n=94)
+  orb48       +0.49 (n=915) | +0.57 (n=94)
+  orb24_cove  +0.45 (n=915) | +0.53 (n=94)
+  chl         +0.41 (n=915) | +0.42 (n=94)
+  wind_kt     +0.04 (n=913) | +0.08 (n=94)
+  rain5_mm    -0.10 (n=915) | -0.12 (n=94)
+
+proxy as configured vs sensor vis: spearman +0.39 (n=915), MAE 11.1 ft, bias -10.6 ft, sensor inside the +/-35% band 18%
+sensor vis ft: p10/p50/p90 [13.8, 23.2, 35.2]
+proxy vis ft:  p10/p50/p90 [10.4, 13.3, 15.2]
+orb24 m/s: p10/p50/p90 [0.193, 0.279, 0.393]
+fit: vis = 41.2 -60.8 * orb24   R^2 0.29   (config: 20 - 22 * orb)
+  orb24 0.10-0.20: n= 104 sensor vis median  31.3 ft  p25  26.6  p75  36.7
+  orb24 0.20-0.30: n= 470 sensor vis median  25.1 ft  p25  20.5  p75  29.2
+  orb24 0.30-0.45: n= 327 sensor vis median  19.4 ft  p25  14.9  p75  23.3
+  orb24 0.45-9.00: n=  14 sensor vis median  10.7 ft  p25   6.7  p75  14.8
+
+murkiest days (median NTU, hs ft, orb24, chl, wind kt, rain5 mm):
+  2026-07-23  1.40 NTU  hs  2.9 ft  orb 0.40  chl 1.17  wind  4.7  rain 0.3
+  2026-09-29  1.29 NTU  hs  2.6 ft  orb 0.44  chl 0.73  wind  2.9  rain 0.6
+  2026-07-24  1.18 NTU  hs  2.6 ft  orb 0.49  chl 1.04  wind  5.2  rain 0.1
+  2026-07-28  1.08 NTU  hs  1.9 ft  orb 0.41  chl 1.21  wind  7.0  rain 0.3
+  2026-07-27  0.88 NTU  hs  2.1 ft  orb 0.37  chl 1.33  wind  5.1  rain 0.3
+  2026-09-14  0.85 NTU  hs  2.3 ft  orb 0.37  chl 0.63  wind 10.8  rain 0.1
+  2026-07-17  0.75 NTU  hs  1.2 ft  orb 0.23  chl 0.84  wind 11.7  rain 1.7
+  2026-07-26  0.66 NTU  hs  1.7 ft  orb 0.34  chl 0.63  wind  4.9  rain 0.3
+  2026-09-28  0.57 NTU  hs  1.6 ft  orb 0.29  chl 0.44  wind  5.7  rain 0.6
+  2026-07-29  0.55 NTU  hs  2.0 ft  orb 0.40  chl 0.73  wind  6.7  rain 0.3
+clearest days:
+  2026-08-05  0.22 NTU  hs  1.1 ft  orb 0.24  chl 0.42  wind  6.0  rain 0.0
+  2026-09-19  0.22 NTU  hs  2.0 ft  orb 0.30  chl 0.74  wind  6.8  rain 0.6
+  2026-08-06  0.21 NTU  hs  1.2 ft  orb 0.21  chl 0.46  wind  4.7  rain 0.0
+  2026-08-08  0.20 NTU  hs  1.2 ft  orb 0.18  chl 0.46  wind  5.7  rain 2.7
+  2026-08-07  0.18 NTU  hs  1.0 ft  orb 0.19  chl 0.40  wind  5.8  rain 2.7
