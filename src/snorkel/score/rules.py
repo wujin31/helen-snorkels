@@ -491,10 +491,20 @@ def score_spot(
                     detail=f"{turb.value.ntu:.1f} NTU at Scripps Pier (~{measured:.0f} ft)",
                 )
             )
-        vis_mid = min(v.max_ft, max(v.min_ft, vis_mid))
+        max_ft = v.max_ft
+        if spot.max_vis_ft is not None:
+            max_ft = min(max_ft, spot.max_vis_ft)
+            factors.append(
+                Factor(
+                    label="Bay water",
+                    effect="~",
+                    detail=f"bay water mixes in; estimate capped at {spot.max_vis_ft:.0f} ft",
+                )
+            )
+        vis_mid = min(max_ft, max(v.min_ft, vis_mid))
         spread = vis_mid * v.spread_fraction
         low = max(v.min_ft, round(vis_mid - spread))
-        vis = (round(low), round(min(v.max_ft, vis_mid + spread)))
+        vis = (round(low), round(min(max_ft, vis_mid + spread)))
 
     if window.chosen and window.slots:
         chosen_slots = [

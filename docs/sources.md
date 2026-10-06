@@ -68,6 +68,13 @@ turbidity-to-feet prior (9 ft at 1 NTU), the fit is at one sandy spot near
 the pier, and summer had no rain or bloom to test those terms. Dive reports
 are what would settle all three.
 
+Two guardrails keep it inside what was fitted: wave motion calmer than the
+data (`min_orbital_ms`, 0.15 m/s) isn't read as any clearer, and Mission
+Point, where the ebb carries Mission Bay water the wave model can't see, is
+capped at 15 ft (`max_vis_ft` in `config/spots.yaml`, a prior). Without the
+cap, the first live run put Mission Point at 26-40 ft and made it the best
+bet.
+
 ## Known access limits
 
 - **CDIP** sometimes answers GitHub-runner requests with "Access Denied. Please

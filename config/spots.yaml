@@ -215,6 +215,7 @@
     exposed: [200, 240]         # only swell that runs up the channel
   thresholds: { max_hs_ft: 2.0, max_wind_kt: 12 }
   wave_factor: 0.2             # prior: inside the jetties, a fifth of the open-coast swell
+  max_vis_ft: 15               # prior: the ebb carries Mission Bay water, which the wave model can't see
   tide_rules: { prefer: incoming }
   min_tide_ft: null
   notes: >-

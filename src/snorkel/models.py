@@ -62,6 +62,8 @@ class SpotConfig(BaseModel):
     area: str = "La Jolla"  # groups spots on the page
     wave_factor: float = Field(default=1.0, gt=0, le=1)
     """Share of the open-coast wave height that reaches a sheltered spot (bays, harbors)."""
+    max_vis_ft: float | None = Field(default=None, gt=0)
+    """Cap on estimated visibility where other water mixes in (e.g. a bay's ebb)."""
     notes: str = ""
 
 

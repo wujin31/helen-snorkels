@@ -351,6 +351,16 @@ def test_a_sheltered_spot_sees_a_share_of_the_open_coast_waves(cfg: ScoringConfi
     assert status.conditions.hs_ft is not None and status.conditions.hs_ft < 1
     assert not any(g.startswith("Waves") for g in status.gates)
     assert any(f.label == "Shelter" for f in status.factors)
+    # Calm water there is partly bay water, so it isn't read as ocean-clear.
+    assert bay.max_vis_ft is not None
+    assert status.vis_ft is not None and status.vis_ft[1] <= bay.max_vis_ft
+    assert any(f.label == "Bay water" for f in status.factors)
+
+
+def test_calmer_than_the_fitted_range_is_not_read_clearer(cfg: ScoringConfig) -> None:
+    v = cfg.visibility
+    assert v.predicted_ntu(0.0, 0.65) == v.predicted_ntu(v.min_orbital_ms, 0.65)
+    assert v.predicted_ntu(v.min_orbital_ms + 0.1, 0.65) > v.predicted_ntu(0.0, 0.65)
 
 
 def test_pier_turbidity_only_counts_near_the_pier(cfg: ScoringConfig) -> None:
