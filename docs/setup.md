@@ -5,7 +5,7 @@
 | Piece | Where | Notes |
 |---|---|---|
 | Supabase project `snorkel-status` | ref `dujjlhiytnrtsebxshhw`, region us-west-1, free tier | Migrations in `supabase/migrations/` are applied |
-| `archive` bucket | Supabase Storage, private | Cam frames, raw snapshots, manifests |
+| `archive` bucket | Supabase Storage, private | Raw snapshots and manifests |
 | `archive-gateway` edge function | `https://dujjlhiytnrtsebxshhw.supabase.co/functions/v1/archive-gateway` | Source in `supabase/functions/archive-gateway/` |
 | Archive workflow | `.github/workflows/archive.yml` | Every 15 min in daylight, from `main` |
 | Score workflow | `.github/workflows/score.yml` | Hourly: scores, appends history to the `data` branch, deploys the page |
@@ -31,7 +31,6 @@ Settings → Secrets and variables → Actions → Variables:
 
 | Variable | Effect |
 |---|---|
-| `CAM_CAPTURE_ENABLED` | Set to `false` to pause cam capture (e.g. if Scripps asks) |
 | `SNORKEL_CONTACT` | An email for the User-Agent; NWS asks API clients for one |
 | `SNORKEL_STORAGE` | Override storage, e.g. `s3:<bucket>` plus `S3_*` secrets, if we move to R2 |
 
@@ -57,12 +56,12 @@ deploy with a warning.
 
 ## Looking at the archive
 
-Supabase dashboard → Storage → `archive`. Frames are under
-`frames/cam.scripps_pier/YYYY/MM/DD/`, raw snapshots under `raw/<source>/…`
-(gzipped), and each day's run log is `manifest/YYYY-MM-DD/archive.jsonl`.
+Supabase dashboard → Storage → `archive`. Raw snapshots are under
+`raw/<source>/…` (gzipped), and each day's run log is
+`manifest/YYYY-MM-DD/archive.jsonl`.
 
 ## Storage budget
 
-About 50 cam frames/day at ~60 KB plus a few MB of gzipped snapshots, roughly
-3–4 MB/day. The free tier's 1 GB lasts about 9–10 months. Before then, move
-frames to Cloudflare R2 (10 GB free) via `SNORKEL_STORAGE`, or upgrade.
+A few MB of gzipped snapshots a day, mostly CDIP wave files. The free tier's
+1 GB lasts the better part of a year. Before then, prune old raw snapshots or
+move to Cloudflare R2 (10 GB free) via `SNORKEL_STORAGE`.

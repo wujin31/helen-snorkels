@@ -52,6 +52,7 @@ turbidity:                   # Scripps Pier ECO turbidity sensor (~1 km from the
   exponent: 0.9
   weight_near_pier: 0.6      # blend weight vs the wave proxy at spots with `cam` set
   weight_elsewhere: 0.3
+  min_valid_ntu: 0.15         # lower than nearshore water ever gets here: a sensor fault, so ignored
 
 window:                      # hourly sub-scores for the best-window search
   incoming_bonus: 1.0

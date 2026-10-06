@@ -279,3 +279,24 @@ def test_buoy_waves_use_exposure_but_no_extra_slack(cove: SpotConfig, cfg: Scori
     assert score(cove, conditions(cove, waves=exposed), cfg).verdict == "no"
     sheltered = {cove.id: ok("w", waves(0.9, 12, dp=190, source="buoy"))}  # from the S
     assert score(cove, conditions(cove, waves=sheltered), cfg).verdict != "no"
+
+
+def test_vis_range_never_passes_the_configured_max(cove: SpotConfig, cfg: ScoringConfig) -> None:
+    # Flat calm and very clear pier water: the estimate pins to the top.
+    clear = ok("turb", Turbidity(time=NOW, ntu=0.2), NOW)
+    status = score(
+        cove,
+        conditions(cove, waves={cove.id: ok("waves", waves(0.05, 8), NOW)}, turbidity=clear),
+        cfg,
+    )
+    assert status.vis_ft is not None
+    assert status.vis_ft[1] <= cfg.visibility.max_ft
+    assert status.vis_ft[0] >= cfg.visibility.min_ft
+
+
+def test_impossibly_low_turbidity_is_ignored(cove: SpotConfig, cfg: ScoringConfig) -> None:
+    glitch = ok("turb", Turbidity(time=NOW, ntu=0.07), NOW)
+    with_glitch = score(cove, conditions(cove, turbidity=glitch), cfg)
+    without = score(cove, conditions(cove), cfg)
+    assert with_glitch.vis_ft == without.vis_ft
+    assert any("too low to trust" in f.detail for f in with_glitch.factors)

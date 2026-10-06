@@ -92,7 +92,7 @@ h2 { font-size: 1.05rem; }
 .vicon-mark { stroke: var(--v-mark); }
 .vicon-unknown .vicon-mark circle { fill: var(--v-mark); }
 
-/* The answer: compact, so the cam sits right under it on a phone. */
+/* The answer, first. */
 .verdict {
   display: flex; gap: 12px; align-items: flex-start;
   background: color-mix(in srgb, var(--v) 13%, var(--surface));
@@ -106,46 +106,6 @@ h2 { font-size: 1.05rem; }
 .verdict-where { display: block; font-size: 1.15rem; font-weight: 650; margin-top: 2px; }
 .verdict-when { margin: 2px 0 0; font-size: 1.05rem; font-weight: 600; font-variant-numeric: tabular-nums; }
 .verdict-reason { margin: 6px 0 0; color: var(--ink-2); font-size: 0.95rem; }
-
-/* The live cam: the page's centerpiece. */
-.cam { margin-top: 12px; }
-.cam-media {
-  position: relative; aspect-ratio: 16 / 9; border-radius: var(--radius); overflow: hidden;
-  background: #02080b; box-shadow: var(--shadow);
-}
-.cam-link, .cam-player, .cam-player iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
-.cam-link { display: grid; place-items: center; color: #fff; text-decoration: none; }
-.cam-link:focus-visible { outline: 3px solid var(--accent); outline-offset: -3px; }
-.cam-scene { position: absolute; inset: 0; width: 100%; height: 100%; }
-.cam-play {
-  position: relative; width: 64px; height: 64px; border-radius: 50%; display: grid; place-items: center;
-  background: rgba(255, 255, 255, 0.92); color: #073549; box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
-}
-.cam-play svg { margin-left: 4px; }
-.cam-cta {
-  position: absolute; left: 12px; right: 12px; bottom: 10px; font-weight: 650; font-size: 0.95rem;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
-}
-.cam[data-state="dark"] .cam-cta {
-  position: relative; left: auto; right: auto; bottom: auto; display: grid; gap: 6px;
-  text-align: center; padding: 0 16px; color: #d7e6ec;
-}
-.cam-anyway { font-weight: 500; font-size: 0.85rem; color: #9fb8c2; }
-.cam-overlay {
-  position: absolute; top: 10px; left: 10px; right: 10px; display: flex; flex-wrap: wrap; gap: 6px;
-  pointer-events: none;
-}
-.cam-chip {
-  display: inline-flex; align-items: center; gap: 6px; padding: 3px 9px; border-radius: 999px;
-  background: rgba(2, 12, 16, 0.62); color: #fff; font-size: 0.8rem; font-weight: 650;
-  font-variant-numeric: tabular-nums; backdrop-filter: blur(4px);
-}
-.live-dot { width: 8px; height: 8px; border-radius: 50%; background: #ff4d4d; box-shadow: 0 0 0 2px rgba(255, 77, 77, 0.3); }
-.cam-player:has(iframe) ~ .cam-overlay .cam-live { display: none; }
-.cam-foot { padding: 8px 2px 0; }
-.cam-foot h2 { font-size: 0.95rem; }
-.cam-caption { margin: 2px 0 0; color: var(--muted); font-size: 0.88rem; }
-.cam-tip { margin: 4px 0 0; color: var(--muted); font-size: 0.8rem; }
 
 .chip { background: var(--surface); border: 1px solid var(--hair); border-radius: 999px; padding: 3px 10px; font-weight: 600; color: var(--ink); }
 .conf { display: inline-flex; align-items: center; gap: 6px; }
@@ -229,7 +189,7 @@ summary { cursor: pointer; color: var(--accent); font-weight: 600; min-height: 3
 .disclaimer { color: var(--muted); font-size: 0.82rem; margin-top: 12px; }
 
 @media (forced-colors: active) {
-  .verdict, .spot, .cam-media { border: 2px solid CanvasText; }
+  .verdict, .spot { border: 2px solid CanvasText; }
   .vicon-disc { fill: CanvasText; }
   .vicon-mark { stroke: Canvas; }
 }

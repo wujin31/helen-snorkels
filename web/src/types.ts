@@ -53,7 +53,6 @@ export interface SpotStatus {
   conditions: SpotConditions;
   hourly: HourScore[];
   shore_normal_deg: number;
-  has_cam: boolean;
 }
 
 export interface SourceHealth {
@@ -89,24 +88,6 @@ export interface DayConditions {
   tide_turns: TideTurn[];
 }
 
-export interface CamReading {
-  time: string;
-  vis_ft: [number, number] | null;
-  pilings_visible: number | null;
-  pilings_total: number | null;
-}
-
-export interface CamInfo {
-  title: string;
-  caption: string;
-  watch_url: string;
-  info_url: string | null;
-  embed_url: string | null;
-  light: TimeWindow[];
-  reading: CamReading | null;
-  readings_today: CamReading[];
-}
-
 export interface StatusDoc {
   version: number;
   generated_at: string;
@@ -117,5 +98,5 @@ export interface StatusDoc {
   day: DayConditions;
   sources: SourceHealth[];
   disclaimer: string;
-  cam?: CamInfo | null; // absent in documents from before the cam section
+  cam_url?: string | null;
 }

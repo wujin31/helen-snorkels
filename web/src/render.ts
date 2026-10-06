@@ -3,7 +3,6 @@
 // when a fresher status.json arrives. Every data string goes through esc().
 
 import { directionDial } from "./arrows";
-import { camSection } from "./cam";
 import { STALE_AFTER_MIN } from "./config";
 import { ago, clock, compass, dayName, esc, ft, range } from "./format";
 import { VERDICT_WORD, verdictIcon } from "./icons";
@@ -59,12 +58,12 @@ function why(spot: SpotStatus): string {
   if (!items.length) return "";
   const source = spot.conditions.wave_source;
   const note = source
-    ? `<p class="fine">Waves: ${esc(source === "mop" ? "CDIP MOP model at this spot" : source === "buoy" ? "Scripps Nearshore buoy" : "Open-Meteo offshore model")}. Visibility is an estimate from waves, pier turbidity and chlorophyll; there's no cam reading yet.</p>`
+    ? `<p class="fine">Waves: ${esc(source === "mop" ? "CDIP MOP model at this spot" : source === "buoy" ? "Scripps Nearshore buoy" : "Open-Meteo offshore model")}. Visibility is an estimate from waves, pier turbidity, chlorophyll, rain and wind.</p>`
     : "";
   return `<details class="why"><summary>Why</summary>${factorList(items)}${note}</details>`;
 }
 
-/** The answer, compact, above the cam: verdict, where, when, and why in a line. */
+/** The answer, first: verdict, where, when, and why in a line. */
 function verdictBar(doc: StatusDoc, featured: SpotStatus | null): string {
   if (!featured) {
     const verdict = doc.spots.some((s) => s.verdict === "no") ? "no" : "unknown";
@@ -166,7 +165,7 @@ function freshness(doc: StatusDoc, now: Date | null): string {
     : `<p class="fine">All ${doc.sources.length} sources fresh.</p>`;
   return `
   <footer class="foot" id="foot">
-    <p>Updated ${esc(clock(doc.generated_at))}${esc(age)}.${doc.cam?.info_url ? ` <a href="${esc(doc.cam.info_url)}" rel="noopener">Scripps PierViz ↗</a>` : ""}</p>
+    <p>Updated ${esc(clock(doc.generated_at))}${esc(age)}.${doc.cam_url ? ` <a href="${esc(doc.cam_url)}" rel="noopener">Scripps Pier cam ↗</a>` : ""}</p>
     <details class="sources"><summary>${stale.length ? `${stale.length} source${stale.length > 1 ? "s" : ""} stale or down` : "Data sources"}</summary>${staleList}
       <p class="fine">NOAA CO-OPS & NWS, CDIP (Scripps), SCCOOS, Open-Meteo, County of San Diego DEHQ. Estimates, not guarantees.</p>
     </details>
@@ -184,11 +183,7 @@ export function staleBanner(doc: StatusDoc, now: Date): string {
   return `<p class="banner" role="alert">These conditions are from ${esc(clock(doc.generated_at))} (${esc(ago(doc.generated_at, now))}). The updater may be down; treat them as old.</p>`;
 }
 
-/**
- * The page body. `now` is null at build time (no relative ages baked in).
- * Top-level regions carry ids so the browser can repaint around a playing
- * cam player without reloading it (main.ts).
- */
+/** The page body. `now` is null at build time (no relative ages baked in). */
 export function renderPage(doc: StatusDoc, now: Date | null): string {
   const featured = doc.spots.find((s) => s.id === doc.best_bet) ?? null;
   const others = doc.spots.filter((s) => s !== featured);
@@ -201,7 +196,6 @@ export function renderPage(doc: StatusDoc, now: Date | null): string {
   <div id="banner">${now ? staleBanner(doc, now) : ""}</div>
   <main>
     ${verdictBar(doc, featured)}
-    ${doc.cam ? camSection(doc.cam, clockNow) : ""}
     <div id="details">
       ${featured ? spotCard(featured, true) : ""}
       ${others.length ? `<h2 class="section-title">${featured ? "Other spots" : "Spots"}</h2><div class="spots">${others.map((s) => spotCard(s)).join("")}</div>` : ""}

@@ -31,6 +31,10 @@ class Storage(Protocol):
 
     def get(self, key: str) -> bytes | None: ...
 
+    def delete(self, key: str) -> bool:
+        """Remove an object; True if it existed."""
+        ...
+
     def describe(self) -> str: ...
 
 
@@ -52,6 +56,13 @@ class LocalStorage:
     def get(self, key: str) -> bytes | None:
         path = self._path(key)
         return path.read_bytes() if path.exists() else None
+
+    def delete(self, key: str) -> bool:
+        path = self._path(key)
+        if not path.exists():
+            return False
+        path.unlink()
+        return True
 
     def describe(self) -> str:
         return f"local:{self.root}"
@@ -100,6 +111,11 @@ class S3Storage:
                 return None
             raise
         return obj["Body"].read()
+
+    def delete(self, key: str) -> bool:
+        existed = self.get(key) is not None
+        self._client.delete_object(Bucket=self.bucket, Key=key)
+        return existed
 
     def describe(self) -> str:
         return f"s3:{self.bucket} @ {self.endpoint_url}"
@@ -188,6 +204,21 @@ class GatewayStorage:
                 return None
             raise
         return response.content
+
+    def delete(self, key: str) -> bool:
+        try:
+            request_with_retry(
+                self._client,
+                "DELETE",
+                self._url(key),
+                headers={"Authorization": f"Bearer {self._token()}"},
+                sleep=self._sleep,
+            )
+        except httpx.HTTPStatusError as exc:
+            if exc.response.status_code == 404:
+                return False
+            raise
+        return True
 
     def describe(self) -> str:
         return f"gateway:{self.base_url}"

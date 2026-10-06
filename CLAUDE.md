@@ -1,15 +1,15 @@
 # Snorkel Status SD
 
-Phone-first yes / maybe / no for snorkeling at La Jolla Cove and Marine Room /
-La Jolla Shores, built from public ocean data and the Scripps Pier underwater
-cam. **Read `docs/brief.md`** (goals, sources, physics, design) before
+Phone-first yes / maybe / no for snorkeling at San Diego spots, starting with
+La Jolla Cove and Marine Room / La Jolla Shores, built from public ocean data.
+**Read `docs/brief.md`** (goals, sources, physics, design) before
 changing behavior; `docs/sources.md` tracks what each source is and what's
 still unconfirmed.
 
 ## Commands
 
 ```sh
-uv sync                              # install (add --extra browser for the cam's headless fallback)
+uv sync                              # install
 uv run pytest                        # tests (fixtures only, no network)
 uv run ruff check && uv run ruff format --check && uv run pyright
 uv run snorkel archive --storage local:.archive           # capture everything due
@@ -29,10 +29,9 @@ cd web && npm ci && npm test && npm run build             # page (Vite + TS, no 
 - `supabase/migrations/`: the private archive bucket (the swim log was cut in `0004`). `supabase/functions/archive-gateway/`: the storage gateway. Supabase project ref `dujjlhiytnrtsebxshhw`; see `docs/setup.md`.
 - `src/snorkel/parse/`: pure parsers (raw bytes → `observations.py` models), tested on real fixtures.
 - `src/snorkel/pipeline.py`: gathers fresh `Conditions`; `score/rules.py`: v0 rules; `publish/status.py`: `status.json`.
-- `src/snorkel/cv/`: the pier-cam model. `pier_cam.py` finds the pilings (dark column bands, nearest = widest) and reads visibility from their contrast; `store.py` runs it against the private archive. Settings in `config/cam_model.yaml`. Frames never leave the archive: no frame, crop or per-frame reading in git, logs or probe output; tests use synthetic frames.
 - `config/scoring.yaml`: every threshold and heuristic (priors to validate).
-- `web/`: the page. `src/render.ts` renders HTML strings from `status.json`, at build time (answer in first paint) and in the browser: verdict, then the live cam (`src/cam.ts`), then details.
-- `.github/workflows/`: `ci.yml`, `archive.yml` (15-min cron), `score.yml` (hourly score + history + Pages deploy), `pacemaker.yml` (fills cron gaps), `cam-calibrate.yml` (manual), `probe.yml` (live probes from `probe/**` branches), `keepalive.yml`.
+- `web/`: the page. `src/render.ts` renders HTML strings from `status.json`, at build time (answer in first paint) and in the browser: verdict first, then details.
+- `.github/workflows/`: `ci.yml`, `archive.yml` (15-min cron), `score.yml` (hourly score + history + Pages deploy), `pacemaker.yml` (fills cron gaps), `maintenance.yml` (manual one-off chores), `probe.yml` (live probes from `probe/**` branches), `keepalive.yml`.
 
 ## Conventions
 
@@ -41,7 +40,7 @@ cd web && npm ci && npm test && npm run build             # page (Vite + TS, no 
 - **Every fetcher is independent.** Nothing raises past a source boundary; failures become manifest rows. The page must always render with whatever is fresh and say what's stale.
 - **Raw first.** The archiver stores responses untouched (gzipped) so parsers can be rewritten and re-run later. Parsing lives in separate pure functions tested against saved fixtures in `tests/fixtures/`.
 - **Tests never touch the network.** Use `httpx.MockTransport` or fixtures captured with `snorkel probe --save-fixture`.
-- **Be polite to sources.** Respect cadences in `config/sources.yaml`; identify via the User-Agent (`SNORKEL_CONTACT`). No Surfline scraping. The cam is one still per 15 min, kept private until Scripps OKs more. HDOnTap forbids framing its player here (CSP `frame-ancestors`): link to the stream; never proxy, rehost or spoof a `Referer` to reach it.
+- **Be polite to sources.** Respect cadences in `config/sources.yaml`; identify via the User-Agent (`SNORKEL_CONTACT`). No Surfline scraping. The Scripps Pier cam is not used (no permission to embed or analyze it, and capture stopped on 2026-10-06): link to Scripps' page only; never capture, proxy, rehost or spoof a `Referer` to reach it.
 - **Never say "safe"** in user-facing copy. Say "conditions look good" and keep the short lifeguard note.
 - **Nothing private in git:** no frames, raw snapshots, or secrets. The repo is public.
 - Every threshold and heuristic is a *prior to validate*; keep them in config, not code.

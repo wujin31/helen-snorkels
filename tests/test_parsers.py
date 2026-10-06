@@ -78,12 +78,12 @@ def test_nws_alerts_and_activity() -> None:
     assert {a.event for a in nws.active(alerts, now)} == {"Beach Hazards Statement"}
 
 
-def test_sccoos_pier_latest_good_values() -> None:
+def test_sccoos_pier_good_values() -> None:
     [csv_file] = (FIX / "sccoos.pier").glob("*.csv")
     temp, chl, turb = sccoos.parse_pier(csv_file.read_bytes())
     assert temp and 15 < temp.temp_c < 30
     assert chl and chl.chl_ug_l == pytest.approx(0.73)
-    assert turb and turb.ntu == pytest.approx(0.3)
+    assert turb and turb.ntu == pytest.approx(0.195)  # median of the last 3 h, not one sample
     assert turb.time == datetime(2026, 9, 27, 6, 52, tzinfo=UTC)
 
 

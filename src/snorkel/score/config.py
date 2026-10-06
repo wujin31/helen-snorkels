@@ -49,6 +49,7 @@ class TurbidityConfig(BaseModel):
     exponent: float
     weight_near_pier: float
     weight_elsewhere: float
+    min_valid_ntu: float = 0.15
 
     def vis_ft(self, ntu: float) -> float:
         return self.vis_ft_at_1_ntu / max(ntu, 0.05) ** self.exponent
