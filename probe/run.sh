@@ -13,7 +13,7 @@ boxes = {"lajolla": (32.80, 32.90, -117.32, -117.24), "northcounty": (32.98, 33.
 
 def viirs(ds, var, box, alt=True):
     la0, la1, lo0, lo1 = box
-    q = f"{var}[(2026-07-05T00:00:00Z):1:(2026-10-06T00:00:00Z)]" + ("[(0.0)]" if alt else "") + f"[({la1}):1:({la0})][({lo0}):1:({lo1})]"
+    q = f"{var}[(2026-07-05T00:00:00Z):1:(last)]" + ("[(0.0)]" if alt else "") + f"[({la1}):1:({la0})][({lo0}):1:({lo1})]"
     r = c.get(f"{CW}/{ds}.csv?{q}")
     print(ds, box, r.status_code, len(r.content))
     if r.status_code != 200:
@@ -79,45 +79,5 @@ for k in boxes:
     both_c = [d for d in kd[k] if d in chl]
     print(k, "days with kd:", len(kd[k]), "| spearman vs NTU", round(spearman([kd[k][d][0] for d in both], [turb[d] for d in both]), 2), f"(n={len(both)})",
           "| vs chl", round(spearman([kd[k][d][0] for d in both_c], [chl[d] for d in both_c]), 2), f"(n={len(both_c)})")
-PY
-
-# Dive-report sources: what they publish, how often, and their terms. Text only.
-uv run python - <<'PY'
-import re, html
-import httpx
-c = httpx.Client(timeout=60, follow_redirects=True, headers={"User-Agent": "snorkel-status (https://github.com/wujin31/helen-snorkels)"})
-def text(body):
-    body = re.sub(r"(?is)<(script|style).*?</\1>", " ", body)
-    return re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", body))).strip()
-def show(url, n=600, grep=None):
-    try:
-        r = c.get(url)
-    except Exception as e:
-        print("##", url, "ERR", e); return ""
-    t = text(r.text)
-    print("##", url, r.status_code, r.headers.get("content-type"), len(r.content))
-    if grep:
-        for m in re.finditer(grep, t, re.I):
-            print("   ...", t[max(0, m.start() - 200): m.end() + 250])
-    else:
-        print("  ", t[:n])
-    return r.text
-feed = show("https://justgetwet.com/blogs/dive-reports-and-conditions.atom", 0)
-for e in re.findall(r"(?s)<entry>(.*?)</entry>", feed)[:40]:
-    title = re.search(r"<title>(.*?)</title>", e, re.S); pub = re.search(r"<published>(.*?)</published>", e)
-    print(" -", pub.group(1)[:10] if pub else "?", html.unescape(title.group(1)).strip() if title else "?")
-first = re.findall(r"(?s)<entry>(.*?)</entry>", feed)[:3]
-for e in first:
-    body = re.search(r"(?s)<content[^>]*>(.*?)</content>", e)
-    if body:
-        t = text(html.unescape(body.group(1)))
-        for m in re.finditer(r"vis", t, re.I):
-            print("   vis:", t[max(0, m.start() - 120): m.end() + 120]); 
-show("https://justgetwet.com/robots.txt", 1200)
-show("https://justgetwet.com/policies/terms-of-service", grep=r"(scrap|automat|robot|crawl|reproduc|copy|intellectual|content)")
-show("https://www.divebums.com/", 1500)
-show("https://www.divebums.com/robots.txt", 800)
-for u in ("https://www.divebums.com/DiveReports/", "https://www.divebums.com/reports/", "https://www.divebums.com/local-info/visitor-info-general-conditions.html"):
-    show(u, 500)
 PY
 
