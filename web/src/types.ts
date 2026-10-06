@@ -84,6 +84,7 @@ export interface DayConditions {
   turbidity_ntu: number | null;
   chlorophyll_ug_l: number | null;
   alerts: string[];
+  surf_forecast?: string | null;
   tide_curve: TidePoint[];
   tide_turns: TideTurn[];
 }

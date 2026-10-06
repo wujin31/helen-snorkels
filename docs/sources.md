@@ -11,6 +11,7 @@ services on 2026-09-27 with `probe.yml` (branches `probe/discovery-*`).
 | `weather.ndbc_ljpc1` | NDBC LJPC1 (same pier station), trimmed to 6 h | 1 h | Pier wind (fallback) |
 | `weather.openmeteo_forecast` | Hourly wind, gusts, precipitation for both spots | 1 h | Window wind, rain gate |
 | `weather.openmeteo_marine` | Hourly waves/swell/SST for both spots | 1 h | Waves (last-resort fallback) |
+| `weather.nws_srf` | NWS Surf Zone Forecast (SGX), San Diego County Coastal Areas segment: surf height, rip current risk, water temp, swell remarks for today and the next day | 3 h | High rip risk caps a spot at Maybe; surf and rip risk shown in Why and Water today |
 | `weather.nws_grid` | NWS SGX gridpoint forecast (land point) | 3 h | Archive only |
 | `weather.nws_alerts` | NWS active alerts at a land and a nearshore point | 1 h | High Surf → No; Beach Hazards / Rip Current → caps at Maybe |
 | `cdip.buoy` | Buoy 201 Scripps Nearshore, last 3 h incl. full spectra + SST | 30 min | Waves (fallback) |
@@ -52,6 +53,12 @@ services on 2026-09-27 with `probe.yml` (branches `probe/discovery-*`).
   it's 1.5x over the limit (`rules.COARSE_MODEL_GATE_FACTOR`).
 
 ## Not used
+
+- **SCCOOS HABs plankton counts** (`sccoos.habs`, still archived): the weekly
+  red-tide cell counts post about six weeks after sampling (2026-10-06: newest
+  counts were from Aug 17), too late for a daily call. A red tide shows up in
+  real time as high chlorophyll on the pier sensor, which the visibility
+  estimate already uses.
 
 - **Swim Guide:** its JSON API requires authentication; the county is the
   primary source anyway.

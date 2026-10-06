@@ -66,6 +66,16 @@ describe("renderPage", () => {
   });
 });
 
+describe("water panel", () => {
+  it("shows the NWS surf forecast when there is one", () => {
+    const doc = clone();
+    doc.day.surf_forecast = "Surf 2–4 ft · moderate rip current risk";
+    expect(renderPage(doc, null)).toContain("<dt>NWS surf</dt><dd>Surf 2–4 ft · moderate rip current risk</dd>");
+    delete doc.day.surf_forecast;
+    expect(renderPage(doc, null)).not.toContain("NWS surf");
+  });
+});
+
 describe("staleness", () => {
   it("warns when the data is old", () => {
     const t = Date.parse(sample.generated_at);
