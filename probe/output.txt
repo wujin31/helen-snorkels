@@ -16,30 +16,25 @@ Spearman vs pier NTU (hourly | daily medians):
   wind_kt     +0.04 (n=913) | +0.08 (n=94)
   rain5_mm    -0.10 (n=915) | -0.12 (n=94)
 
-proxy as configured vs sensor vis: spearman +0.39 (n=915), MAE 11.1 ft, bias -10.6 ft, sensor inside the +/-35% band 18%
-sensor vis ft: p10/p50/p90 [13.8, 23.2, 35.2]
-proxy vis ft:  p10/p50/p90 [10.4, 13.3, 15.2]
-orb24 m/s: p10/p50/p90 [0.193, 0.279, 0.393]
-fit: vis = 41.2 -60.8 * orb24   R^2 0.29   (config: 20 - 22 * orb)
-  orb24 0.10-0.20: n= 104 sensor vis median  31.3 ft  p25  26.6  p75  36.7
-  orb24 0.20-0.30: n= 470 sensor vis median  25.1 ft  p25  20.5  p75  29.2
-  orb24 0.30-0.45: n= 327 sensor vis median  19.4 ft  p25  14.9  p75  23.3
-  orb24 0.45-9.00: n=  14 sensor vis median  10.7 ft  p25   6.7  p75  14.8
+train 579 samples (Jul-Aug), test 336 (Sep-Oct)
 
-murkiest days (median NTU, hs ft, orb24, chl, wind kt, rain5 mm):
-  2026-07-23  1.40 NTU  hs  2.9 ft  orb 0.40  chl 1.17  wind  4.7  rain 0.3
-  2026-09-29  1.29 NTU  hs  2.6 ft  orb 0.44  chl 0.73  wind  2.9  rain 0.6
-  2026-07-24  1.18 NTU  hs  2.6 ft  orb 0.49  chl 1.04  wind  5.2  rain 0.1
-  2026-07-28  1.08 NTU  hs  1.9 ft  orb 0.41  chl 1.21  wind  7.0  rain 0.3
-  2026-07-27  0.88 NTU  hs  2.1 ft  orb 0.37  chl 1.33  wind  5.1  rain 0.3
-  2026-09-14  0.85 NTU  hs  2.3 ft  orb 0.37  chl 0.63  wind 10.8  rain 0.1
-  2026-07-17  0.75 NTU  hs  1.2 ft  orb 0.23  chl 0.84  wind 11.7  rain 1.7
-  2026-07-26  0.66 NTU  hs  1.7 ft  orb 0.34  chl 0.63  wind  4.9  rain 0.3
-  2026-09-28  0.57 NTU  hs  1.6 ft  orb 0.29  chl 0.44  wind  5.7  rain 0.6
-  2026-07-29  0.55 NTU  hs  2.0 ft  orb 0.40  chl 0.73  wind  6.7  rain 0.3
-clearest days:
-  2026-08-05  0.22 NTU  hs  1.1 ft  orb 0.24  chl 0.42  wind  6.0  rain 0.0
-  2026-09-19  0.22 NTU  hs  2.0 ft  orb 0.30  chl 0.74  wind  6.8  rain 0.6
-  2026-08-06  0.21 NTU  hs  1.2 ft  orb 0.21  chl 0.46  wind  4.7  rain 0.0
-  2026-08-08  0.20 NTU  hs  1.2 ft  orb 0.18  chl 0.46  wind  5.7  rain 2.7
-  2026-08-07  0.18 NTU  hs  1.0 ft  orb 0.19  chl 0.40  wind  5.8  rain 2.7
+in sample, all: linear fit base 42.7, -64.0 ft per m/s | with chl: base 51.0, -64.3 per m/s, -11.3 per ug/L | log NTU = -2.48 +3.59*orb +0.63*chl
+  configured (20 - 22*orb)           spearman +0.39  MAE  11.1  bias -10.6  inside +/-25/35/45%: 12%/18%/24%  >=10ft agree 89%
+  refit base/slope                   spearman +0.01  MAE  16.4  bias +16.4  inside +/-25/35/45%: 21%/36%/60%  >=10ft agree 94%
+  refit base/slope + chl from 0      spearman +0.01  MAE  16.4  bias +16.4  inside +/-25/35/45%: 21%/36%/60%  >=10ft agree 94%
+  log-NTU model -> prior ft          spearman +0.66  MAE   5.0  bias  -1.4  inside +/-25/35/45%: 62%/76%/86%  >=10ft agree 95%
+  rounded 35 - 50*orb                spearman +0.48  MAE   6.3  bias  -3.7  inside +/-25/35/45%: 48%/62%/72%  >=10ft agree 94%
+  rounded 38 - 55*orb                spearman +0.48  MAE   5.8  bias  -2.1  inside +/-25/35/45%: 54%/68%/80%  >=10ft agree 94%
+  rounded 40 - 60*orb                spearman +0.48  MAE   5.7  bias  -1.6  inside +/-25/35/45%: 55%/70%/80%  >=10ft agree 94%
+
+out of sample, Sep-Oct: linear fit base 42.6, -64.3 ft per m/s | with chl: base 52.5, -63.3 per m/s, -12.8 per ug/L | log NTU = -2.58 +3.58*orb +0.72*chl
+  configured (20 - 22*orb)           spearman +0.34  MAE  10.5  bias -10.2  inside +/-25/35/45%: 10%/19%/24%  >=10ft agree 82%
+  refit base/slope                   spearman +0.08  MAE  17.5  bias +17.5  inside +/-25/35/45%: 16%/28%/53%  >=10ft agree 95%
+  refit base/slope + chl from 0      spearman +0.08  MAE  17.5  bias +17.5  inside +/-25/35/45%: 16%/28%/53%  >=10ft agree 95%
+  log-NTU model -> prior ft          spearman +0.55  MAE   5.1  bias  +0.3  inside +/-25/35/45%: 62%/76%/87%  >=10ft agree 95%
+  rounded 35 - 50*orb                spearman +0.43  MAE   5.7  bias  -3.8  inside +/-25/35/45%: 50%/62%/74%  >=10ft agree 95%
+  rounded 38 - 55*orb                spearman +0.43  MAE   5.2  bias  -2.3  inside +/-25/35/45%: 57%/69%/82%  >=10ft agree 95%
+  rounded 40 - 60*orb                spearman +0.44  MAE   5.1  bias  -1.8  inside +/-25/35/45%: 58%/71%/82%  >=10ft agree 95%
+
+residuals (sensor - 40-60*orb): p10/p25/p50/p75/p90 [-7.2, -3.5, 1.3, 6.2, 11.3]
+bias by month: {'2026-07': -1.1, '2026-08': 3.7, '2026-09': 2.0, '2026-10': 0.7}
