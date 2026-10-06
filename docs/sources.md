@@ -20,7 +20,7 @@ services on 2026-09-27 with `probe.yml` (branches `probe/discovery-*`).
 | `sccoos.pier` | CeNCOOS ERDDAP `scripps-pier-automated-shore-sta-1`: temperature, chlorophyll (ECO), **turbidity (ECO, NTU)**, O₂, salinity | 30 min | Water temp, chlorophyll, turbidity → visibility |
 | `sccoos.habs` | SCCOOS ERDDAP `HABs-ScrippsPier` weekly samples (chlorophyll, domoic acid, cell counts) | daily | Archive only (bloom notes later) |
 | `water_quality.county` | County DEHQ sdbeachinfo.com site list with advisory levels (OutSystems screen service `ScreenDataSetGetSiteById`) | 1 h | Advisory/closure → No |
-| `coastwatch.viirs` | CoastWatch `noaacwNPPVIIRSkd490SectorVYDaily` (750 m), `kd_490` box around each spot | daily | Archive only (Tier 3 clarity) |
+| `coastwatch.viirs` | CoastWatch `noaacwNPPVIIRSkd490SectorVYDaily` (750 m), `kd_490` box around each spot | daily | Archive only: tested against the pier sensor and doesn't track it (see Not used) |
 
 ## How IDs were found
 
@@ -53,6 +53,27 @@ services on 2026-09-27 with `probe.yml` (branches `probe/discovery-*`).
   it's 1.5x over the limit (`rules.COARSE_MODEL_GATE_FACTOR`).
 
 ## Not used
+
+- **Satellite water color, per spot** (tested 2026-10-06 on `probe/embed-check`).
+  The idea was turbidity right off each beach from satellite reflectance, where
+  no sensor exists. Both products were checked against the Scripps Pier ECO
+  turbidity and chlorophyll sensors, the only measured clarity nearby:
+  - *Sentinel-2 L2A* (20 m, every 2-5 days, via Microsoft Planetary Computer):
+    red-band (B04) water reflectance, NIR-masked, minus an offshore reference
+    in the same scene, on 9 clear passes since July. No relationship: on the
+    murkiest day (1.75 NTU) the pier pixel read clearer than offshore, on a
+    0.17 NTU day too, and several readings were negative (Sen2Cor
+    over-corrects dark water). At 1 NTU the expected signal is ~0.004 in
+    reflectance, about the product's noise over water. La Jolla's usual range
+    (0.2-2 NTU) is below what it can resolve; only big runoff or bloom
+    plumes would show, and those already arrive through the rain rules and
+    the pier's chlorophyll.
+  - *VIIRS Kd490 and chlorophyll* (750 m, daily, CoastWatch): over 41
+    cloud-free days near the pier, Spearman -0.13 (wide box) and 0.01 (near
+    box) against pier turbidity, ~0.3 against pier chlorophyll. North County
+    and Point Loma boxes were no better. Too coarse for water within a few
+    hundred metres of shore. Still archived (`coastwatch.viirs`), since the
+    near-real-time product only keeps ~90 days.
 
 - **SCCOOS HABs plankton counts** (`sccoos.habs`, still archived): the weekly
   red-tide cell counts post about six weeks after sampling (2026-10-06: newest

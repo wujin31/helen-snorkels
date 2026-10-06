@@ -6,17 +6,18 @@ Subject: Access from GitHub Actions for a small La Jolla snorkel-conditions tool
 Hi CDIP team,
 
 I'm Jay; I work with SIO through SPF. I've built a small, non-commercial tool
-that gives my partner a daily "snorkel today?" call for La Jolla Cove and La
-Jolla Shores, and CDIP's MOP nowcasts (D0482, D0496) and the Scripps Nearshore
-buoy (201) are its backbone. Thank you for them.
+that gives my partner a daily "snorkel today?" call for twelve San Diego snorkel spots, from La
+Jolla to Point Loma and North County, and CDIP's MOP nowcasts (one point per
+spot, D0317 to D0708) and the Scripps Nearshore buoy (201) are its backbone.
+Thank you for them.
 
 It runs on GitHub Actions, and some requests from those runners now get
 "Access Denied. Please contact us at www@cdip.ucsd.edu". So I'm getting in touch, as the message asks. What it fetches, all via THREDDS:
 
-- OPeNDAP subsets of the last few hours of `D0482_nowcast.nc`, `D0496_nowcast.nc`
+- OPeNDAP subsets of the last few hours of the twelve `D0xxx_nowcast.nc` files
   and `201p1_rt.nc`, about once an hour in daylight, plus a 72-hour window
   when it recomputes the call (hourly);
-- the two MOP forecast files twice a day via fileServer.
+- the MOP forecast files twice a day via fileServer.
 
 Requests identify themselves with the User-Agent
 `snorkel-status/0.1 (+https://github.com/wujin31/helen-snorkels)`.
