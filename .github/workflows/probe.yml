@@ -20,7 +20,6 @@ jobs:
       - uses: astral-sh/setup-uv@v6
         with:
           enable-cache: true
-      - run: command -v ffmpeg || (sudo apt-get update -qq && sudo apt-get install -y -qq --no-install-recommends ffmpeg)
       - run: uv sync --locked --extra browser
       - run: uv run playwright install --with-deps --only-shell chromium
       - name: Run probe/run.sh
