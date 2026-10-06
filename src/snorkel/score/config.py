@@ -35,6 +35,7 @@ class VisibilityConfig(BaseModel):
     ln_ntu_per_orbital_ms: float
     ln_ntu_per_ln_chl: float
     typical_chl_ug_l: float
+    min_orbital_ms: float
     chl_threshold_ug_l: float
     rain_recent_days: float
     rain_recent_penalty_ft: float
@@ -48,7 +49,7 @@ class VisibilityConfig(BaseModel):
         """Turbidity the pier sensor would likely read, from waves and plankton."""
         return math.exp(
             self.ln_ntu_intercept
-            + self.ln_ntu_per_orbital_ms * orbital_ms
+            + self.ln_ntu_per_orbital_ms * max(orbital_ms, self.min_orbital_ms)
             + self.ln_ntu_per_ln_chl * math.log(max(chl_ug_l, 0.05))
         )
 

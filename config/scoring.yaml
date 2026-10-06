@@ -46,6 +46,7 @@ visibility:
   ln_ntu_per_orbital_ms: 3.5
   ln_ntu_per_ln_chl: 0.49    # power law, so it extrapolates sanely into blooms
   typical_chl_ug_l: 0.65     # summer median at the pier; used when the sensor is stale
+  min_orbital_ms: 0.15       # calmer than the fitted data: not predicted any clearer than this
   half_life_h: 24            # swell stirs the bottom for a day or two (12-48 h fit equally well)
   chl_threshold_ug_l: 2.0    # above this the Plankton factor reads as a minus
   rain_recent_days: 5        # rain after the gate lifts still clouds nearshore water
