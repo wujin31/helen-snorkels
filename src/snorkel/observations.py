@@ -6,7 +6,7 @@ fetched and whether it worked, so the page can show what's stale.
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import date, datetime
 from typing import Generic, Literal, TypeVar
 
 from pydantic import BaseModel, Field
@@ -99,6 +99,27 @@ class WaterQuality(BaseModel):
     station: str
     since: datetime | None = None
     detail: str = ""
+
+
+class SurfPeriod(BaseModel):
+    """One period (TODAY, WEDNESDAY...) of the NWS Surf Zone Forecast for a zone."""
+
+    name: str
+    day: date
+    rip_risk: str | None = None  # Low / Moderate / High
+    surf_ft: tuple[float, float] | None = None
+    sets_ft: float | None = None
+    water_temp_f: tuple[float, float] | None = None
+    remarks: str | None = None
+
+
+class SurfForecast(BaseModel):
+    issued: datetime
+    zone: str
+    periods: list[SurfPeriod] = Field(default_factory=list)
+
+    def for_day(self, day: date) -> SurfPeriod | None:
+        return next((p for p in self.periods if p.day == day), None)
 
 
 class Alert(BaseModel):

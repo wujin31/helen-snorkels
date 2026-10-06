@@ -13,6 +13,7 @@ SOURCES: dict[str, SourceFn] = {
     "weather.openmeteo_marine": weather.capture_openmeteo_marine,
     "weather.nws_grid": weather.capture_nws_grid,
     "weather.nws_alerts": weather.capture_nws_alerts,
+    "weather.nws_srf": weather.capture_nws_srf,
     "cdip.buoy": cdip.capture_buoy,
     "cdip.mop_nowcast": cdip.capture_mop_nowcast,
     "cdip.mop_forecast": cdip.capture_mop_forecast,

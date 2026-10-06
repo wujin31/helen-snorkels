@@ -108,3 +108,30 @@ def test_county_sites_and_status() -> None:
     assert county.status_for(["110"], sites).status == "closure"
     with pytest.raises(ValueError, match="not found"):
         county.status_for(["9999"], sites)
+
+
+def test_nws_surf_zone_forecast_san_diego() -> None:
+    from datetime import date
+
+    from snorkel.parse import srf
+
+    fc = srf.parse_srf((FIX / "weather.nws_srf/sgx.json").read_bytes())
+    assert fc.zone == "San Diego County Coastal Areas"
+    today, wed = fc.periods[0], fc.periods[1]
+    assert (today.name, today.day) == ("Today", date(2026, 10, 6))
+    assert today.rip_risk == "Moderate" and today.surf_ft == (2, 4) and today.sets_ft is None
+    assert today.water_temp_f == (68, 72)
+    assert today.remarks == "Mixed swell from 300 and 210 degrees"
+    assert (wed.name, wed.day) == ("Wednesday", date(2026, 10, 7))
+    assert wed.surf_ft == (2, 4) and wed.sets_ft == 5
+    assert fc.for_day(date(2026, 10, 7)) is wed
+
+
+def test_srf_without_the_zone_is_an_error() -> None:
+    import json
+
+    from snorkel.parse import srf
+
+    body = json.dumps({"issuanceTime": "2026-10-06T08:28:00+00:00", "productText": "x"}).encode()
+    with pytest.raises(ValueError):
+        srf.parse_srf(body)

@@ -136,6 +136,9 @@ function waterSection(doc: StatusDoc): string {
   if (d.chlorophyll_ug_l != null) {
     rows.push(`<div><dt>Chlorophyll</dt><dd>${esc(d.chlorophyll_ug_l.toFixed(1))} µg/L</dd></div>`);
   }
+  if (d.surf_forecast) {
+    rows.push(`<div><dt>NWS surf</dt><dd>${esc(d.surf_forecast)}</dd></div>`);
+  }
   rows.push(`<div><dt>Daylight</dt><dd>${esc(range(d.sunrise, d.sunset))}</dd></div>`);
   const alerts = d.alerts.length
     ? `<p class="alerts" role="note"><strong>NWS:</strong> ${d.alerts.map(esc).join(", ")}</p>`
