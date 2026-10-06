@@ -188,24 +188,37 @@ def fit_log(data):
     coef, *_ = np.linalg.lstsq(X, y, rcond=None)
     return coef
 
-for label, data in (("in sample, all", use), ("out of sample, Sep-Oct", test)):
-    fitset = use if label.startswith("in") else train
-    a = fit_linear(fitset, False)
-    b = fit_linear(fitset, True)
-    g = fit_log(fitset)
-    print(f"\n{label}: linear fit base {a[0]:.1f}, {a[1]:.1f} ft per m/s | with chl: base {b[0]:.1f}, {b[1]:.1f} per m/s, {b[2]:.1f} per ug/L | log NTU = {g[0]:.2f} {g[1]:+.2f}*orb {g[2]:+.2f}*chl")
+CHL_TYPICAL = statistics.median([r["chl"] for r in use if r["chl"] is not None])
+print("median pier chl", round(CHL_TYPICAL, 2))
+def lchl(r, missing=False):
+    return math.log(max(CHL_TYPICAL if (missing or r["chl"] is None) else r["chl"], 0.05))
+def fit_logln(data):
+    X = np.array([[1.0, r["orb24"], lchl(r)] for r in data])
+    y = np.array([math.log(max(r["ntu"], 0.05)) for r in data])
+    coef, *_ = np.linalg.lstsq(X, y, rcond=None)
+    resid = y - X @ coef
+    return coef, float(np.std(resid))
+def fit_logorb(data):
+    X = np.array([[1.0, r["orb24"]] for r in data])
+    y = np.array([math.log(max(r["ntu"], 0.05)) for r in data])
+    coef, *_ = np.linalg.lstsq(X, y, rcond=None)
+    return coef
+
+for label, data, fitset in (("in sample, all", use, use), ("out of sample, Sep-Oct", test, train), ("out of sample, Jul-Aug (fit Sep-Oct)", train, test)):
+    g, sd = fit_logln(fitset)
+    o = fit_logorb(fitset)
+    print(f"\n{label}: ln NTU = {g[0]:.3f} {g[1]:+.3f}*orb {g[2]:+.3f}*ln(chl)  (resid sd {sd:.2f}) | waves only: {o[0]:.3f} {o[1]:+.3f}*orb")
     report("configured (20 - 22*orb)", lambda r: clamp(v["base_ft"] - v["orbital_ft_per_ms"] * r["orb24"] - penalties(r)), data)
-    report("refit base/slope", lambda r, a=a: clamp(a[0] - a[1] * r["orb24"] - penalties(r)), data)
-    report("refit base/slope + chl from 0", lambda r, b=b: clamp(b[0] - b[1] * r["orb24"] - b[2] * (r["chl"] or 0) - penalties(r, chl_k=0)), data)
-    report("log-NTU model -> prior ft", lambda r, g=g: clamp(measured(math.exp(g[0] + g[1] * r["orb24"] + g[2] * (r["chl"] or 0))) - penalties(r, chl_k=0)), data)
-    for base, k in ((35, 50), (38, 55), (40, 60)):
-        report(f"rounded {base} - {k}*orb", lambda r, base=base, k=k: clamp(base - k * r["orb24"] - penalties(r)), data)
+    report("ln model, waves + ln chl", lambda r, g=g: clamp(measured(math.exp(g[0] + g[1] * r["orb24"] + g[2] * lchl(r))) - penalties(r, chl_k=0)), data)
+    report("ln model, chl missing -> typical", lambda r, g=g: clamp(measured(math.exp(g[0] + g[1] * r["orb24"] + g[2] * lchl(r, True))) - penalties(r, chl_k=0)), data)
+    report("ln model, waves only", lambda r, o=o: clamp(measured(math.exp(o[0] + o[1] * r["orb24"])) - penalties(r, chl_k=0)), data)
+    report("linear 40 - 60*orb", lambda r: clamp(40 - 60 * r["orb24"] - penalties(r)), data)
 
-res = [measured(r["ntu"]) - clamp(40 - 60 * r["orb24"] - penalties(r)) for r in use]
-print("\nresiduals (sensor - 40-60*orb): p10/p25/p50/p75/p90", [round(float(np.percentile(res, q)), 1) for q in (10, 25, 50, 75, 90)])
-by_month = {}
-for r in use:
-    by_month.setdefault(r["t"].strftime("%Y-%m"), []).append(measured(r["ntu"]) - clamp(40 - 60 * r["orb24"] - penalties(r)))
-print("bias by month:", {m: round(statistics.mean(x), 1) for m, x in sorted(by_month.items())})
-
+g, _ = fit_logln(use)
+print("\nwhat the all-data ln model says (ft, before rain/wind):")
+for orb in (0.1, 0.2, 0.3, 0.4, 0.5, 0.7):
+    cells = []
+    for chl in (0.4, 0.6, 1.5, 5, 12, 30):
+        cells.append(f"{measured(math.exp(g[0] + g[1] * orb + g[2] * math.log(chl))):5.1f}")
+    print(f"  orb {orb:.1f}: chl 0.4/0.6/1.5/5/12/30 -> " + " ".join(cells))
 PY
