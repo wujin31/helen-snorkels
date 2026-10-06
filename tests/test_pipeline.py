@@ -9,6 +9,7 @@ import pytest
 
 from snorkel.config import load_sources, load_spots
 from snorkel.fetch import cdip as cdip_fetch
+from snorkel.models import SpotConfig
 from snorkel.pipeline import gather
 from snorkel.score.config import load_scoring
 from snorkel.score.run import score_all
@@ -42,6 +43,11 @@ def test_everything_down_still_renders(monkeypatch: pytest.MonkeyPatch) -> None:
 FIX = Path(__file__).parent / "fixtures"
 # The probe that captured these fixtures ran at about 07:10 UTC on 2026-09-27.
 CAPTURED = datetime(2026, 9, 27, 7, 20, tzinfo=UTC)
+
+
+def fixture_spots() -> list[SpotConfig]:
+    """The two spots the 2026-09-27 fixtures were captured for."""
+    return [s for s in load_spots() if s.id in {"la-jolla-cove", "marine-room"}]
 
 
 def fixture_handler(request: httpx.Request) -> httpx.Response:
@@ -97,7 +103,7 @@ def test_real_fixtures_score_like_the_live_run(monkeypatch: pytest.MonkeyPatch) 
     Hazards Statement in effect) and No at the Cove (~3 ft of NW swell).
     """
     monkeypatch.setattr(cdip_fetch, "dataset_subset_bytes", fixture_netcdf)
-    spots, sources = load_spots(), load_sources()
+    spots, sources = fixture_spots(), load_sources()
     sources.sources["water_quality.county"]["api_version"] = "API"
     with httpx.Client(transport=httpx.MockTransport(fixture_handler)) as client:
         cond = gather(client, CAPTURED, spots, sources)
@@ -151,7 +157,7 @@ def test_cdip_refusal_falls_back_to_the_archive(
         )
     append_manifest(storage, archived_at.date(), records)
 
-    spots, sources = load_spots(), load_sources()
+    spots, sources = fixture_spots(), load_sources()
     sources.sources["water_quality.county"]["api_version"] = "API"
     with httpx.Client(transport=httpx.MockTransport(fixture_handler)) as client:
         cond = gather(client, CAPTURED, spots, sources, storage=storage)

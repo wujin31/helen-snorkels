@@ -41,6 +41,7 @@ export interface SpotStatus {
   name: string;
   tier: number;
   difficulty: string;
+  area?: string;
   verdict: Verdict;
   confidence: Confidence;
   vis_ft: [number, number] | null;

@@ -210,6 +210,35 @@ def plan_window(
     return _Window(slots=slots, chosen=chosen, day=day, max_wind_kt=max_wind)
 
 
+def distance_km(a: tuple[float, float], b: tuple[float, float]) -> float:
+    """Great-circle distance between two (lat, lon) points."""
+    lat1, lon1, lat2, lon2 = map(math.radians, (*a, *b))
+    h = (
+        math.sin((lat2 - lat1) / 2) ** 2
+        + math.cos(lat1) * math.cos(lat2) * math.sin((lon2 - lon1) / 2) ** 2
+    )
+    return 2 * 6371.0 * math.asin(math.sqrt(h))
+
+
+def sheltered(waves: WaveSeries, factor: float) -> WaveSeries:
+    """Scale open-coast waves down for a sheltered spot (height x f, energy x f^2)."""
+    return waves.model_copy(
+        update={
+            "obs": [
+                o.model_copy(
+                    update={
+                        "hs_m": o.hs_m * factor,
+                        "energy_m2_hz": [e * factor**2 for e in o.energy_m2_hz]
+                        if o.energy_m2_hz
+                        else None,
+                    }
+                )
+                for o in waves.obs
+            ]
+        }
+    )
+
+
 def score_spot(
     spot: SpotConfig,
     cond: Conditions,
@@ -311,6 +340,15 @@ def score_spot(
         wave_result.value if is_fresh(wave_result, "waves", cfg, now) and wave_result else None
     )
     orbital: float | None = None
+    if waves and spot.wave_factor < 1:
+        waves = sheltered(waves, spot.wave_factor)
+        factors.append(
+            Factor(
+                label="Shelter",
+                effect="+",
+                detail=f"about {spot.wave_factor:.0%} of the open-coast waves reach here",
+            )
+        )
     if waves:
         current = latest(waves.obs, now)
         assert current is None or isinstance(current, WaveObs)
@@ -425,6 +463,9 @@ def score_spot(
         vis_mid = v.base_ft - penalty
         turb = cond.turbidity
         tc = cfg.turbidity
+        pier_km = distance_km((spot.lat, spot.lon), cfg.pier)
+        if pier_km > tc.max_distance_km:
+            turb = None  # the pier sensor says nothing about water this far away
         if (
             is_fresh(turb, "turbidity", cfg, now)
             and turb
@@ -479,6 +520,7 @@ def score_spot(
         name=spot.name,
         tier=spot.tier,
         difficulty=spot.difficulty,
+        area=spot.area,
         verdict=verdict,
         confidence=confidence,
         vis_ft=vis,

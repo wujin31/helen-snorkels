@@ -1,9 +1,12 @@
 # Spot registry. Schema: docs/brief.md §4, validated by snorkel.models.SpotConfig.
-# Every number here is a prior to be validated against her logs and the archive.
+# Every number here is a prior to validate against the archive and dive reports.
+# Wave points come from `snorkel discover-mops`; county sites from the county's
+# site list (tests/fixtures/water_quality.county).
 # `null` IDs are still to be looked up (see docs/sources.md); fetchers skip them.
 
 - id: la-jolla-cove
   name: La Jolla Cove
+  area: La Jolla
   lat: 32.8506
   lon: -117.2713
   tier: 1
@@ -29,6 +32,7 @@
 
 - id: marine-room
   name: Marine Room / La Jolla Shores
+  area: La Jolla
   lat: 32.8532                  # reef off the Marine Room (county site 106 is at 32.8548, -117.2598)
   lon: -117.2598
   tier: 1
@@ -51,3 +55,236 @@
   notes: >-
     Sand flats to rocky reef. Leopard sharks in summer and fall. Surge on south
     swell. Scripps Pier and its sensors are about 1 km north.
+
+- id: shell-beach
+  name: Shell Beach
+  lat: 32.8487
+  lon: -117.2790
+  area: La Jolla
+  tier: 2
+  difficulty: moderate
+  access: shore
+  bottom_depth_m: 4
+  shore_normal_deg: 315
+  cdip_mop_id: D0477            # 0.23 km, 10 m depth; MOP normal 316°
+  cdip_buoy: "201"
+  tide_station: "9410230"
+  water_quality_ids: ["50"]     # county: South Casa Beach (Children's Pool, site 51, is a standing seal advisory)
+  exposure_deg:
+    exposed: [200, 320]
+  thresholds: { max_hs_ft: 2.0, max_wind_kt: 10 }
+  tide_rules: { prefer: incoming }
+  min_tide_ft: null
+  notes: >-
+    Small cove north of the Children's Pool. Reef and tidepools; surge on any
+    real swell. Best at a mid-to-low incoming tide on a flat day.
+
+- id: goldfish-point
+  name: Goldfish Point / Devil's Slide
+  lat: 32.8508
+  lon: -117.2696
+  area: La Jolla
+  tier: 2
+  difficulty: moderate
+  access: shore
+  bottom_depth_m: 6
+  shore_normal_deg: 10
+  cdip_mop_id: D0484            # 0.20 km, 10 m depth; MOP normal 11°
+  cdip_buoy: "201"
+  tide_station: "9410230"
+  water_quality_ids: ["105"]    # county: La Jolla Cove
+  exposure_deg:
+    exposed: [250, 340]
+    sheltered: [150, 230]
+  thresholds: { max_hs_ft: 2.5, max_wind_kt: 10 }
+  tide_rules: { prefer: incoming }
+  min_tide_ft: null
+  notes: >-
+    Just east of the Cove along the cliffs, where the garibaldi gather. Same
+    entry as the Cove; a swim of a few hundred meters.
+
+- id: sea-caves
+  name: La Jolla Sea Caves
+  lat: 32.8510
+  lon: -117.2672
+  area: La Jolla
+  tier: 2
+  difficulty: advanced
+  access: strenuous
+  bottom_depth_m: 6
+  shore_normal_deg: 15
+  cdip_mop_id: D0487            # 0.20 km, 10 m depth; MOP normal 16°
+  cdip_buoy: "201"
+  tide_station: "9410230"
+  water_quality_ids: ["105"]
+  exposure_deg:
+    exposed: [250, 340]
+    sheltered: [150, 230]
+  thresholds: { max_hs_ft: 2.0, max_wind_kt: 8 }
+  tide_rules: { prefer: any }
+  min_tide_ft: null
+  notes: >-
+    The seven caves along the cliffs east of the Cove. Long swim or kayak; surge
+    in the caves on any swell. Fins and a buddy.
+
+- id: turtle-town
+  name: Turtle Town
+  lat: 32.8565
+  lon: -117.2635
+  area: La Jolla
+  tier: 2
+  difficulty: advanced
+  access: strenuous
+  bottom_depth_m: 6
+  shore_normal_deg: 300
+  cdip_mop_id: D0499            # 0.09 km, 10 m depth; MOP normal 300°
+  cdip_buoy: "201"
+  tide_station: "9410230"
+  water_quality_ids: ["106", "54"]
+  exposure_deg:
+    exposed: [190, 290]
+    sheltered: [300, 340]
+  thresholds: { max_hs_ft: 2.5, max_wind_kt: 10 }
+  tide_rules: { prefer: incoming }
+  min_tide_ft: null
+  near_pier: true
+  notes: >-
+    Reef off the south end of La Jolla Shores where green sea turtles feed.
+    A long swim or a kayak from the Shores.
+
+- id: bird-rock
+  name: Bird Rock
+  lat: 32.8145
+  lon: -117.2735
+  area: La Jolla
+  tier: 2
+  difficulty: moderate
+  access: shore
+  bottom_depth_m: 3
+  shore_normal_deg: 235
+  cdip_mop_id: D0432            # 0.68 km, 10 m depth; MOP normal 236°
+  cdip_buoy: "201"
+  tide_station: "9410230"
+  water_quality_ids: ["43", "101"]  # nearest county sites: WindanSea (Palomar), Tourmaline
+  exposure_deg:
+    exposed: [190, 320]
+  thresholds: { max_hs_ft: 2.0, max_wind_kt: 10 }
+  tide_rules: { prefer: outgoing }
+  min_tide_ft: null
+  notes: >-
+    Shallow reef and tidepools; best on a low tide and a flat day. Rocky entry.
+
+- id: sunset-cliffs
+  name: Sunset Cliffs (Ladera St)
+  lat: 32.7193
+  lon: -117.2575
+  area: Point Loma & Mission Bay
+  tier: 3
+  difficulty: advanced
+  access: strenuous
+  bottom_depth_m: 5
+  shore_normal_deg: 265
+  cdip_mop_id: D0317            # 0.70 km, 10 m depth; MOP normal 264°
+  cdip_buoy: null
+  tide_station: "9410230"
+  water_quality_ids: ["189"]    # county: Sunset Cliffs, Ladera Street
+  exposure_deg:
+    exposed: [190, 320]
+  thresholds: { max_hs_ft: 2.0, max_wind_kt: 10 }
+  tide_rules: { prefer: incoming }
+  min_tide_ft: null
+  notes: >-
+    Rocky reef and kelp below the cliffs; steep stairs at Ladera Street.
+    Only on a flat day.
+
+- id: mission-point
+  name: Mission Point (bay side)
+  lat: 32.7612
+  lon: -117.2480
+  area: Point Loma & Mission Bay
+  tier: 3
+  difficulty: easy
+  access: shore
+  bottom_depth_m: 3
+  shore_normal_deg: 180
+  cdip_mop_id: D0367            # open coast outside the channel, 1.2 km; scaled by wave_factor
+  cdip_buoy: null
+  tide_station: "9410230"
+  water_quality_ids: ["172"]    # county: Mission Point Park
+  exposure_deg:
+    exposed: [200, 240]         # only swell that runs up the channel
+  thresholds: { max_hs_ft: 2.0, max_wind_kt: 12 }
+  wave_factor: 0.2             # prior: inside the jetties, a fifth of the open-coast swell
+  tide_rules: { prefer: incoming }
+  min_tide_ft: null
+  notes: >-
+    Calm water along the rocks inside the Mission Bay channel. Strong current
+    at mid-tide; best near high slack. Clearest on an incoming tide.
+
+- id: tide-beach
+  name: Tide Beach Park (Solana Beach)
+  lat: 32.9966
+  lon: -117.2768
+  area: North County
+  tier: 3
+  difficulty: moderate
+  access: shore
+  bottom_depth_m: 3
+  shore_normal_deg: 250
+  cdip_mop_id: D0661            # 0.67 km, 10 m depth; MOP normal 247°
+  cdip_buoy: null
+  tide_station: "9410230"
+  water_quality_ids: ["200"]    # county: Tide Beach Park
+  exposure_deg:
+    exposed: [190, 320]
+  thresholds: { max_hs_ft: 2.0, max_wind_kt: 10 }
+  tide_rules: { prefer: outgoing }
+  min_tide_ft: null
+  notes: >-
+    Reef and tidepools below the stairs; best at low tide on a flat day.
+
+- id: cardiff-reef
+  name: Cardiff Reef
+  lat: 33.0140
+  lon: -117.2825
+  area: North County
+  tier: 3
+  difficulty: moderate
+  access: shore
+  bottom_depth_m: 4
+  shore_normal_deg: 253
+  cdip_mop_id: D0680            # 0.57 km, 10 m depth; MOP normal 253°
+  cdip_buoy: null
+  tide_station: "9410230"
+  water_quality_ids: ["204", "203"]  # county: San Elijo Lagoon Outlet, Charthouse
+  exposure_deg:
+    exposed: [190, 320]
+  thresholds: { max_hs_ft: 2.0, max_wind_kt: 10 }
+  tide_rules: { prefer: outgoing }
+  min_tide_ft: null
+  notes: >-
+    A surf reef that's snorkelable only when it's flat. Lagoon outflow clouds
+    the water after rain.
+
+- id: swamis
+  name: Swami's
+  lat: 33.0344
+  lon: -117.2935
+  area: North County
+  tier: 3
+  difficulty: moderate
+  access: strenuous
+  bottom_depth_m: 4
+  shore_normal_deg: 220
+  cdip_mop_id: D0708            # 0.59 km, 10 m depth; MOP normal 220°
+  cdip_buoy: null
+  tide_station: "9410230"
+  water_quality_ids: ["71"]     # county: Swami's
+  exposure_deg:
+    exposed: [190, 320]
+  thresholds: { max_hs_ft: 2.0, max_wind_kt: 10 }
+  tide_rules: { prefer: outgoing }
+  min_tide_ft: null
+  notes: >-
+    Marine protected reef below the stairs at Swami's; a surf break most days,
+    snorkelable on flat, low-tide mornings.

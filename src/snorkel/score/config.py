@@ -50,6 +50,7 @@ class TurbidityConfig(BaseModel):
     weight_near_pier: float
     weight_elsewhere: float
     min_valid_ntu: float = 0.15
+    max_distance_km: float = 6
 
     def vis_ft(self, ntu: float) -> float:
         return self.vis_ft_at_1_ntu / max(ntu, 0.05) ** self.exponent
@@ -72,6 +73,7 @@ class ScoringConfig(BaseModel):
     gates: Gates
     visibility: VisibilityConfig
     turbidity: TurbidityConfig
+    pier: tuple[float, float] = (32.8666, -117.2571)
     window: WindowConfig
     wetsuit_f: list[tuple[float, str]]
 

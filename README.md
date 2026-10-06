@@ -1,7 +1,10 @@
 # Snorkel Status SD
 
-A calm, phone-first answer to "should we snorkel today, and where?" for La Jolla
-Cove and Marine Room / La Jolla Shores, built from public ocean data (CDIP
+A calm, phone-first answer to "should we snorkel today, and where?" across 12
+San Diego spots, from La Jolla (Cove, Shores, Shell Beach, Goldfish Point, the
+Sea Caves, Turtle Town, Bird Rock) to Point Loma and Mission Bay (Sunset
+Cliffs, Mission Point) and North County (Tide Beach, Cardiff Reef, Swami's),
+built from public ocean data (CDIP
 waves, NOAA tides and weather, SCCOOS pier sensors, county water quality).
 
 - **Project brief:** [docs/brief.md](docs/brief.md)

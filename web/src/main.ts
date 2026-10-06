@@ -10,7 +10,15 @@ let lastCheck = 0;
 
 function paint(next: StatusDoc): void {
   doc = next;
+  // Keep whatever she opened open across the 10-minute refresh.
+  const open = [...app.querySelectorAll<HTMLDetailsElement>("details[open]")].map(
+    (d) => d.id || `${d.closest("[id]")?.id ?? ""}>${d.className}`,
+  );
   app.innerHTML = renderPage(doc, new Date());
+  for (const d of app.querySelectorAll<HTMLDetailsElement>("details")) {
+    const key = d.id || `${d.closest("[id]")?.id ?? ""}>${d.className}`;
+    if (open.includes(key)) d.open = true;
+  }
   bind();
 }
 
