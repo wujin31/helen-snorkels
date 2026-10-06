@@ -1,8 +1,8 @@
 {
  "version": 1,
- "generated_at": "2026-10-06T19:41:08.910642Z",
+ "generated_at": "2026-10-06T20:39:24.036719Z",
  "timezone": "America/Los_Angeles",
- "summary": "Marine Room looks good 1:00–2:30 pm. La Jolla Cove: county water-quality advisory at La Jolla Cove.",
+ "summary": "Maybe Marine Room 2:00–3:30 pm. La Jolla Cove: county water-quality advisory at La Jolla Cove.",
  "best_bet": "marine-room",
  "spots": [
   {
@@ -10,16 +10,16 @@
    "name": "Marine Room / La Jolla Shores",
    "tier": 1,
    "difficulty": "moderate",
-   "verdict": "yes",
+   "verdict": "maybe",
    "confidence": "medium",
    "vis_ft": [
-    11,
-    23
+    13,
+    26
    ],
-   "reason": "~11–23 ft vis, 1.4 ft NW swell at 5 s, incoming tide, light wind",
+   "reason": "~13–26 ft vis, 1.3 ft NW swell at 5 s, incoming tide, ~8 kt wind",
    "window": {
-    "start": "2026-10-06T20:00:00Z",
-    "end": "2026-10-06T21:30:00Z"
+    "start": "2026-10-06T21:00:00Z",
+    "end": "2026-10-06T22:30:00Z"
    },
    "window_day": "today",
    "gates": [],
@@ -29,6 +29,11 @@
      "label": "Water quality",
      "effect": "+",
      "detail": "No county advisory"
+    },
+    {
+     "label": "NWS surf forecast",
+     "effect": "~",
+     "detail": "surf 2–4 ft, moderate rip current risk (county beaches)"
     },
     {
      "label": "Rain",
@@ -43,12 +48,12 @@
     {
      "label": "Plankton",
      "effect": "+",
-     "detail": "chlorophyll 0.7 µg/L at the pier"
+     "detail": "chlorophyll 0.4 µg/L at the pier"
     },
     {
      "label": "Turbidity",
      "effect": "+",
-     "detail": "0.5 NTU at Scripps Pier (~18 ft)"
+     "detail": "0.4 NTU at Scripps Pier (~22 ft)"
     },
     {
      "label": "Tide",
@@ -57,79 +62,65 @@
     },
     {
      "label": "Wind",
-     "effect": "+",
-     "detail": "~6 kt"
+     "effect": "~",
+     "detail": "~8 kt"
     }
    ],
    "conditions": {
-    "hs_ft": 1.4,
+    "hs_ft": 1.3,
     "tp_s": 4.819277286529541,
-    "swell_dir_deg": 293.9244384765625,
+    "swell_dir_deg": 292.8373718261719,
     "wave_source": "mop",
-    "orbital_ms": 0.193,
-    "wind_kt": 1.9,
-    "gust_kt": 2.3,
-    "wind_dir_deg": 351.0,
+    "orbital_ms": 0.194,
+    "wind_kt": 3.9,
+    "gust_kt": 4.3,
+    "wind_dir_deg": 317.0,
     "wind_onshore": true,
     "tide_ft": 1.9,
-    "tide_trend": "outgoing"
+    "tide_trend": "incoming"
    },
    "hourly": [
     {
-     "time": "2026-10-06T20:00:00Z",
-     "score": 0.497,
-     "tide_ft": 1.84,
-     "tide_trend": "incoming",
-     "wind_kt": 5.0
-    },
-    {
-     "time": "2026-10-06T20:30:00Z",
-     "score": 0.333,
-     "tide_ft": 1.95,
-     "tide_trend": "incoming",
-     "wind_kt": 5.8
-    },
-    {
      "time": "2026-10-06T21:00:00Z",
-     "score": 0.333,
+     "score": 0.231,
      "tide_ft": 2.18,
      "tide_trend": "incoming",
-     "wind_kt": 5.8
+     "wind_kt": 6.2
     },
     {
      "time": "2026-10-06T21:30:00Z",
-     "score": 0.085,
+     "score": -0.144,
      "tide_ft": 2.5,
      "tide_trend": "incoming",
-     "wind_kt": 6.8
+     "wind_kt": 7.6
     },
     {
      "time": "2026-10-06T22:00:00Z",
-     "score": 0.085,
+     "score": -0.144,
      "tide_ft": 2.91,
      "tide_trend": "incoming",
-     "wind_kt": 6.8
+     "wind_kt": 7.6
     },
     {
      "time": "2026-10-06T22:30:00Z",
-     "score": -0.001,
+     "score": -0.252,
      "tide_ft": 3.37,
      "tide_trend": "incoming",
-     "wind_kt": 7.1
+     "wind_kt": 7.9
     },
     {
      "time": "2026-10-06T23:00:00Z",
-     "score": -0.001,
+     "score": -0.252,
      "tide_ft": 3.85,
      "tide_trend": "incoming",
-     "wind_kt": 7.1
+     "wind_kt": 7.9
     },
     {
      "time": "2026-10-06T23:30:00Z",
-     "score": -0.592,
+     "score": -0.359,
      "tide_ft": 4.33,
      "tide_trend": "incoming",
-     "wind_kt": 8.9
+     "wind_kt": 8.2
     }
    ],
    "shore_normal_deg": 305.0
@@ -142,8 +133,8 @@
    "verdict": "no",
    "confidence": "high",
    "vis_ft": [
-    9,
-    19
+    10,
+    21
    ],
    "reason": "County water-quality advisory at La Jolla Cove",
    "window": null,
@@ -153,6 +144,11 @@
    ],
    "cautions": [],
    "factors": [
+    {
+     "label": "NWS surf forecast",
+     "effect": "~",
+     "detail": "surf 2–4 ft, moderate rip current risk (county beaches)"
+    },
     {
      "label": "Rain",
      "effect": "+",
@@ -166,12 +162,12 @@
     {
      "label": "Plankton",
      "effect": "+",
-     "detail": "chlorophyll 0.7 µg/L at the pier"
+     "detail": "chlorophyll 0.4 µg/L at the pier"
     },
     {
      "label": "Turbidity",
      "effect": "+",
-     "detail": "0.5 NTU at Scripps Pier (~18 ft)"
+     "detail": "0.4 NTU at Scripps Pier (~22 ft)"
     },
     {
      "label": "Tide",
@@ -180,79 +176,65 @@
     },
     {
      "label": "Wind",
-     "effect": "+",
-     "detail": "~6 kt"
+     "effect": "~",
+     "detail": "~8 kt"
     }
    ],
    "conditions": {
     "hs_ft": 2.0,
     "tp_s": 13.333333015441895,
-    "swell_dir_deg": 333.3118896484375,
+    "swell_dir_deg": 333.05584716796875,
     "wave_source": "mop",
     "orbital_ms": 0.34,
-    "wind_kt": 1.9,
-    "gust_kt": 2.3,
-    "wind_dir_deg": 351.0,
+    "wind_kt": 3.9,
+    "gust_kt": 4.3,
+    "wind_dir_deg": 317.0,
     "wind_onshore": true,
     "tide_ft": 1.9,
-    "tide_trend": "outgoing"
+    "tide_trend": "incoming"
    },
    "hourly": [
     {
-     "time": "2026-10-06T20:00:00Z",
-     "score": 0.497,
-     "tide_ft": 1.84,
-     "tide_trend": "incoming",
-     "wind_kt": 5.0
-    },
-    {
-     "time": "2026-10-06T20:30:00Z",
-     "score": 0.333,
-     "tide_ft": 1.95,
-     "tide_trend": "incoming",
-     "wind_kt": 5.8
-    },
-    {
      "time": "2026-10-06T21:00:00Z",
-     "score": 0.333,
+     "score": 0.231,
      "tide_ft": 2.18,
      "tide_trend": "incoming",
-     "wind_kt": 5.8
+     "wind_kt": 6.2
     },
     {
      "time": "2026-10-06T21:30:00Z",
-     "score": 0.085,
+     "score": -0.144,
      "tide_ft": 2.5,
      "tide_trend": "incoming",
-     "wind_kt": 6.8
+     "wind_kt": 7.6
     },
     {
      "time": "2026-10-06T22:00:00Z",
-     "score": 0.085,
+     "score": -0.144,
      "tide_ft": 2.91,
      "tide_trend": "incoming",
-     "wind_kt": 6.8
+     "wind_kt": 7.6
     },
     {
      "time": "2026-10-06T22:30:00Z",
-     "score": -0.001,
+     "score": -0.252,
      "tide_ft": 3.37,
      "tide_trend": "incoming",
-     "wind_kt": 7.1
+     "wind_kt": 7.9
     },
     {
      "time": "2026-10-06T23:00:00Z",
-     "score": -0.001,
+     "score": -0.252,
      "tide_ft": 3.85,
      "tide_trend": "incoming",
-     "wind_kt": 7.1
+     "wind_kt": 7.9
     },
     {
      "time": "2026-10-06T23:30:00Z",
-     "score": -0.592,
+     "score": -0.359,
      "tide_ft": 4.33,
      "tide_trend": "incoming",
-     "wind_kt": 8.9
+     "wind_kt": 8.2
     }
    ],
    "shore_normal_deg": 15.0
@@ -262,14 +244,15 @@
   "date": "2026-10-06",
   "sunrise": "2026-10-06T13:46:59.148783Z",
   "sunset": "2026-10-07T01:26:37.954399Z",
-  "water_temp_f": 71.9,
+  "water_temp_f": 72.0,
   "water_temp_source": "sccoos",
   "wetsuit": "3/2 mm shorty or springsuit",
-  "turbidity_ntu": 0.45,
-  "chlorophyll_ug_l": 0.73,
+  "turbidity_ntu": 0.37,
+  "chlorophyll_ug_l": 0.42,
   "alerts": [
    "Extreme Heat Warning"
   ],
+  "surf_forecast": "Surf 2–4 ft · moderate rip current risk",
   "tide_curve": [
    {
     "time": "2026-10-06T12:15:00Z",
@@ -532,8 +515,8 @@
    "label": "Tide predictions (NOAA 9410230)",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-10-06T19:41:08.910642Z",
-   "valid_at": "2026-10-06T19:41:08.910642Z",
+   "fetched_at": "2026-10-06T20:39:24.036719Z",
+   "valid_at": "2026-10-06T20:39:24.036719Z",
    "error": null
   },
   {
@@ -541,8 +524,8 @@
    "label": "Pier wind (NOAA 9410230)",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-10-06T19:41:08.910642Z",
-   "valid_at": "2026-10-06T19:36:00Z",
+   "fetched_at": "2026-10-06T20:39:24.036719Z",
+   "valid_at": "2026-10-06T20:30:00Z",
    "error": null
   },
   {
@@ -550,8 +533,8 @@
    "label": "Water temperature",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-10-06T19:41:08.910642Z",
-   "valid_at": "2026-10-06T19:24:00Z",
+   "fetched_at": "2026-10-06T20:39:24.036719Z",
+   "valid_at": "2026-10-06T20:24:00Z",
    "error": null
   },
   {
@@ -559,8 +542,8 @@
    "label": "Chlorophyll (SCCOOS pier)",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-10-06T19:41:08.910642Z",
-   "valid_at": "2026-10-06T19:24:00Z",
+   "fetched_at": "2026-10-06T20:39:24.036719Z",
+   "valid_at": "2026-10-06T20:24:00Z",
    "error": null
   },
   {
@@ -568,8 +551,8 @@
    "label": "Turbidity (SCCOOS pier)",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-10-06T19:41:08.910642Z",
-   "valid_at": "2026-10-06T19:24:00Z",
+   "fetched_at": "2026-10-06T20:39:24.036719Z",
+   "valid_at": "2026-10-06T20:24:00Z",
    "error": null
   },
   {
@@ -577,8 +560,17 @@
    "label": "NWS alerts",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-10-06T19:41:08.910642Z",
-   "valid_at": "2026-10-06T19:41:08.910642Z",
+   "fetched_at": "2026-10-06T20:39:24.036719Z",
+   "valid_at": "2026-10-06T20:39:24.036719Z",
+   "error": null
+  },
+  {
+   "id": "surf_forecast",
+   "label": "NWS surf zone forecast",
+   "ok": true,
+   "stale": false,
+   "fetched_at": "2026-10-06T20:39:24.036719Z",
+   "valid_at": "2026-10-06T20:06:00Z",
    "error": null
   },
   {
@@ -586,8 +578,8 @@
    "label": "Waves (mop) · la-jolla-cove",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-10-06T19:41:08.910642Z",
-   "valid_at": "2026-10-06T18:00:00Z",
+   "fetched_at": "2026-10-06T20:39:24.036719Z",
+   "valid_at": "2026-10-06T19:00:00Z",
    "error": null
   },
   {
@@ -595,8 +587,8 @@
    "label": "Waves (mop) · marine-room",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-10-06T19:41:08.910642Z",
-   "valid_at": "2026-10-06T18:00:00Z",
+   "fetched_at": "2026-10-06T20:39:24.036719Z",
+   "valid_at": "2026-10-06T19:00:00Z",
    "error": null
   },
   {
@@ -604,8 +596,8 @@
    "label": "Wind forecast (Open-Meteo) · la-jolla-cove",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-10-06T19:41:08.910642Z",
-   "valid_at": "2026-10-06T19:41:08.910642Z",
+   "fetched_at": "2026-10-06T20:39:24.036719Z",
+   "valid_at": "2026-10-06T20:39:24.036719Z",
    "error": null
   },
   {
@@ -613,8 +605,8 @@
    "label": "Wind forecast (Open-Meteo) · marine-room",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-10-06T19:41:08.910642Z",
-   "valid_at": "2026-10-06T19:41:08.910642Z",
+   "fetched_at": "2026-10-06T20:39:24.036719Z",
+   "valid_at": "2026-10-06T20:39:24.036719Z",
    "error": null
   },
   {
@@ -622,8 +614,8 @@
    "label": "Rain (Open-Meteo) · la-jolla-cove",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-10-06T19:41:08.910642Z",
-   "valid_at": "2026-10-06T19:41:08.910642Z",
+   "fetched_at": "2026-10-06T20:39:24.036719Z",
+   "valid_at": "2026-10-06T20:39:24.036719Z",
    "error": null
   },
   {
@@ -631,8 +623,8 @@
    "label": "Rain (Open-Meteo) · marine-room",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-10-06T19:41:08.910642Z",
-   "valid_at": "2026-10-06T19:41:08.910642Z",
+   "fetched_at": "2026-10-06T20:39:24.036719Z",
+   "valid_at": "2026-10-06T20:39:24.036719Z",
    "error": null
   },
   {
@@ -640,8 +632,8 @@
    "label": "Water quality · la-jolla-cove",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-10-06T19:41:08.910642Z",
-   "valid_at": "2026-10-06T19:41:08.910642Z",
+   "fetched_at": "2026-10-06T20:39:24.036719Z",
+   "valid_at": "2026-10-06T20:39:24.036719Z",
    "error": null
   },
   {
@@ -649,8 +641,8 @@
    "label": "Water quality · marine-room",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-10-06T19:41:08.910642Z",
-   "valid_at": "2026-10-06T19:41:08.910642Z",
+   "fetched_at": "2026-10-06T20:39:24.036719Z",
+   "valid_at": "2026-10-06T20:39:24.036719Z",
    "error": null
   }
  ],
