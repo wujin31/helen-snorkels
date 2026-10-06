@@ -10,6 +10,7 @@ from snorkel.observations import (
     Chlorophyll,
     PrecipObs,
     SourceResult,
+    SurfForecast,
     Tides,
     Turbidity,
     WaterQuality,
@@ -36,6 +37,8 @@ class Conditions:
     turbidity: SourceResult[Turbidity] | None = None
     water_quality: dict[str, SourceResult[WaterQuality]] = field(default_factory=dict)
     alerts: SourceResult[list[Alert]] | None = None
+    surf_forecast: SourceResult[SurfForecast] | None = None
+    """NWS Surf Zone Forecast for San Diego County beaches."""
 
     def all_results(self) -> list[SourceResult]:  # type: ignore[type-arg]
         singles = [
@@ -45,6 +48,7 @@ class Conditions:
             self.chlorophyll,
             self.turbidity,
             self.alerts,
+            self.surf_forecast,
         ]
         groups = [self.waves, self.wind_forecast, self.precip, self.water_quality]
         out = [r for r in singles if r is not None]

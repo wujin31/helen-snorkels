@@ -256,6 +256,35 @@ def score_spot(
             cautions.append(f"NWS {alert.event}")
             factors.append(Factor(label=alert.event, effect="-", detail=alert.headline))
 
+    # NWS Surf Zone Forecast: county-wide surf height and rip current risk.
+    srf = cond.surf_forecast
+    if is_fresh(srf, "surf_forecast", cfg, now) and srf and srf.value:
+        period = srf.value.for_day(now.astimezone(LOCAL_TZ).date())
+        if period and period.rip_risk == "High" and "NWS Rip Current Statement" not in cautions:
+            cautions.append("NWS high rip current risk")
+        if period and (period.surf_ft or period.rip_risk):
+            parts = []
+            if period.surf_ft:
+                lo, hi = period.surf_ft
+                parts.append(f"surf {lo:g}–{hi:g} ft" if hi > lo else f"surf {hi:g} ft")
+            if period.rip_risk:
+                parts.append(f"{period.rip_risk.lower()} rip current risk")
+            calm = (
+                period.surf_ft is not None
+                and period.surf_ft[1] <= spot.thresholds.max_hs_ft
+                and period.rip_risk == "Low"
+            )
+            rough = period.rip_risk == "High" or (
+                period.surf_ft is not None and period.surf_ft[0] > spot.thresholds.max_hs_ft
+            )
+            factors.append(
+                Factor(
+                    label="NWS surf forecast",
+                    effect="+" if calm else "-" if rough else "~",
+                    detail=", ".join(parts) + " (county beaches)",
+                )
+            )
+
     # Rain: the county advises staying out of the water for 72 h after rain.
     rain = cond.precip.get(spot.id)
     recent_rain_penalty = 0.0

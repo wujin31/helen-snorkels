@@ -51,6 +51,10 @@ sources:
       - [32.8420, -117.2650]    # land zone (beach hazards, high surf)
       - [32.8506, -117.2713]    # nearshore marine zone
 
+  weather.nws_srf:              # Surf Zone Forecast: surf height, rip current risk, water temp
+    every_minutes: 180          # issued two or three times a day
+    office: SGX
+
   cdip.buoy:                    # realtime spectra + SST, OPeNDAP subset
     every_minutes: 60           # keep CDIP load low (it blocks some cloud IPs)
     dods: https://thredds.cdip.ucsd.edu/thredds/dodsC

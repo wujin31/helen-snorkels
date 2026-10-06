@@ -300,3 +300,23 @@ def test_impossibly_low_turbidity_is_ignored(cove: SpotConfig, cfg: ScoringConfi
     without = score(cove, conditions(cove), cfg)
     assert with_glitch.vis_ft == without.vis_ft
     assert any("too low to trust" in f.detail for f in with_glitch.factors)
+
+
+def test_nws_high_rip_risk_caps_at_maybe(cove: SpotConfig, cfg: ScoringConfig) -> None:
+    from snorkel.observations import SurfForecast, SurfPeriod
+
+    today = NOW.astimezone(LOCAL_TZ).date()
+
+    def forecast(rip: str, surf: tuple[float, float]) -> SourceResult:  # type: ignore[type-arg]
+        fc = SurfForecast(
+            issued=NOW,
+            zone="San Diego County Coastal Areas",
+            periods=[SurfPeriod(name="Today", day=today, rip_risk=rip, surf_ft=surf)],
+        )
+        return ok("srf", fc, NOW)
+
+    calm = score(cove, conditions(cove, surf_forecast=forecast("Low", (1, 2))), cfg)
+    assert calm.verdict == "yes"
+    assert any(f.label == "NWS surf forecast" and f.effect == "+" for f in calm.factors)
+    rips = score(cove, conditions(cove, surf_forecast=forecast("High", (1, 2))), cfg)
+    assert rips.verdict == "maybe" and "NWS high rip current risk" in rips.cautions

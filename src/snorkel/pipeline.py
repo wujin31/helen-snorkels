@@ -27,6 +27,7 @@ from snorkel.observations import (
     Chlorophyll,
     PrecipObs,
     SourceResult,
+    SurfForecast,
     Tides,
     Turbidity,
     WaterQuality,
@@ -35,7 +36,7 @@ from snorkel.observations import (
     WindSeries,
 )
 from snorkel.parse import cdip as cdip_parse
-from snorkel.parse import coops, county, ndbc, nws, openmeteo, sccoos
+from snorkel.parse import coops, county, ndbc, nws, openmeteo, sccoos, srf
 from snorkel.score.conditions import Conditions
 from snorkel.storage import Storage
 
@@ -318,6 +319,12 @@ def gather(
         return list(seen.values())
 
     cond.alerts = g.result("alerts", alerts, lambda _a: now)
+
+    # NWS Surf Zone Forecast (county-wide surf, rip current risk, water temp).
+    def surf_forecast() -> SurfForecast:
+        return srf.parse_srf(g.item("weather.nws_srf", weather_fetch.capture_nws_srf).content)
+
+    cond.surf_forecast = g.result("surf_forecast", surf_forecast, lambda f: f.issued)
 
     # Water quality per spot, from the county's own site list.
     def county_sites() -> list[county.CountySite]:

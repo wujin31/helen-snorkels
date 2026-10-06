@@ -157,3 +157,23 @@ def capture_nws_alerts(ctx: FetchContext) -> list[Item]:
         for lat, lon in _points(ctx)
     ]
     return get_many(ctx, items)
+
+
+def capture_nws_srf(ctx: FetchContext) -> list[Item]:
+    """The latest Surf Zone Forecast from the configured office (two requests)."""
+    office = str(ctx.params.get("office", "SGX"))
+    listing_url = f"{NWS_URL}/products/types/SRF/locations/{office}"
+    try:
+        listing = get_with_retry(ctx.client, listing_url, sleep=ctx.sleep).json()
+        latest = (listing.get("@graph") or [None])[0]
+        if not latest:
+            return [ItemError(error="no SRF products listed", url=listing_url)]
+    except Exception as exc:
+        return [ItemError(error=describe_error(exc), url=listing_url)]
+    item = HttpItem(
+        url=f"{NWS_URL}/products/{latest['id']}",
+        ext="json",
+        variant=office.lower(),
+        meta={"issued": latest.get("issuanceTime")},
+    )
+    return get_many(ctx, [item])

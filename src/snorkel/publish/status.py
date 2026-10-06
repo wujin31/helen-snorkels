@@ -33,6 +33,7 @@ SOURCE_LABELS = {
     "turbidity": "Turbidity (SCCOOS pier)",
     "water_quality": "Water quality",
     "alerts": "NWS alerts",
+    "surf_forecast": "NWS surf zone forecast",
 }
 
 
@@ -67,6 +68,7 @@ class DayConditions(BaseModel):
     turbidity_ntu: float | None = None
     chlorophyll_ug_l: float | None = None
     alerts: list[str] = Field(default_factory=list)
+    surf_forecast: str | None = None  # "Surf 2–4 ft · moderate rip current risk (NWS)"
     tide_curve: list[TideCurvePoint] = Field(default_factory=list)
     tide_turns: list[TideTurn] = Field(default_factory=list)
 
@@ -161,6 +163,7 @@ def source_health(cond: Conditions, cfg: ScoringConfig) -> list[SourceHealth]:
         "chlorophyll": "chlorophyll",
         "turbidity": "turbidity",
         "alerts": "alerts",
+        "surf_forecast": "surf_forecast",
     }
     out = []
     for key, kind in kinds.items():
@@ -196,6 +199,16 @@ def day_conditions(cond: Conditions, cfg: ScoringConfig, sun: SunTimes) -> DayCo
         day.turbidity_ntu = turb.ntu
     if cond.chlorophyll and cond.chlorophyll.ok and cond.chlorophyll.value:
         day.chlorophyll_ug_l = cond.chlorophyll.value.chl_ug_l
+    srf = cond.surf_forecast.value if cond.surf_forecast and cond.surf_forecast.ok else None
+    period = srf.for_day(local_day) if srf else None
+    if period:
+        bits = []
+        if period.surf_ft:
+            lo, hi = period.surf_ft
+            bits.append(f"Surf {lo:g}–{hi:g} ft" if hi > lo else f"Surf {hi:g} ft")
+        if period.rip_risk:
+            bits.append(f"{period.rip_risk.lower()} rip current risk")
+        day.surf_forecast = " · ".join(bits) or None
     if cond.alerts and cond.alerts.ok and cond.alerts.value:
         day.alerts = sorted({a.event for a in cond.alerts.value})
     tides = cond.tides.value if cond.tides and cond.tides.ok else None
