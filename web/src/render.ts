@@ -178,7 +178,7 @@ function waterSection(doc: StatusDoc): string {
   const alerts = d.alerts.length
     ? `<p class="alerts" role="note"><strong>NWS:</strong> ${d.alerts.map(esc).join(", ")}</p>`
     : "";
-  return `<section class="panel" aria-labelledby="water-title"><h2 id="water-title">Water today</h2><dl class="facts">${rows.join("")}</dl>${alerts}</section>`;
+  return `<section class="panel" aria-labelledby="water-title"><h2 id="water-title">Water</h2><dl class="facts">${rows.join("")}</dl>${alerts}</section>`;
 }
 
 function tideSection(doc: StatusDoc, now: Date): string {
@@ -228,7 +228,7 @@ export function renderPage(doc: StatusDoc, now: Date | null): string {
   const clockNow = now ?? new Date(doc.generated_at);
   return `
   <header class="top" id="top">
-    <span class="brand">Snorkel Status <span class="muted">· La Jolla</span></span>
+    <span class="brand">Snorkel Status <span class="muted">· San Diego</span></span>
     <span class="updated">Updated ${esc(clock(doc.generated_at))}</span>
   </header>
   <div id="banner">${now ? staleBanner(doc, now) : ""}</div>

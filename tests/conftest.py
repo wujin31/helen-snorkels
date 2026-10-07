@@ -14,8 +14,6 @@ Handler = Callable[[httpx.Request], httpx.Response]
 
 # 2026-09-27 09:00 PDT: well after sunrise in La Jolla.
 MORNING = datetime(2026, 9, 27, 16, 0, tzinfo=UTC)
-# 2026-09-27 23:00 PDT: dark.
-NIGHT = datetime(2026, 9, 28, 6, 0, tzinfo=UTC)
 
 
 @pytest.fixture

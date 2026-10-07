@@ -31,7 +31,7 @@ cd web && npm ci && npm test && npm run build             # page (Vite + TS, no 
 - `src/snorkel/pipeline.py`: gathers fresh `Conditions`; `score/rules.py`: v0 rules; `publish/status.py`: `status.json`.
 - `config/scoring.yaml`: every threshold and heuristic (priors to validate).
 - `web/`: the page. `src/render.ts` renders HTML strings from `status.json`, at build time (answer in first paint) and in the browser: verdict first, then details.
-- `.github/workflows/`: `ci.yml`, `archive.yml` (15-min cron), `score.yml` (hourly score + history + Pages deploy), `pacemaker.yml` (fills cron gaps), `maintenance.yml` (manual one-off chores), `probe.yml` (live probes from `probe/**` branches), `keepalive.yml`.
+- `.github/workflows/`: `ci.yml`, `archive.yml` (15-min cron), `score.yml` (hourly score + history + Pages deploy), `pacemaker.yml` (fills cron gaps), `probe.yml` (live probes from `probe/**` branches), `keepalive.yml`.
 
 ## Conventions
 

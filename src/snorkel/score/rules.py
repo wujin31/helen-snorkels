@@ -285,10 +285,15 @@ def score_spot(
             cautions.append(f"NWS {alert.event}")
             factors.append(Factor(label=alert.event, effect="-", detail=alert.headline))
 
-    # NWS Surf Zone Forecast: county-wide surf height and rip current risk.
+    # The best window; after the last usable light it's tomorrow morning.
+    window = plan_window(spot, cond, cfg, sun_today, sun_tomorrow)
+    plan_sun = sun_today if window.day == "today" else sun_tomorrow
+    plan_date = plan_sun.sunrise.astimezone(LOCAL_TZ).date()
+
+    # NWS Surf Zone Forecast for the day being planned: surf height, rip current risk.
     srf = cond.surf_forecast
     if is_fresh(srf, "surf_forecast", cfg, now) and srf and srf.value:
-        period = srf.value.for_day(now.astimezone(LOCAL_TZ).date())
+        period = srf.value.for_day(plan_date)
         if period and period.rip_risk == "High" and "NWS Rip Current Statement" not in cautions:
             cautions.append("NWS high rip current risk")
         if period and (period.surf_ft or period.rip_risk):
@@ -426,8 +431,7 @@ def score_spot(
         sc.tide_ft = round(m_to_ft(height), 1) if height is not None else None
         sc.tide_trend = trend_at(tides.points, now)
 
-    # Best window, and wind across it.
-    window = plan_window(spot, cond, cfg, sun_today, sun_tomorrow)
+    # Wind across the best window.
     window_wind = window.max_wind_kt if window.max_wind_kt is not None else sc.wind_kt
     if window_wind is not None and window_wind > spot.thresholds.max_wind_kt:
         gates.append(f"Wind ~{window_wind:.0f} kt even at the best time")

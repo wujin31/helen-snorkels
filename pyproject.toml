@@ -18,8 +18,8 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-# Headless-browser fallback for grabbing a pier-cam still when no direct
-# snapshot or HLS URL can be found. Only the archive workflow installs it.
+# Headless browser for `snorkel sniff` (lists the requests a page makes; how
+# the county endpoint was found). A dev tool: only probes that sniff install it.
 browser = ["playwright>=1.47"]
 
 [project.scripts]

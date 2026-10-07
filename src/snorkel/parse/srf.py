@@ -1,7 +1,8 @@
 """NWS Surf Zone Forecast (SRF) text, from api.weather.gov/products/{id}.
 
 The product is plain text: one segment per coastal zone, each with periods
-like `.TODAY...` holding dotted key/value lines:
+like `.TODAY...` (or, in afternoon issues, `.THIS AFTERNOON THROUGH WEDNESDAY...`)
+holding dotted key/value lines:
 
     Rip Current Risk*.............Moderate.
     Surf Height...................2 to 4 feet. Sets to 5 feet.
@@ -27,12 +28,22 @@ NUMBER_RE = re.compile(r"\d+(?:\.\d+)?")
 
 def _period_day(name: str, issued_local: date) -> date | None:
     first = name.split()[0]
-    if first in {"TODAY", "TONIGHT", "THIS"}:
+    if first in {"TODAY", "TONIGHT", "THIS", "REST"}:
         return issued_local
     if first in WEEKDAYS:
         ahead = (WEEKDAYS.index(first) - issued_local.weekday()) % 7
         return issued_local + timedelta(days=ahead or 7)
     return None
+
+
+def _period_days(name: str, issued_local: date) -> tuple[date, date | None] | None:
+    """First day and, for "X THROUGH Y" periods, the last day the period covers."""
+    start, _, end = name.partition(" THROUGH ")
+    first = _period_day(start, issued_local)
+    if first is None:
+        return None
+    last = _period_day(end, issued_local) if end else None
+    return first, last if last and last > first else None
 
 
 def _range(text: str) -> tuple[float, float] | None:
@@ -64,8 +75,12 @@ def parse_srf(body: bytes, zone: str = SAN_DIEGO_ZONE) -> SurfForecast:
             break
         head = PERIOD_RE.match(line)
         if head:
-            day = _period_day(head.group(1), issued_local)
-            current = SurfPeriod(name=head.group(1).title(), day=day) if day else None
+            days = _period_days(head.group(1), issued_local)
+            current = (
+                SurfPeriod(name=head.group(1).title(), day=days[0], last_day=days[1])
+                if days
+                else None
+            )
             if current:
                 periods.append(current)
             continue

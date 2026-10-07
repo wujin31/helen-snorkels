@@ -7,9 +7,12 @@ name: Pacemaker
 # healthy it finds nothing overdue and does nothing; the archiver's cadence
 # check makes an occasional overlap harmless.
 #
-# It runs around the clock as a chain, re-dispatching itself before the
-# 6-hour job limit. Archive and Score restart it if the chain ever breaks,
-# and it can be started by hand: Actions -> Pacemaker -> Run workflow.
+# It runs around the clock as a chain: each run queues its successor as soon
+# as it starts, and the concurrency group holds that run until this one ends,
+# however it ends. (On 2026-10-05 a hosted runner was lost mid-run, and with
+# the successor only dispatched at the end, the chain stopped for 3.5 h.)
+# Archive and Score also restart it if no run is active or queued, and it can
+# be started by hand: Actions -> Pacemaker -> Run workflow.
 on:
   workflow_dispatch:
 
@@ -32,6 +35,16 @@ jobs:
         run: |
           set -uo pipefail
           end=$(( $(date +%s) + 330 * 60 ))
+          ensure_successor() { # queue the next run unless one is already waiting
+            local waiting
+            waiting=$(gh api "repos/$REPO/actions/workflows/pacemaker.yml/runs?per_page=10" \
+              --jq "[.workflow_runs[] | select(.status != \"completed\" and .id != $GITHUB_RUN_ID)] | length" \
+              2>/dev/null) || waiting=0
+            if [ "$waiting" = "0" ]; then
+              gh workflow run pacemaker.yml --repo "$REPO" --ref main && echo "Queued the next pacemaker run."
+            fi
+          }
+          ensure_successor
           in_window() { # UTC hours 12-23 and 0-$1, the cron schedules' span (~5am-8pm Pacific)
             local h=$((10#$(date -u +%H)))
             [ "$h" -ge 12 ] || [ "$h" -le "$1" ]
@@ -60,5 +73,4 @@ jobs:
             fi
             sleep 300
           done
-          gh workflow run pacemaker.yml --repo "$REPO" --ref main
-          echo "Re-dispatched the pacemaker for the next ~5.5 hours."
+          ensure_successor # in case the dispatch at the start failed

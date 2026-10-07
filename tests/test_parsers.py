@@ -127,6 +127,27 @@ def test_nws_surf_zone_forecast_san_diego() -> None:
     assert fc.for_day(date(2026, 10, 7)) is wed
 
 
+def test_afternoon_srf_periods_span_days() -> None:
+    """The 1 pm issue merges today and tomorrow into one period (seen 2026-10-06)."""
+    import json
+    from datetime import date
+
+    from snorkel.parse import srf
+
+    data = json.loads((FIX / "weather.nws_srf/sgx.json").read_text())
+    data["issuanceTime"] = "2026-10-06T20:06:00+00:00"
+    data["productText"] = (
+        data["productText"]
+        .replace(".WEDNESDAY...", ".THURSDAY...")
+        .replace(".TODAY...", ".THIS AFTERNOON THROUGH WEDNESDAY...")
+    )
+    fc = srf.parse_srf(json.dumps(data).encode())
+    merged, thu = fc.periods[0], fc.periods[1]
+    assert (merged.day, merged.last_day) == (date(2026, 10, 6), date(2026, 10, 7))
+    assert fc.for_day(date(2026, 10, 6)) is merged and fc.for_day(date(2026, 10, 7)) is merged
+    assert fc.for_day(date(2026, 10, 8)) is thu
+
+
 def test_srf_without_the_zone_is_an_error() -> None:
     import json
 
