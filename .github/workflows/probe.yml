@@ -20,8 +20,13 @@ jobs:
       - uses: astral-sh/setup-uv@v6
         with:
           enable-cache: true
-      - run: uv sync --locked --extra browser
-      - run: uv run playwright install --with-deps --only-shell chromium
+      - run: uv sync --locked
+      - name: Headless browser, for probes that run `snorkel sniff`
+        run: |
+          if grep -qs "sniff" probe/run.sh; then
+            uv sync --locked --extra browser
+            uv run playwright install --with-deps --only-shell chromium
+          fi
       - name: Run probe/run.sh
         run: bash probe/run.sh > probe/output.txt 2>&1 || echo "run.sh exited $?" >> probe/output.txt
       - name: Commit results

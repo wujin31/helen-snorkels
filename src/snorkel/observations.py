@@ -106,6 +106,7 @@ class SurfPeriod(BaseModel):
 
     name: str
     day: date
+    last_day: date | None = None  # "THIS AFTERNOON THROUGH WEDNESDAY" spans two days
     rip_risk: str | None = None  # Low / Moderate / High
     surf_ft: tuple[float, float] | None = None
     sets_ft: float | None = None
@@ -119,7 +120,7 @@ class SurfForecast(BaseModel):
     periods: list[SurfPeriod] = Field(default_factory=list)
 
     def for_day(self, day: date) -> SurfPeriod | None:
-        return next((p for p in self.periods if p.day == day), None)
+        return next((p for p in self.periods if p.day <= day <= (p.last_day or p.day)), None)
 
 
 class Alert(BaseModel):

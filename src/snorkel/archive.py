@@ -2,10 +2,10 @@
 
 Each run:
 1. reads today's and yesterday's manifest to see when each source last ran;
-2. for every source that is due (cadence elapsed, daylight if required, not
-   switched off), calls its capture function with a timeout;
-3. stores each item (gzipped raw bytes, or a JPEG frame) and appends one
-   manifest row per item, including failures.
+2. for every source whose cadence has elapsed, calls its capture function
+   with a timeout;
+3. stores each item as gzipped raw bytes and appends one manifest row per
+   item, including failures.
 
 A failing or hanging source is recorded and skipped; it never stops the run.
 """
@@ -14,7 +14,6 @@ from __future__ import annotations
 
 import gzip
 import hashlib
-import os
 import threading
 from collections.abc import Callable, Mapping
 from datetime import date, datetime, timedelta
@@ -28,21 +27,11 @@ from snorkel.fetch.base import FetchContext, ItemError, SkipSource, SourceFn, de
 from snorkel.http import make_client
 from snorkel.models import CaptureRecord, SourcesConfig, SpotConfig
 from snorkel.storage import Storage
-from snorkel.sun import sun_elevation
 
 T = TypeVar("T")
 
 WRITER = "archive"
 DEFAULT_TIMEOUT_S = 120.0
-FALSY = {"0", "false", "no", "off"}
-CONTENT_TYPES = {
-    "jpg": "image/jpeg",
-    "json": "application/json",
-    "csv": "text/csv",
-    "txt": "text/plain",
-    "html": "text/html",
-    "nc": "application/x-netcdf",
-}
 
 
 def manifest_key(day: date, writer: str = WRITER) -> str:
@@ -51,10 +40,7 @@ def manifest_key(day: date, writer: str = WRITER) -> str:
 
 def snapshot_key(source: str, variant: str | None, when: datetime, ext: str) -> str:
     name = when.strftime("%H%M%SZ") + (f"_{slug(variant)}" if variant else "")
-    day = when.strftime("%Y/%m/%d")
-    if ext == "jpg":
-        return f"frames/{source}/{day}/{name}.jpg"
-    return f"raw/{source}/{day}/{name}.{ext}.gz"
+    return f"raw/{source}/{when.strftime('%Y/%m/%d')}/{name}.{ext}.gz"
 
 
 def read_manifest(storage: Storage, day: date, writer: str = WRITER) -> list[CaptureRecord]:
@@ -97,11 +83,6 @@ def is_due(previous: list[CaptureRecord], every_minutes: int, now: datetime) -> 
     return now - max(attempts) >= timedelta(minutes=every_minutes) - slack
 
 
-def env_disabled(params: Mapping[str, Any], environ: Mapping[str, str]) -> bool:
-    name = params.get("enabled_env")
-    return bool(name) and environ.get(str(name), "").strip().lower() in FALSY
-
-
 def run_with_timeout(fn: Callable[[], T], timeout_s: float) -> T:
     """Run `fn` in a daemon thread so a hung download can't stall the whole run."""
     result: dict[str, Any] = {}
@@ -132,16 +113,14 @@ def run_archive(
     spots: list[SpotConfig] | None = None,
     sources: SourcesConfig | None = None,
     registry: Mapping[str, SourceFn] | None = None,
-    environ: Mapping[str, str] | None = None,
     log: Callable[[str], None] = print,
 ) -> list[CaptureRecord]:
-    """Capture every due source once. `force` ignores cadence and daylight."""
+    """Capture every due source once. `force` ignores cadence."""
     if now.tzinfo is None:
         raise ValueError("now must be timezone-aware")
     spots = spots if spots is not None else load_spots()
     sources = sources or load_sources()
     registry = registry if registry is not None else SOURCES
-    environ = environ if environ is not None else os.environ
     unknown = set(only or []) - set(registry)
     if unknown:
         raise ValueError(f"unknown source(s): {', '.join(sorted(unknown))}")
@@ -159,18 +138,9 @@ def run_archive(
             if params is None:
                 log(f"  {source_id}: no config, skipping")
                 continue
-            if env_disabled(params, environ):
-                log(f"  {source_id}: disabled by ${params['enabled_env']}")
-                continue
             previous = [r for r in history if r.source == source_id]
             if not force and not is_due(previous, int(params["every_minutes"]), now):
                 continue
-            min_sun = params.get("min_sun_elevation_deg")
-            if not force and min_sun is not None:
-                elevation = sun_elevation(sources.location.lat, sources.location.lon, now)
-                if elevation < float(min_sun):
-                    log(f"  {source_id}: sun at {elevation:.1f}°, below {min_sun}°")
-                    continue
             ctx = FetchContext(
                 client=client,
                 now=now,
@@ -216,8 +186,7 @@ def _capture_source(
             )
             continue
         key = snapshot_key(source_id, item.variant, now, item.ext)
-        body = item.content if item.ext == "jpg" else gzip.compress(item.content, mtime=0)
-        content_type = "application/gzip" if item.ext != "jpg" else CONTENT_TYPES["jpg"]
+        body = gzip.compress(item.content, mtime=0)
         record = CaptureRecord(
             source=source_id,
             variant=item.variant,
@@ -230,7 +199,7 @@ def _capture_source(
             meta=item.meta,
         )
         try:
-            storage.put(key, body, content_type)
+            storage.put(key, body, "application/gzip")
         except Exception as exc:
             record = record.model_copy(
                 update={"status": "error", "key": None, "error": f"store: {describe_error(exc)}"}

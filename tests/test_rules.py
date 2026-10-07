@@ -344,6 +344,23 @@ def test_nws_high_rip_risk_caps_at_maybe(cove: SpotConfig, cfg: ScoringConfig) -
     assert rips.verdict == "maybe" and "NWS high rip current risk" in rips.cautions
 
 
+def test_evening_reads_tomorrows_surf_forecast(cove: SpotConfig, cfg: ScoringConfig) -> None:
+    from snorkel.observations import SurfForecast, SurfPeriod
+
+    evening = datetime(2026, 9, 28, 2, 30, tzinfo=UTC)  # 7:30 pm PDT Sep 27
+    fc = SurfForecast(
+        issued=evening,
+        zone="San Diego County Coastal Areas",
+        periods=[
+            SurfPeriod(name="Tonight", day=date(2026, 9, 27), rip_risk="Low", surf_ft=(1, 2)),
+            SurfPeriod(name="Monday", day=date(2026, 9, 28), rip_risk="High", surf_ft=(1, 2)),
+        ],
+    )
+    status = score(cove, conditions(cove, now=evening, surf_forecast=ok("srf", fc, evening)), cfg)
+    assert status.window_day == "tomorrow"
+    assert "NWS high rip current risk" in status.cautions
+
+
 def test_a_sheltered_spot_sees_a_share_of_the_open_coast_waves(cfg: ScoringConfig) -> None:
     bay = next(s for s in load_spots() if s.id == "mission-point")
     open_coast = {bay.id: ok("waves", waves(0.9, 10), NOW)}  # ~3 ft outside the jetties

@@ -123,9 +123,9 @@ bet.
   refuse to be framed by other sites (`X-Frame-Options: DENY`; the portal
   players' CSP `frame-ancestors` allows only `*.hdontap.com`, or only UCSD sites
   for Scripps' copy), and permission to embed or analyze the stream wasn't
-  granted. Capture stopped and every archived frame was deleted
-  (`snorkel purge-cam`, via `maintenance.yml`). The page links to Scripps'
-  PierViz page instead.
+  granted. Capture stopped and every archived frame was deleted on
+  2026-10-06 (a one-off `purge-cam` command, since removed). The page links
+  to Scripps' PierViz page instead.
 
 ## Probing
 

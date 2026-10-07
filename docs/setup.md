@@ -37,13 +37,15 @@ Settings → Secrets and variables → Actions → Variables:
 ## If scheduled runs stop
 
 GitHub's cron schedules on this repository fire late, in bursts, or not at
-all for hours. `pacemaker.yml` covers the gaps: it runs around the clock as a
-chain (re-dispatching itself every ~5.5 h), and every 5 minutes it dispatches
-Archive if its last run is 14+ minutes old and Score if its last run is 58+
-minutes old, within their daylight windows. When the scheduler is healthy it
-finds nothing overdue. Archive and Score restart the pacemaker at the end of
-every run if its chain ever broke, so the two keep each other going. Start it
-by hand any time from Actions → Pacemaker → Run workflow.
+all for hours (in practice nearly every run is dispatched by the pacemaker).
+`pacemaker.yml` covers the gaps: it runs around the clock as a chain of ~5.5 h
+runs, and every 5 minutes it dispatches Archive if its last run is 14+ minutes
+old and Score if its last run is 58+ minutes old, within their daylight
+windows. Each run queues its successor as soon as it starts; the concurrency
+group holds that run until the current one ends, so even a lost runner (as on
+2026-10-05) only ends one link. Archive and Score also restart the pacemaker
+if no run is active or queued. Start it by hand any time from Actions →
+Pacemaker → Run workflow.
 
 Schedules run as whoever last edited the cron lines, so change `schedule:`
 blocks in commits authored by the repo owner (see CLAUDE.md).
@@ -62,6 +64,8 @@ Supabase dashboard → Storage → `archive`. Raw snapshots are under
 
 ## Storage budget
 
-A few MB of gzipped snapshots a day, mostly CDIP wave files. The free tier's
-1 GB lasts the better part of a year. Before then, prune old raw snapshots or
-move to Cloudflare R2 (10 GB free) via `SNORKEL_STORAGE`.
+About 3 MB of gzipped snapshots a day with twelve spots (measured 2026-10-07:
+18 MB after ten days), mostly CDIP wave files. The free tier's 1 GB lasts
+roughly a year. Before then, prune old raw snapshots (`Storage.delete`, also
+supported by the gateway) or move to Cloudflare R2 (10 GB free) via
+`SNORKEL_STORAGE`.

@@ -17,6 +17,7 @@ describe("renderPage", () => {
     expect(html).toContain('<p class="verdict-when">7:00–8:30 am</p>');
     expect(html.indexOf('id="verdict"')).toBeLessThan(html.indexOf('id="details"'));
     expect(html).toContain("Other spots");
+    expect(html).toContain('<span class="muted">· San Diego</span>');
   });
 
   it("asks nothing of the reader and talks only to its own data", () => {
