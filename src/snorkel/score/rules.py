@@ -363,6 +363,17 @@ def score_spot(
             sc.swell_dir_deg = current.dp_deg
             sc.wave_source = waves.source
             limit = spot.thresholds.max_hs_ft
+            for cap in spot.swell_dir_caps:
+                if (
+                    current.dp_deg is not None
+                    and angle_between(current.dp_deg, cap.center_deg) <= cap.half_width_deg
+                    and sc.hs_ft > cap.max_hs_ft
+                ):
+                    gates.append(
+                        f"{compass(current.dp_deg)} swell ~{sc.hs_ft:.0f} ft, "
+                        f"over {cap.max_hs_ft:g} ft for this direction"
+                    )
+                    break
             if waves.source == "mop":
                 # MOP is modelled at this spot: compare it directly.
                 if sc.hs_ft > limit:
