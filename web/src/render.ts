@@ -64,7 +64,13 @@ function why(spot: SpotStatus): string {
 }
 
 /** The answer, first: verdict, where, when, and why in a line. */
-function verdictBar(doc: StatusDoc, featured: SpotStatus | null): string {
+function verdictBar(doc: StatusDoc, featured: SpotStatus | null, now: Date | null): string {
+  const dead = doc.sources.filter((s) => !s.ok).length;
+  const age = now ? ` <span class="verdict-age">Updated ${esc(ago(doc.generated_at, now))}</span>` : "";
+  const badge = dead
+    ? ` <a class="verdict-dead" href="#foot" role="alert">${dead} source${dead > 1 ? "s" : ""} down</a>`
+    : "";
+  const meta = `<p class="verdict-meta">${age}${badge}</p>`;
   if (!featured) {
     const verdict = doc.spots.some((s) => s.verdict === "no") ? "no" : "unknown";
     const title = verdict === "no" ? "Not today" : "Can't tell right now";
@@ -74,6 +80,7 @@ function verdictBar(doc: StatusDoc, featured: SpotStatus | null): string {
     <div class="verdict-text">
       <h1 id="hero-title" class="verdict-word">${title}</h1>
       <p class="verdict-reason">${esc(doc.summary)}</p>
+      ${meta}
     </div>
   </section>`;
   }
@@ -86,6 +93,7 @@ function verdictBar(doc: StatusDoc, featured: SpotStatus | null): string {
       <h1 id="hero-title"><span class="verdict-word">${VERDICT_WORD[featured.verdict]}</span> <span class="verdict-where">${esc(short(featured.name))}</span></h1>
       ${when ? `<p class="verdict-when">${esc(when)}</p>` : ""}
       ${reason ? `<p class="verdict-reason">${esc(reason)}</p>` : ""}
+      ${meta}
     </div>
   </section>`;
 }
@@ -124,6 +132,7 @@ const AREA_ORDER = ["La Jolla", "Point Loma & Mission Bay", "North County"];
 function spotRow(spot: SpotStatus): string {
   const when = windowText(spot);
   const go = spot.verdict === "yes" || spot.verdict === "maybe";
+  const win = go && when ? `<span class="chip window">Best ${esc(when)}</span>` : "";
   const sub = go
     ? [spot.vis_ft ? `~${spot.vis_ft[0]}–${spot.vis_ft[1]} ft vis` : "", when].filter(Boolean).join(" · ")
     : withoutVis(spot.reason) || spot.reason;
@@ -132,7 +141,7 @@ function spotRow(spot: SpotStatus): string {
   <details class="row v-${spot.verdict}" id="spot-${esc(spot.id)}">
     <summary>
       ${verdictIcon(spot.verdict, 22)}
-      <span class="row-main"><span class="row-name">${esc(spot.name)}${tag}</span><span class="row-sub">${esc(sub)}</span></span>
+      <span class="row-main"><span class="row-name">${esc(spot.name)}${tag}</span><span class="row-sub">${esc(sub)}</span>${win}</span>
       <span class="row-verdict">${VERDICT_WORD[spot.verdict]}</span>
     </summary>
     <div class="row-body">
@@ -233,7 +242,7 @@ export function renderPage(doc: StatusDoc, now: Date | null): string {
   </header>
   <div id="banner">${now ? staleBanner(doc, now) : ""}</div>
   <main>
-    ${verdictBar(doc, featured)}
+    ${verdictBar(doc, featured, now)}
     <div id="details">
       ${featured ? featuredCard(featured) : ""}
       ${spotList(others, featured !== null)}
