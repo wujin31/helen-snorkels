@@ -152,7 +152,6 @@ def score(
     ] = None,
 ) -> None:
     """Fetch fresh conditions, score every spot, write status.json."""
-    import json
 
     from snorkel.pipeline import gather
     from snorkel.publish.status import history_rows
@@ -171,19 +170,32 @@ def score(
     with make_client() as client:
         cond = gather(client, when, spots, sources, storage=archive)
     doc = score_all(cond, spots, sources, cfg)
-    out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(doc.model_dump_json(indent=1))
+    from snorkel.misses import dead_sources, load_misses, save_misses, state_path_for, update_misses
+    from snorkel.publish.io import append_jsonl_atomic, atomic_write_text
+
+    atomic_write_text(out, doc.model_dump_json(indent=1))
     print(doc.summary)
     for spot in doc.spots:
         print(f"  {spot.name}: {spot.verdict} ({spot.confidence}) · {spot.reason}")
     for health in doc.sources:
         if health.stale:
             print(f"  stale: {health.label}: {health.error or 'old data'}")
+    misses = update_misses(
+        load_misses(state_path_for(out)),
+        [(h.id, h.ok and not h.stale) for h in doc.sources],
+    )
+    save_misses(state_path_for(out), misses)
+    dead = dead_sources(misses)
+    alert_lines = []
+    for source_id in dead:
+        line = f"ALERT: source '{source_id}' missed {misses[source_id]} runs in a row"
+        print(f"  {line}")
+        alert_lines.append(line)
+    if alert_lines and (step_summary := os.environ.get("GITHUB_STEP_SUMMARY")):
+        with open(step_summary, "a") as fh:
+            fh.write("## Dead sources\n\n" + "\n".join(f"- {a}" for a in alert_lines) + "\n")
     if history:
-        history.parent.mkdir(parents=True, exist_ok=True)
-        with history.open("a") as fh:
-            for row in history_rows(doc):
-                fh.write(json.dumps(row) + "\n")
+        append_jsonl_atomic(history, history_rows(doc))
 
 
 @app.command("discover-mops")
