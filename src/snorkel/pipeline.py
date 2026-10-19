@@ -39,6 +39,7 @@ from snorkel.parse import cdip as cdip_parse
 from snorkel.parse import coops, county, ndbc, nws, openmeteo, sccoos, srf
 from snorkel.score.conditions import Conditions
 from snorkel.storage import Storage
+from snorkel.units import m_to_ft
 
 T = TypeVar("T")
 TIMEOUT_S = 90.0
@@ -239,7 +240,20 @@ def gather(
             and (c.valid_at is None or now - c.valid_at <= timedelta(hours=4))
         ]
         if fresh:
-            cond.waves[spot.id] = fresh[0]
+            winner = fresh[0]
+            assert winner.value is not None
+            latest_hs: dict[str, float] = {}
+            for c in fresh:
+                if c.value is None or not c.value.obs or c.value.source in latest_hs:
+                    continue
+                past = [o for o in c.value.obs if o.time <= now]
+                point = max(past, key=lambda o: o.time) if past else c.value.obs[-1]
+                latest_hs[c.value.source] = m_to_ft(point.hs_m)
+            if len(latest_hs) >= 2 and winner.value is not None:
+                spread = max(latest_hs.values()) - min(latest_hs.values())
+                stamped = winner.value.model_copy(update={"spread_ft": spread})
+                winner = winner.model_copy(update={"value": stamped})
+            cond.waves[spot.id] = winner
         else:
             errors = "; ".join(f"{c.source}: {c.error or 'stale'}" for c in candidates)
             cond.waves[spot.id] = SourceResult(

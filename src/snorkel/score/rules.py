@@ -452,6 +452,7 @@ def score_spot(
     # curve as the sensor itself; recent rain and wind come off after.
     vis: tuple[int, int] | None = None
     vis_mid: float | None = None
+    turb_agree = False
     if orbital is not None:
         v = cfg.visibility
         tc = cfg.turbidity
@@ -477,7 +478,9 @@ def score_spot(
         penalty = recent_rain_penalty
         if window_wind is not None:
             penalty += v.wind_ft_per_kt * max(0.0, window_wind - v.wind_threshold_kt)
-        vis_mid = min(v.max_ft, tc.vis_ft(v.predicted_ntu(orbital, chl_ug_l))) - penalty
+        predicted = min(v.max_ft, tc.vis_ft(v.predicted_ntu(orbital, chl_ug_l)))
+        vis_mid = predicted - penalty
+        proxy_mid = predicted
         turb = cond.turbidity
         pier_km = distance_km((spot.lat, spot.lon), cfg.pier)
         if pier_km > tc.max_distance_km:
@@ -499,6 +502,19 @@ def score_spot(
             measured = min(v.max_ft, tc.vis_ft(turb.value.ntu))
             weight = tc.weight_near_pier if spot.near_pier else tc.weight_elsewhere
             vis_mid = weight * measured + (1 - weight) * vis_mid
+            turb_agree = (
+                proxy_mid > 0 and abs(measured - proxy_mid) <= v.spread_fraction * proxy_mid
+            )
+            factors.append(
+                Factor(
+                    label="Model vs sensor",
+                    effect="+" if turb_agree else "~",
+                    detail=(
+                        f"wave proxy ~{proxy_mid:.0f} ft vs pier sensor ~{measured:.0f} ft "
+                        f"({'agree' if turb_agree else 'differ'})"
+                    ),
+                )
+            )
             factors.append(
                 Factor(
                     label="Turbidity",
@@ -539,7 +555,19 @@ def score_spot(
             )
         )
 
-    verdict, confidence = _verdict(spot, cfg, gates, cautions, waves, vis, vis_mid, sc, window_wind)
+    verdict, confidence = _verdict(
+        spot,
+        cfg,
+        gates,
+        cautions,
+        waves,
+        vis,
+        vis_mid,
+        sc,
+        window_wind,
+        wave_spread_ft=waves.spread_ft if waves else None,
+        turb_agree=turb_agree,
+    )
     reason = _reason(verdict, gates, cautions, vis, sc, window)
     return SpotStatus(
         id=spot.id,
@@ -562,6 +590,16 @@ def score_spot(
     )
 
 
+INFORMATIONAL_CAUTIONS = frozenset(
+    {
+        "Waves from a coarse offshore model",
+        "Water-quality status unknown",
+    }
+)
+"""Cautions that describe data limits, not danger. Shown on the page but never
+cap confidence on their own: a missing county CSV must not veto a flat calm cove."""
+
+
 def _verdict(
     spot: SpotConfig,
     cfg: ScoringConfig,
@@ -572,6 +610,9 @@ def _verdict(
     vis_mid: float | None,
     sc: SpotConditions,
     window_wind: float | None,
+    *,
+    wave_spread_ft: float | None = None,
+    turb_agree: bool = False,
 ) -> tuple[Verdict, Confidence]:
     if gates:
         return "no", "high"
@@ -583,8 +624,14 @@ def _verdict(
     comfortable = (sc.hs_ft is not None and sc.hs_ft <= frac * spot.thresholds.max_hs_ft) and (
         window_wind is None or window_wind <= frac * spot.thresholds.max_wind_kt
     )
+    blocking = [c for c in cautions if c not in INFORMATIONAL_CAUTIONS]
     confidence: Confidence = "medium" if waves.source in ("mop", "buoy") else "low"
-    if vis_mid >= cfg.preferences.min_vis_ft and comfortable and not cautions:
+    if vis_mid >= cfg.preferences.min_vis_ft and comfortable and not blocking:
+        spread_ok = (
+            wave_spread_ft is not None and wave_spread_ft <= cfg.agreement.max_wave_spread_ft
+        )
+        if turb_agree and spread_ok:
+            return "yes", "high"
         return "yes", confidence
     return "maybe", "low" if cautions else confidence
 

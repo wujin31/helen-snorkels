@@ -33,6 +33,9 @@ gates:
     - Rip Current Statement
   comfortable_fraction: 0.7  # Yes needs Hs and wind at or under 70% of the spot threshold
 
+agreement:                   # what unlocks HIGH confidence on a yes
+  max_wave_spread_ft: 0.5    # independent wave sources must agree within this Hs spread
+
 visibility:
   # Predicted turbidity from near-bottom wave motion and plankton, read off the
   # turbidity curve below: ln NTU = intercept + a * orbital + b * ln(chl).
