@@ -106,6 +106,10 @@ h2 { font-size: 1.05rem; }
 .verdict-where { display: block; font-size: 1.15rem; font-weight: 650; margin-top: 2px; }
 .verdict-when { margin: 2px 0 0; font-size: 1.05rem; font-weight: 600; font-variant-numeric: tabular-nums; }
 .verdict-reason { margin: 6px 0 0; color: var(--ink-2); font-size: 0.95rem; }
+.verdict-meta { margin: 8px 0 0; font-size: 0.85rem; color: var(--ink-2); display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.verdict-age { font-variant-numeric: tabular-nums; }
+.verdict-dead { color: inherit; font-weight: 700; text-decoration: underline; text-underline-offset: 2px; }
+.chip.window { border-color: currentColor; }
 
 .chip { background: var(--surface); border: 1px solid var(--hair); border-radius: 999px; padding: 3px 10px; font-weight: 600; color: var(--ink); }
 .conf { display: inline-flex; align-items: center; gap: 6px; }

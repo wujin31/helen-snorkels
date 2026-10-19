@@ -115,6 +115,36 @@ describe("staleness", () => {
     expect(staleBanner(sample, new Date(t + 30 * 60_000))).toBe("");
     expect(staleBanner(sample, new Date(t + 4 * 3600_000))).toContain("4 h ago");
   });
+
+  it("puts data age in the verdict bar once rendered in a browser", () => {
+    const t = Date.parse(sample.generated_at);
+    expect(renderPage(sample, null)).not.toContain("verdict-age");
+    expect(renderPage(sample, new Date(t + 22 * 60_000))).toContain("Updated 22 min ago");
+  });
+
+  it("badges dead sources in the verdict bar", () => {
+    const doc = clone();
+    for (const s of doc.sources) s.ok = true;
+    expect(renderPage(doc, new Date(doc.generated_at))).not.toContain("verdict-dead");
+    doc.sources[0].ok = false;
+    doc.sources[1].ok = false;
+    const html = renderPage(doc, new Date(doc.generated_at));
+    expect(html).toContain('class="verdict-dead"');
+    expect(html).toContain("2 sources down");
+  });
+});
+
+describe("best window", () => {
+  it("chips the best window on go rows", () => {
+    const doc = clone();
+    const featured = doc.spots.find((s) => s.id === doc.best_bet)!;
+    const cove = doc.spots.find((s) => s.id === "la-jolla-cove")!;
+    cove.verdict = "maybe";
+    cove.window = structuredClone(featured.window);
+    cove.window_day = featured.window_day;
+    const html = renderPage(doc, null);
+    expect(html).toMatch(/<span class="chip window">Best [^<]+<\/span>/);
+  });
 });
 
 describe("format", () => {
