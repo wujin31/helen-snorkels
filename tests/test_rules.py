@@ -125,10 +125,13 @@ def test_water_quality_advisory_is_a_no(cove: SpotConfig, cfg: ScoringConfig) ->
     assert status.window is None
 
 
-def test_unknown_water_quality_caps_at_maybe(cove: SpotConfig, cfg: ScoringConfig) -> None:
+def test_unknown_water_quality_is_informational_not_a_cap(
+    cove: SpotConfig, cfg: ScoringConfig
+) -> None:
     status = score(cove, conditions(cove, water_quality={}), cfg)
-    assert status.verdict == "maybe"
-    assert "Water-quality status unknown" in status.reason
+    assert status.verdict == "yes"
+    assert status.confidence == "medium"
+    assert "Water-quality status unknown" in status.cautions
 
 
 def test_big_swell_is_a_no(cove: SpotConfig, cfg: ScoringConfig) -> None:
@@ -151,6 +154,51 @@ def test_directional_swell_cap_gates_only_its_window(cove: SpotConfig, cfg: Scor
     north = {capped.id: ok("waves", waves(0.6, 12, dp=285))}
     status = score(capped, conditions(capped, waves=north), cfg)
     assert not any("for this direction" in g for g in status.gates)
+
+
+def test_wave_and_sensor_agreement_unlocks_high(cove: SpotConfig, cfg: ScoringConfig) -> None:
+    base = score(cove, conditions(cove), cfg)
+    assert base.verdict == "yes" and base.confidence == "medium"
+    assert base.conditions.orbital_ms is not None
+    proxy = cfg.visibility.predicted_ntu(base.conditions.orbital_ms, 1.0)
+    series = waves(0.3, 10).model_copy(update={"spread_ft": 0.2})
+    cond = conditions(
+        cove,
+        waves={cove.id: ok("waves", series)},
+        turbidity=ok("turb", Turbidity(time=NOW, ntu=proxy)),
+    )
+    status = score(cove, cond, cfg)
+    assert status.verdict == "yes"
+    assert status.confidence == "high"
+
+
+def test_sensor_disagreement_blocks_high(cove: SpotConfig, cfg: ScoringConfig) -> None:
+    base = score(cove, conditions(cove), cfg)
+    assert base.conditions.orbital_ms is not None
+    proxy = cfg.visibility.predicted_ntu(base.conditions.orbital_ms, 1.0)
+    series = waves(0.3, 10).model_copy(update={"spread_ft": 0.2})
+    cond = conditions(
+        cove,
+        waves={cove.id: ok("waves", series)},
+        turbidity=ok("turb", Turbidity(time=NOW, ntu=proxy * 3)),
+    )
+    status = score(cove, cond, cfg)
+    assert status.confidence != "high"
+
+
+def test_wave_spread_blocks_high(cove: SpotConfig, cfg: ScoringConfig) -> None:
+    base = score(cove, conditions(cove), cfg)
+    assert base.conditions.orbital_ms is not None
+    proxy = cfg.visibility.predicted_ntu(base.conditions.orbital_ms, 1.0)
+    series = waves(0.3, 10).model_copy(update={"spread_ft": 2.0})
+    cond = conditions(
+        cove,
+        waves={cove.id: ok("waves", series)},
+        turbidity=ok("turb", Turbidity(time=NOW, ntu=proxy)),
+    )
+    status = score(cove, cond, cfg)
+    assert status.verdict == "yes"
+    assert status.confidence == "medium"
 
 
 def test_rain_within_72h_is_a_no(cove: SpotConfig, cfg: ScoringConfig) -> None:
@@ -188,11 +236,14 @@ def test_stale_waves_are_ignored(cove: SpotConfig, cfg: ScoringConfig) -> None:
     assert status.verdict == "unknown"
 
 
-def test_coarse_model_waves_cap_at_maybe(cove: SpotConfig, cfg: ScoringConfig) -> None:
+def test_coarse_model_waves_cap_confidence_not_verdict(
+    cove: SpotConfig, cfg: ScoringConfig
+) -> None:
     coarse = {cove.id: ok("waves", waves(0.3, 10, source="openmeteo"))}
     status = score(cove, conditions(cove, waves=coarse), cfg)
-    assert status.verdict == "maybe"
-    assert "coarse" in status.reason
+    assert status.verdict == "yes"
+    assert status.confidence == "low"
+    assert "Waves from a coarse offshore model" in status.cautions
 
 
 def test_high_surf_advisory_is_a_no(cove: SpotConfig, cfg: ScoringConfig) -> None:

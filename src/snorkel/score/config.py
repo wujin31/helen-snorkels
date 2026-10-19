@@ -55,6 +55,11 @@ class VisibilityConfig(BaseModel):
         )
 
 
+class AgreementConfig(BaseModel):
+    max_wave_spread_ft: float = 0.5
+    """Wave sources must agree within this Hs spread (ft) for the high-confidence bonus."""
+
+
 class TurbidityConfig(BaseModel):
     vis_ft_at_1_ntu: float
     exponent: float
@@ -84,6 +89,7 @@ class ScoringConfig(BaseModel):
     gates: Gates
     visibility: VisibilityConfig
     turbidity: TurbidityConfig
+    agreement: AgreementConfig = AgreementConfig()
     pier: tuple[float, float] = (32.8666, -117.2571)
     window: WindowConfig
     wetsuit_f: list[tuple[float, str]]

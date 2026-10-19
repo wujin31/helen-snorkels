@@ -58,6 +58,8 @@ class WaveSeries(BaseModel):
     obs: list[WaveObs]
     freqs_hz: list[float] | None = None
     bandwidths_hz: list[float] | None = None
+    spread_ft: float | None = None
+    """Max-min latest Hs across candidate series (ft). None = single source."""
 
 
 class WindObs(BaseModel):
