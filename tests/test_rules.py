@@ -138,6 +138,21 @@ def test_big_swell_is_a_no(cove: SpotConfig, cfg: ScoringConfig) -> None:
     assert status.reason.startswith("Waves ~4 ft")
 
 
+def test_directional_swell_cap_gates_only_its_window(cove: SpotConfig, cfg: ScoringConfig) -> None:
+    from snorkel.models import SwellDirCap
+
+    capped = cove.model_copy(
+        update={"swell_dir_caps": [SwellDirCap(center_deg=180, half_width_deg=30, max_hs_ft=1.0)]}
+    )
+    south = {capped.id: ok("waves", waves(0.6, 12, dp=180))}
+    status = score(capped, conditions(capped, waves=south), cfg)
+    assert status.verdict == "no"
+    assert "for this direction" in status.reason
+    north = {capped.id: ok("waves", waves(0.6, 12, dp=285))}
+    status = score(capped, conditions(capped, waves=north), cfg)
+    assert not any("for this direction" in g for g in status.gates)
+
+
 def test_rain_within_72h_is_a_no(cove: SpotConfig, cfg: ScoringConfig) -> None:
     rain = dry()
     rain[-40] = PrecipObs(time=rain[-40].time, mm=6.0)

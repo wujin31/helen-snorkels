@@ -37,6 +37,17 @@ class SeasonalClosure(BaseModel):
     reason: str
 
 
+class SwellDirCap(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    center_deg: float = Field(ge=0, lt=360)
+    """Middle of the swell direction window this cap applies to."""
+    half_width_deg: float = Field(default=30, gt=0, le=180)
+    """Half-width of the direction window, in degrees."""
+    max_hs_ft: float = Field(gt=0)
+    """Swell over this height from inside the window gates the spot out."""
+
+
 class SpotConfig(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
@@ -55,6 +66,8 @@ class SpotConfig(BaseModel):
     water_quality_ids: list[str] = Field(default_factory=list)
     exposure_deg: ExposureDeg
     thresholds: Thresholds
+    swell_dir_caps: list[SwellDirCap] = Field(default_factory=list)
+    """Directional swell gates: swell inside a cap window over its height gates out. Empty = off."""
     tide_rules: TideRules = Field(default_factory=TideRules)
     min_tide_ft: float | None = None
     seasonal_closures: list[SeasonalClosure] = Field(default_factory=list)
