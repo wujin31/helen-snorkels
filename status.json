@@ -1,9 +1,9 @@
 {
  "version": 1,
- "generated_at": "2026-11-04T23:05:42.752684Z",
+ "generated_at": "2026-11-05T00:05:58.428656Z",
  "timezone": "America/Los_Angeles",
- "summary": "Not a snorkel day: rain 3 day(s) ago (county 72 h advisory).",
- "best_bet": null,
+ "summary": "Maybe Marine Room tomorrow 2:00–3:30 pm. La Jolla Cove: county water-quality advisory at La Jolla Cove.",
+ "best_bet": "marine-room",
  "spots": [
   {
    "id": "marine-room",
@@ -11,18 +11,19 @@
    "tier": 1,
    "difficulty": "moderate",
    "area": "La Jolla",
-   "verdict": "no",
-   "confidence": "high",
+   "verdict": "maybe",
+   "confidence": "low",
    "vis_ft": [
     15,
-    30
+    32
    ],
-   "reason": "Rain 3 day(s) ago (county 72 h advisory)",
-   "window": null,
-   "window_day": null,
-   "gates": [
-    "Rain 3 day(s) ago (county 72 h advisory)"
-   ],
+   "reason": "~15–32 ft vis, 2.2 ft NW swell at 6 s, incoming tide, ~8 kt wind · NWS high rip current risk",
+   "window": {
+    "start": "2026-11-05T22:00:00Z",
+    "end": "2026-11-05T23:30:00Z"
+   },
+   "window_day": "tomorrow",
+   "gates": [],
    "cautions": [
     "NWS high rip current risk"
    ],
@@ -38,24 +39,29 @@
      "detail": "surf 3–5 ft, high rip current risk (county beaches)"
     },
     {
+     "label": "Rain",
+     "effect": "+",
+     "detail": "None in the last few days"
+    },
+    {
      "label": "Swell",
-     "effect": "-",
-     "detail": "near-bottom motion 0.42 m/s"
+     "effect": "~",
+     "detail": "near-bottom motion 0.37 m/s"
     },
     {
      "label": "Plankton",
      "effect": "+",
-     "detail": "chlorophyll 0.5 µg/L at the pier"
+     "detail": "chlorophyll 0.4 µg/L at the pier"
     },
     {
      "label": "Model vs sensor",
-     "effect": "~",
-     "detail": "wave proxy ~16 ft vs pier sensor ~27 ft (differ)"
+     "effect": "+",
+     "detail": "wave proxy ~22 ft vs pier sensor ~25 ft (agree)"
     },
     {
      "label": "Turbidity",
      "effect": "+",
-     "detail": "0.3 NTU at Scripps Pier (~27 ft)"
+     "detail": "0.3 NTU at Scripps Pier (~25 ft)"
     },
     {
      "label": "Tide",
@@ -71,44 +77,44 @@
    "conditions": {
     "hs_ft": 2.2,
     "tp_s": 6.25,
-    "swell_dir_deg": 300.0503234863281,
+    "swell_dir_deg": 299.54840087890625,
     "wave_source": "mop",
-    "orbital_ms": 0.423,
-    "wind_kt": 7.2,
-    "gust_kt": 9.1,
-    "wind_dir_deg": 264.0,
+    "orbital_ms": 0.367,
+    "wind_kt": 6.2,
+    "gust_kt": 9.5,
+    "wind_dir_deg": 278.0,
     "wind_onshore": true,
-    "tide_ft": 3.1,
+    "tide_ft": 3.9,
     "tide_trend": "incoming"
    },
    "hourly": [
     {
      "time": "2026-11-05T14:30:00Z",
-     "score": -0.808,
+     "score": -0.79,
      "tide_ft": 5.41,
      "tide_trend": "outgoing",
-     "wind_kt": 3.9
+     "wind_kt": 3.8
     },
     {
      "time": "2026-11-05T15:00:00Z",
-     "score": -0.808,
+     "score": -0.79,
      "tide_ft": 5.23,
      "tide_trend": "outgoing",
-     "wind_kt": 3.9
+     "wind_kt": 3.8
     },
     {
      "time": "2026-11-05T15:30:00Z",
-     "score": -0.551,
+     "score": -0.693,
      "tide_ft": 4.92,
      "tide_trend": "outgoing",
-     "wind_kt": 1.6
+     "wind_kt": 3.1
     },
     {
      "time": "2026-11-05T16:00:00Z",
-     "score": -0.551,
+     "score": -0.693,
      "tide_ft": 4.5,
      "tide_trend": "outgoing",
-     "wind_kt": 1.6
+     "wind_kt": 3.1
     },
     {
      "time": "2026-11-05T16:30:00Z",
@@ -212,6 +218,430 @@
    "shore_normal_deg": 305.0
   },
   {
+   "id": "turtle-town",
+   "name": "Turtle Town",
+   "tier": 2,
+   "difficulty": "advanced",
+   "area": "La Jolla",
+   "verdict": "maybe",
+   "confidence": "low",
+   "vis_ft": [
+    17,
+    36
+   ],
+   "reason": "~17–36 ft vis, 2.5 ft W swell at 7 s, incoming tide, ~8 kt wind · NWS high rip current risk",
+   "window": {
+    "start": "2026-11-05T21:00:00Z",
+    "end": "2026-11-05T22:30:00Z"
+   },
+   "window_day": "tomorrow",
+   "gates": [],
+   "cautions": [
+    "NWS high rip current risk"
+   ],
+   "factors": [
+    {
+     "label": "Water quality",
+     "effect": "+",
+     "detail": "No county advisory"
+    },
+    {
+     "label": "NWS surf forecast",
+     "effect": "-",
+     "detail": "surf 3–5 ft, high rip current risk (county beaches)"
+    },
+    {
+     "label": "Rain",
+     "effect": "+",
+     "detail": "None in the last few days"
+    },
+    {
+     "label": "Swell",
+     "effect": "~",
+     "detail": "near-bottom motion 0.29 m/s"
+    },
+    {
+     "label": "Plankton",
+     "effect": "+",
+     "detail": "chlorophyll 0.4 µg/L at the pier"
+    },
+    {
+     "label": "Model vs sensor",
+     "effect": "+",
+     "detail": "wave proxy ~28 ft vs pier sensor ~25 ft (agree)"
+    },
+    {
+     "label": "Turbidity",
+     "effect": "+",
+     "detail": "0.3 NTU at Scripps Pier (~25 ft)"
+    },
+    {
+     "label": "Tide",
+     "effect": "+",
+     "detail": "Incoming during the window"
+    },
+    {
+     "label": "Wind",
+     "effect": "~",
+     "detail": "~8 kt"
+    }
+   ],
+   "conditions": {
+    "hs_ft": 2.5,
+    "tp_s": 7.142857074737549,
+    "swell_dir_deg": 284.9634094238281,
+    "wave_source": "mop",
+    "orbital_ms": 0.287,
+    "wind_kt": 6.2,
+    "gust_kt": 9.5,
+    "wind_dir_deg": 278.0,
+    "wind_onshore": true,
+    "tide_ft": 3.9,
+    "tide_trend": "incoming"
+   },
+   "hourly": [
+    {
+     "time": "2026-11-05T14:30:00Z",
+     "score": -0.79,
+     "tide_ft": 5.41,
+     "tide_trend": "outgoing",
+     "wind_kt": 3.8
+    },
+    {
+     "time": "2026-11-05T15:00:00Z",
+     "score": -0.79,
+     "tide_ft": 5.23,
+     "tide_trend": "outgoing",
+     "wind_kt": 3.8
+    },
+    {
+     "time": "2026-11-05T15:30:00Z",
+     "score": -0.693,
+     "tide_ft": 4.92,
+     "tide_trend": "outgoing",
+     "wind_kt": 3.1
+    },
+    {
+     "time": "2026-11-05T16:00:00Z",
+     "score": -0.693,
+     "tide_ft": 4.5,
+     "tide_trend": "outgoing",
+     "wind_kt": 3.1
+    },
+    {
+     "time": "2026-11-05T16:30:00Z",
+     "score": -0.646,
+     "tide_ft": 3.99,
+     "tide_trend": "outgoing",
+     "wind_kt": 2.7
+    },
+    {
+     "time": "2026-11-05T17:00:00Z",
+     "score": -0.646,
+     "tide_ft": 3.42,
+     "tide_trend": "outgoing",
+     "wind_kt": 2.7
+    },
+    {
+     "time": "2026-11-05T17:30:00Z",
+     "score": -1.043,
+     "tide_ft": 2.83,
+     "tide_trend": "outgoing",
+     "wind_kt": 5.2
+    },
+    {
+     "time": "2026-11-05T18:00:00Z",
+     "score": -1.043,
+     "tide_ft": 2.25,
+     "tide_trend": "outgoing",
+     "wind_kt": 5.2
+    },
+    {
+     "time": "2026-11-05T18:30:00Z",
+     "score": -1.027,
+     "tide_ft": 1.72,
+     "tide_trend": "outgoing",
+     "wind_kt": 5.1
+    },
+    {
+     "time": "2026-11-05T19:00:00Z",
+     "score": -1.027,
+     "tide_ft": 1.27,
+     "tide_trend": "outgoing",
+     "wind_kt": 5.1
+    },
+    {
+     "time": "2026-11-05T19:30:00Z",
+     "score": -1.217,
+     "tide_ft": 0.93,
+     "tide_trend": "outgoing",
+     "wind_kt": 6.0
+    },
+    {
+     "time": "2026-11-05T20:00:00Z",
+     "score": -1.217,
+     "tide_ft": 0.72,
+     "tide_trend": "outgoing",
+     "wind_kt": 6.0
+    },
+    {
+     "time": "2026-11-05T20:30:00Z",
+     "score": -0.915,
+     "tide_ft": 0.64,
+     "tide_trend": "slack",
+     "wind_kt": 6.8
+    },
+    {
+     "time": "2026-11-05T21:00:00Z",
+     "score": 0.085,
+     "tide_ft": 0.7,
+     "tide_trend": "incoming",
+     "wind_kt": 6.8
+    },
+    {
+     "time": "2026-11-05T21:30:00Z",
+     "score": -0.333,
+     "tide_ft": 0.89,
+     "tide_trend": "incoming",
+     "wind_kt": 8.2
+    },
+    {
+     "time": "2026-11-05T22:00:00Z",
+     "score": -0.333,
+     "tide_ft": 1.2,
+     "tide_trend": "incoming",
+     "wind_kt": 8.2
+    },
+    {
+     "time": "2026-11-05T22:30:00Z",
+     "score": -0.308,
+     "tide_ft": 1.6,
+     "tide_trend": "incoming",
+     "wind_kt": 8.1
+    },
+    {
+     "time": "2026-11-05T23:00:00Z",
+     "score": -0.308,
+     "tide_ft": 2.06,
+     "tide_trend": "incoming",
+     "wind_kt": 8.1
+    }
+   ],
+   "shore_normal_deg": 300.0
+  },
+  {
+   "id": "mission-point",
+   "name": "Mission Point (bay side)",
+   "tier": 3,
+   "difficulty": "easy",
+   "area": "Point Loma & Mission Bay",
+   "verdict": "maybe",
+   "confidence": "low",
+   "vis_ft": [
+    10,
+    15
+   ],
+   "reason": "~10–15 ft vis, <1 ft W swell at 15 s, incoming tide, ~8 kt wind · NWS high rip current risk",
+   "window": {
+    "start": "2026-11-05T21:00:00Z",
+    "end": "2026-11-05T23:30:00Z"
+   },
+   "window_day": "tomorrow",
+   "gates": [],
+   "cautions": [
+    "NWS high rip current risk"
+   ],
+   "factors": [
+    {
+     "label": "Water quality",
+     "effect": "+",
+     "detail": "No county advisory"
+    },
+    {
+     "label": "NWS surf forecast",
+     "effect": "-",
+     "detail": "surf 3–5 ft, high rip current risk (county beaches)"
+    },
+    {
+     "label": "Rain",
+     "effect": "+",
+     "detail": "None in the last few days"
+    },
+    {
+     "label": "Shelter",
+     "effect": "+",
+     "detail": "about 20% of the open-coast waves reach here"
+    },
+    {
+     "label": "Swell",
+     "effect": "+",
+     "detail": "near-bottom motion 0.19 m/s"
+    },
+    {
+     "label": "Plankton",
+     "effect": "+",
+     "detail": "chlorophyll 0.4 µg/L at the pier"
+    },
+    {
+     "label": "Bay water",
+     "effect": "~",
+     "detail": "bay water mixes in; estimate capped at 15 ft"
+    },
+    {
+     "label": "Tide",
+     "effect": "+",
+     "detail": "Incoming during the window"
+    },
+    {
+     "label": "Wind",
+     "effect": "~",
+     "detail": "~8 kt"
+    }
+   ],
+   "conditions": {
+    "hs_ft": 0.8,
+    "tp_s": 15.384615898132324,
+    "swell_dir_deg": 267.08416748046875,
+    "wave_source": "mop",
+    "orbital_ms": 0.194,
+    "wind_kt": 6.2,
+    "gust_kt": 9.5,
+    "wind_dir_deg": 278.0,
+    "wind_onshore": false,
+    "tide_ft": 3.9,
+    "tide_trend": "incoming"
+   },
+   "hourly": [
+    {
+     "time": "2026-11-05T14:30:00Z",
+     "score": -0.712,
+     "tide_ft": 5.41,
+     "tide_trend": "outgoing",
+     "wind_kt": 3.9
+    },
+    {
+     "time": "2026-11-05T15:00:00Z",
+     "score": -0.712,
+     "tide_ft": 5.23,
+     "tide_trend": "outgoing",
+     "wind_kt": 3.9
+    },
+    {
+     "time": "2026-11-05T15:30:00Z",
+     "score": -0.67,
+     "tide_ft": 4.92,
+     "tide_trend": "outgoing",
+     "wind_kt": 3.5
+    },
+    {
+     "time": "2026-11-05T16:00:00Z",
+     "score": -0.67,
+     "tide_ft": 4.5,
+     "tide_trend": "outgoing",
+     "wind_kt": 3.5
+    },
+    {
+     "time": "2026-11-05T16:30:00Z",
+     "score": -0.502,
+     "tide_ft": 3.99,
+     "tide_trend": "outgoing",
+     "wind_kt": 0.4
+    },
+    {
+     "time": "2026-11-05T17:00:00Z",
+     "score": -0.502,
+     "tide_ft": 3.42,
+     "tide_trend": "outgoing",
+     "wind_kt": 0.4
+    },
+    {
+     "time": "2026-11-05T17:30:00Z",
+     "score": -0.807,
+     "tide_ft": 2.83,
+     "tide_trend": "outgoing",
+     "wind_kt": 4.7
+    },
+    {
+     "time": "2026-11-05T18:00:00Z",
+     "score": -0.807,
+     "tide_ft": 2.25,
+     "tide_trend": "outgoing",
+     "wind_kt": 4.7
+    },
+    {
+     "time": "2026-11-05T18:30:00Z",
+     "score": -0.972,
+     "tide_ft": 1.72,
+     "tide_trend": "outgoing",
+     "wind_kt": 5.8
+    },
+    {
+     "time": "2026-11-05T19:00:00Z",
+     "score": -0.972,
+     "tide_ft": 1.27,
+     "tide_trend": "outgoing",
+     "wind_kt": 5.8
+    },
+    {
+     "time": "2026-11-05T19:30:00Z",
+     "score": -1.085,
+     "tide_ft": 0.93,
+     "tide_trend": "outgoing",
+     "wind_kt": 6.5
+    },
+    {
+     "time": "2026-11-05T20:00:00Z",
+     "score": -1.085,
+     "tide_ft": 0.72,
+     "tide_trend": "outgoing",
+     "wind_kt": 6.5
+    },
+    {
+     "time": "2026-11-05T20:30:00Z",
+     "score": -0.802,
+     "tide_ft": 0.64,
+     "tide_trend": "slack",
+     "wind_kt": 7.6
+    },
+    {
+     "time": "2026-11-05T21:00:00Z",
+     "score": 0.198,
+     "tide_ft": 0.7,
+     "tide_trend": "incoming",
+     "wind_kt": 7.6
+    },
+    {
+     "time": "2026-11-05T21:30:00Z",
+     "score": 0.048,
+     "tide_ft": 0.89,
+     "tide_trend": "incoming",
+     "wind_kt": 8.3
+    },
+    {
+     "time": "2026-11-05T22:00:00Z",
+     "score": 0.048,
+     "tide_ft": 1.2,
+     "tide_trend": "incoming",
+     "wind_kt": 8.3
+    },
+    {
+     "time": "2026-11-05T22:30:00Z",
+     "score": 0.135,
+     "tide_ft": 1.6,
+     "tide_trend": "incoming",
+     "wind_kt": 7.9
+    },
+    {
+     "time": "2026-11-05T23:00:00Z",
+     "score": 0.135,
+     "tide_ft": 2.06,
+     "tide_trend": "incoming",
+     "wind_kt": 7.9
+    }
+   ],
+   "shore_normal_deg": 180.0
+  },
+  {
    "id": "la-jolla-cove",
    "name": "La Jolla Cove",
    "tier": 1,
@@ -228,7 +658,6 @@
    "window_day": null,
    "gates": [
     "County water-quality advisory at La Jolla Cove",
-    "Rain 3 day(s) ago (county 72 h advisory)",
     "Waves ~4 ft, over 2.5 ft"
    ],
    "cautions": [
@@ -241,6 +670,11 @@
      "detail": "surf 3–5 ft, high rip current risk (county beaches)"
     },
     {
+     "label": "Rain",
+     "effect": "+",
+     "detail": "None in the last few days"
+    },
+    {
      "label": "Swell",
      "effect": "-",
      "detail": "near-bottom motion 0.67 m/s"
@@ -248,17 +682,17 @@
     {
      "label": "Plankton",
      "effect": "+",
-     "detail": "chlorophyll 0.5 µg/L at the pier"
+     "detail": "chlorophyll 0.4 µg/L at the pier"
     },
     {
      "label": "Model vs sensor",
      "effect": "~",
-     "detail": "wave proxy ~7 ft vs pier sensor ~27 ft (differ)"
+     "detail": "wave proxy ~9 ft vs pier sensor ~25 ft (differ)"
     },
     {
      "label": "Turbidity",
      "effect": "+",
-     "detail": "0.3 NTU at Scripps Pier (~27 ft)"
+     "detail": "0.3 NTU at Scripps Pier (~25 ft)"
     },
     {
      "label": "Tide",
@@ -274,44 +708,44 @@
    "conditions": {
     "hs_ft": 3.6,
     "tp_s": 13.333333015441895,
-    "swell_dir_deg": 330.75189208984375,
+    "swell_dir_deg": 330.5908203125,
     "wave_source": "mop",
-    "orbital_ms": 0.674,
-    "wind_kt": 7.2,
-    "gust_kt": 9.1,
-    "wind_dir_deg": 264.0,
+    "orbital_ms": 0.665,
+    "wind_kt": 6.2,
+    "gust_kt": 9.5,
+    "wind_dir_deg": 278.0,
     "wind_onshore": false,
-    "tide_ft": 3.1,
+    "tide_ft": 3.9,
     "tide_trend": "incoming"
    },
    "hourly": [
     {
      "time": "2026-11-05T14:30:00Z",
-     "score": -0.808,
+     "score": -0.79,
      "tide_ft": 5.41,
      "tide_trend": "outgoing",
-     "wind_kt": 3.9
+     "wind_kt": 3.8
     },
     {
      "time": "2026-11-05T15:00:00Z",
-     "score": -0.808,
+     "score": -0.79,
      "tide_ft": 5.23,
      "tide_trend": "outgoing",
-     "wind_kt": 3.9
+     "wind_kt": 3.8
     },
     {
      "time": "2026-11-05T15:30:00Z",
-     "score": -0.551,
+     "score": -0.693,
      "tide_ft": 4.92,
      "tide_trend": "outgoing",
-     "wind_kt": 1.6
+     "wind_kt": 3.1
     },
     {
      "time": "2026-11-05T16:00:00Z",
-     "score": -0.551,
+     "score": -0.693,
      "tide_ft": 4.5,
      "tide_trend": "outgoing",
-     "wind_kt": 1.6
+     "wind_kt": 3.1
     },
     {
      "time": "2026-11-05T16:30:00Z",
@@ -423,14 +857,13 @@
    "verdict": "no",
    "confidence": "high",
    "vis_ft": [
-    7,
-    14
+    6,
+    13
    ],
-   "reason": "Rain 3 day(s) ago (county 72 h advisory)",
+   "reason": "Waves ~4 ft, over 2 ft",
    "window": null,
    "window_day": null,
    "gates": [
-    "Rain 3 day(s) ago (county 72 h advisory)",
     "Waves ~4 ft, over 2 ft"
    ],
    "cautions": [
@@ -448,24 +881,29 @@
      "detail": "surf 3–5 ft, high rip current risk (county beaches)"
     },
     {
+     "label": "Rain",
+     "effect": "+",
+     "detail": "None in the last few days"
+    },
+    {
      "label": "Swell",
      "effect": "-",
-     "detail": "near-bottom motion 0.91 m/s"
+     "detail": "near-bottom motion 0.99 m/s"
     },
     {
      "label": "Plankton",
      "effect": "+",
-     "detail": "chlorophyll 0.5 µg/L at the pier"
+     "detail": "chlorophyll 0.4 µg/L at the pier"
     },
     {
      "label": "Model vs sensor",
      "effect": "~",
-     "detail": "wave proxy ~4 ft vs pier sensor ~27 ft (differ)"
+     "detail": "wave proxy ~3 ft vs pier sensor ~25 ft (differ)"
     },
     {
      "label": "Turbidity",
      "effect": "+",
-     "detail": "0.3 NTU at Scripps Pier (~27 ft)"
+     "detail": "0.3 NTU at Scripps Pier (~25 ft)"
     },
     {
      "label": "Tide",
@@ -480,45 +918,45 @@
    ],
    "conditions": {
     "hs_ft": 4.2,
-    "tp_s": 14.285714149475098,
-    "swell_dir_deg": 292.04168701171875,
+    "tp_s": 16.666667938232422,
+    "swell_dir_deg": 321.6507263183594,
     "wave_source": "mop",
-    "orbital_ms": 0.909,
-    "wind_kt": 7.2,
-    "gust_kt": 9.1,
-    "wind_dir_deg": 264.0,
+    "orbital_ms": 0.991,
+    "wind_kt": 6.2,
+    "gust_kt": 9.5,
+    "wind_dir_deg": 278.0,
     "wind_onshore": true,
-    "tide_ft": 3.1,
+    "tide_ft": 3.9,
     "tide_trend": "incoming"
    },
    "hourly": [
     {
      "time": "2026-11-05T14:30:00Z",
-     "score": -0.808,
+     "score": -0.79,
      "tide_ft": 5.41,
      "tide_trend": "outgoing",
-     "wind_kt": 3.9
+     "wind_kt": 3.8
     },
     {
      "time": "2026-11-05T15:00:00Z",
-     "score": -0.808,
+     "score": -0.79,
      "tide_ft": 5.23,
      "tide_trend": "outgoing",
-     "wind_kt": 3.9
+     "wind_kt": 3.8
     },
     {
      "time": "2026-11-05T15:30:00Z",
-     "score": -0.551,
+     "score": -0.693,
      "tide_ft": 4.92,
      "tide_trend": "outgoing",
-     "wind_kt": 1.6
+     "wind_kt": 3.1
     },
     {
      "time": "2026-11-05T16:00:00Z",
-     "score": -0.551,
+     "score": -0.693,
      "tide_ft": 4.5,
      "tide_trend": "outgoing",
-     "wind_kt": 1.6
+     "wind_kt": 3.1
     },
     {
      "time": "2026-11-05T16:30:00Z",
@@ -630,15 +1068,14 @@
    "verdict": "no",
    "confidence": "high",
    "vis_ft": [
-    10,
-    21
+    11,
+    22
    ],
    "reason": "County water-quality advisory at La Jolla Cove",
    "window": null,
    "window_day": null,
    "gates": [
     "County water-quality advisory at La Jolla Cove",
-    "Rain 3 day(s) ago (county 72 h advisory)",
     "Waves ~4 ft, over 2.5 ft"
    ],
    "cautions": [
@@ -651,24 +1088,29 @@
      "detail": "surf 3–5 ft, high rip current risk (county beaches)"
     },
     {
+     "label": "Rain",
+     "effect": "+",
+     "detail": "None in the last few days"
+    },
+    {
      "label": "Swell",
      "effect": "-",
-     "detail": "near-bottom motion 0.56 m/s"
+     "detail": "near-bottom motion 0.54 m/s"
     },
     {
      "label": "Plankton",
      "effect": "+",
-     "detail": "chlorophyll 0.5 µg/L at the pier"
+     "detail": "chlorophyll 0.4 µg/L at the pier"
     },
     {
      "label": "Model vs sensor",
      "effect": "~",
-     "detail": "wave proxy ~11 ft vs pier sensor ~27 ft (differ)"
+     "detail": "wave proxy ~13 ft vs pier sensor ~25 ft (differ)"
     },
     {
      "label": "Turbidity",
      "effect": "+",
-     "detail": "0.3 NTU at Scripps Pier (~27 ft)"
+     "detail": "0.3 NTU at Scripps Pier (~25 ft)"
     },
     {
      "label": "Tide",
@@ -682,46 +1124,46 @@
     }
    ],
    "conditions": {
-    "hs_ft": 3.5,
-    "tp_s": 14.285714149475098,
-    "swell_dir_deg": 322.5586853027344,
+    "hs_ft": 3.6,
+    "tp_s": 7.142857074737549,
+    "swell_dir_deg": 322.50677490234375,
     "wave_source": "mop",
-    "orbital_ms": 0.557,
-    "wind_kt": 7.2,
-    "gust_kt": 9.1,
-    "wind_dir_deg": 264.0,
+    "orbital_ms": 0.539,
+    "wind_kt": 6.2,
+    "gust_kt": 9.5,
+    "wind_dir_deg": 278.0,
     "wind_onshore": false,
-    "tide_ft": 3.1,
+    "tide_ft": 3.9,
     "tide_trend": "incoming"
    },
    "hourly": [
     {
      "time": "2026-11-05T14:30:00Z",
-     "score": -0.808,
+     "score": -0.79,
      "tide_ft": 5.41,
      "tide_trend": "outgoing",
-     "wind_kt": 3.9
+     "wind_kt": 3.8
     },
     {
      "time": "2026-11-05T15:00:00Z",
-     "score": -0.808,
+     "score": -0.79,
      "tide_ft": 5.23,
      "tide_trend": "outgoing",
-     "wind_kt": 3.9
+     "wind_kt": 3.8
     },
     {
      "time": "2026-11-05T15:30:00Z",
-     "score": -0.551,
+     "score": -0.693,
      "tide_ft": 4.92,
      "tide_trend": "outgoing",
-     "wind_kt": 1.6
+     "wind_kt": 3.1
     },
     {
      "time": "2026-11-05T16:00:00Z",
-     "score": -0.551,
+     "score": -0.693,
      "tide_ft": 4.5,
      "tide_trend": "outgoing",
-     "wind_kt": 1.6
+     "wind_kt": 3.1
     },
     {
      "time": "2026-11-05T16:30:00Z",
@@ -833,15 +1275,14 @@
    "verdict": "no",
    "confidence": "high",
    "vis_ft": [
-    19,
+    23,
     40
    ],
    "reason": "County water-quality advisory at La Jolla Cove",
    "window": null,
    "window_day": null,
    "gates": [
-    "County water-quality advisory at La Jolla Cove",
-    "Rain 3 day(s) ago (county 72 h advisory)"
+    "County water-quality advisory at La Jolla Cove"
    ],
    "cautions": [
     "NWS high rip current risk"
@@ -853,24 +1294,29 @@
      "detail": "surf 3–5 ft, high rip current risk (county beaches)"
     },
     {
+     "label": "Rain",
+     "effect": "+",
+     "detail": "None in the last few days"
+    },
+    {
      "label": "Swell",
-     "effect": "~",
-     "detail": "near-bottom motion 0.22 m/s"
+     "effect": "+",
+     "detail": "near-bottom motion 0.18 m/s"
     },
     {
      "label": "Plankton",
      "effect": "+",
-     "detail": "chlorophyll 0.5 µg/L at the pier"
+     "detail": "chlorophyll 0.4 µg/L at the pier"
     },
     {
      "label": "Model vs sensor",
-     "effect": "+",
-     "detail": "wave proxy ~31 ft vs pier sensor ~27 ft (agree)"
+     "effect": "~",
+     "detail": "wave proxy ~39 ft vs pier sensor ~25 ft (differ)"
     },
     {
      "label": "Turbidity",
      "effect": "+",
-     "detail": "0.3 NTU at Scripps Pier (~27 ft)"
+     "detail": "0.3 NTU at Scripps Pier (~25 ft)"
     },
     {
      "label": "Tide",
@@ -886,44 +1332,44 @@
    "conditions": {
     "hs_ft": 1.6,
     "tp_s": 6.25,
-    "swell_dir_deg": 322.6090393066406,
+    "swell_dir_deg": 322.2450866699219,
     "wave_source": "mop",
-    "orbital_ms": 0.221,
-    "wind_kt": 7.2,
-    "gust_kt": 9.1,
-    "wind_dir_deg": 264.0,
+    "orbital_ms": 0.181,
+    "wind_kt": 6.2,
+    "gust_kt": 9.5,
+    "wind_dir_deg": 278.0,
     "wind_onshore": false,
-    "tide_ft": 3.1,
+    "tide_ft": 3.9,
     "tide_trend": "incoming"
    },
    "hourly": [
     {
      "time": "2026-11-05T14:30:00Z",
-     "score": -0.482,
+     "score": -0.454,
      "tide_ft": 5.41,
      "tide_trend": "outgoing",
-     "wind_kt": 3.9
+     "wind_kt": 3.8
     },
     {
      "time": "2026-11-05T15:00:00Z",
-     "score": -0.482,
+     "score": -0.454,
      "tide_ft": 5.23,
      "tide_trend": "outgoing",
-     "wind_kt": 3.9
+     "wind_kt": 3.8
     },
     {
      "time": "2026-11-05T15:30:00Z",
-     "score": -0.079,
+     "score": -0.302,
      "tide_ft": 4.92,
      "tide_trend": "outgoing",
-     "wind_kt": 1.6
+     "wind_kt": 3.1
     },
     {
      "time": "2026-11-05T16:00:00Z",
-     "score": -0.079,
+     "score": -0.302,
      "tide_ft": 4.5,
      "tide_trend": "outgoing",
-     "wind_kt": 1.6
+     "wind_kt": 3.1
     },
     {
      "time": "2026-11-05T16:30:00Z",
@@ -1027,212 +1473,6 @@
    "shore_normal_deg": 15.0
   },
   {
-   "id": "turtle-town",
-   "name": "Turtle Town",
-   "tier": 2,
-   "difficulty": "advanced",
-   "area": "La Jolla",
-   "verdict": "no",
-   "confidence": "high",
-   "vis_ft": [
-    16,
-    33
-   ],
-   "reason": "Rain 3 day(s) ago (county 72 h advisory)",
-   "window": null,
-   "window_day": null,
-   "gates": [
-    "Rain 3 day(s) ago (county 72 h advisory)"
-   ],
-   "cautions": [
-    "NWS high rip current risk"
-   ],
-   "factors": [
-    {
-     "label": "Water quality",
-     "effect": "+",
-     "detail": "No county advisory"
-    },
-    {
-     "label": "NWS surf forecast",
-     "effect": "-",
-     "detail": "surf 3–5 ft, high rip current risk (county beaches)"
-    },
-    {
-     "label": "Swell",
-     "effect": "~",
-     "detail": "near-bottom motion 0.33 m/s"
-    },
-    {
-     "label": "Plankton",
-     "effect": "+",
-     "detail": "chlorophyll 0.5 µg/L at the pier"
-    },
-    {
-     "label": "Model vs sensor",
-     "effect": "+",
-     "detail": "wave proxy ~22 ft vs pier sensor ~27 ft (agree)"
-    },
-    {
-     "label": "Turbidity",
-     "effect": "+",
-     "detail": "0.3 NTU at Scripps Pier (~27 ft)"
-    },
-    {
-     "label": "Tide",
-     "effect": "+",
-     "detail": "Incoming during the window"
-    },
-    {
-     "label": "Wind",
-     "effect": "~",
-     "detail": "~8 kt"
-    }
-   ],
-   "conditions": {
-    "hs_ft": 2.4,
-    "tp_s": 6.25,
-    "swell_dir_deg": 290.1813659667969,
-    "wave_source": "mop",
-    "orbital_ms": 0.333,
-    "wind_kt": 7.2,
-    "gust_kt": 9.1,
-    "wind_dir_deg": 264.0,
-    "wind_onshore": true,
-    "tide_ft": 3.1,
-    "tide_trend": "incoming"
-   },
-   "hourly": [
-    {
-     "time": "2026-11-05T14:30:00Z",
-     "score": -0.808,
-     "tide_ft": 5.41,
-     "tide_trend": "outgoing",
-     "wind_kt": 3.9
-    },
-    {
-     "time": "2026-11-05T15:00:00Z",
-     "score": -0.808,
-     "tide_ft": 5.23,
-     "tide_trend": "outgoing",
-     "wind_kt": 3.9
-    },
-    {
-     "time": "2026-11-05T15:30:00Z",
-     "score": -0.551,
-     "tide_ft": 4.92,
-     "tide_trend": "outgoing",
-     "wind_kt": 1.6
-    },
-    {
-     "time": "2026-11-05T16:00:00Z",
-     "score": -0.551,
-     "tide_ft": 4.5,
-     "tide_trend": "outgoing",
-     "wind_kt": 1.6
-    },
-    {
-     "time": "2026-11-05T16:30:00Z",
-     "score": -0.646,
-     "tide_ft": 3.99,
-     "tide_trend": "outgoing",
-     "wind_kt": 2.7
-    },
-    {
-     "time": "2026-11-05T17:00:00Z",
-     "score": -0.646,
-     "tide_ft": 3.42,
-     "tide_trend": "outgoing",
-     "wind_kt": 2.7
-    },
-    {
-     "time": "2026-11-05T17:30:00Z",
-     "score": -1.043,
-     "tide_ft": 2.83,
-     "tide_trend": "outgoing",
-     "wind_kt": 5.2
-    },
-    {
-     "time": "2026-11-05T18:00:00Z",
-     "score": -1.043,
-     "tide_ft": 2.25,
-     "tide_trend": "outgoing",
-     "wind_kt": 5.2
-    },
-    {
-     "time": "2026-11-05T18:30:00Z",
-     "score": -1.027,
-     "tide_ft": 1.72,
-     "tide_trend": "outgoing",
-     "wind_kt": 5.1
-    },
-    {
-     "time": "2026-11-05T19:00:00Z",
-     "score": -1.027,
-     "tide_ft": 1.27,
-     "tide_trend": "outgoing",
-     "wind_kt": 5.1
-    },
-    {
-     "time": "2026-11-05T19:30:00Z",
-     "score": -1.217,
-     "tide_ft": 0.93,
-     "tide_trend": "outgoing",
-     "wind_kt": 6.0
-    },
-    {
-     "time": "2026-11-05T20:00:00Z",
-     "score": -1.217,
-     "tide_ft": 0.72,
-     "tide_trend": "outgoing",
-     "wind_kt": 6.0
-    },
-    {
-     "time": "2026-11-05T20:30:00Z",
-     "score": -0.915,
-     "tide_ft": 0.64,
-     "tide_trend": "slack",
-     "wind_kt": 6.8
-    },
-    {
-     "time": "2026-11-05T21:00:00Z",
-     "score": 0.085,
-     "tide_ft": 0.7,
-     "tide_trend": "incoming",
-     "wind_kt": 6.8
-    },
-    {
-     "time": "2026-11-05T21:30:00Z",
-     "score": -0.333,
-     "tide_ft": 0.89,
-     "tide_trend": "incoming",
-     "wind_kt": 8.2
-    },
-    {
-     "time": "2026-11-05T22:00:00Z",
-     "score": -0.333,
-     "tide_ft": 1.2,
-     "tide_trend": "incoming",
-     "wind_kt": 8.2
-    },
-    {
-     "time": "2026-11-05T22:30:00Z",
-     "score": -0.308,
-     "tide_ft": 1.6,
-     "tide_trend": "incoming",
-     "wind_kt": 8.1
-    },
-    {
-     "time": "2026-11-05T23:00:00Z",
-     "score": -0.308,
-     "tide_ft": 2.06,
-     "tide_trend": "incoming",
-     "wind_kt": 8.1
-    }
-   ],
-   "shore_normal_deg": 300.0
-  },
-  {
    "id": "bird-rock",
    "name": "Bird Rock",
    "tier": 2,
@@ -1241,14 +1481,13 @@
    "verdict": "no",
    "confidence": "high",
    "vis_ft": [
-    7,
-    14
+    6,
+    13
    ],
-   "reason": "Rain 3 day(s) ago (county 72 h advisory)",
+   "reason": "Waves ~4 ft, over 2 ft",
    "window": null,
    "window_day": null,
    "gates": [
-    "Rain 3 day(s) ago (county 72 h advisory)",
     "Waves ~4 ft, over 2 ft"
    ],
    "cautions": [
@@ -1266,24 +1505,29 @@
      "detail": "surf 3–5 ft, high rip current risk (county beaches)"
     },
     {
+     "label": "Rain",
+     "effect": "+",
+     "detail": "None in the last few days"
+    },
+    {
      "label": "Swell",
      "effect": "-",
-     "detail": "near-bottom motion 0.93 m/s"
+     "detail": "near-bottom motion 0.97 m/s"
     },
     {
      "label": "Plankton",
      "effect": "+",
-     "detail": "chlorophyll 0.5 µg/L at the pier"
+     "detail": "chlorophyll 0.4 µg/L at the pier"
     },
     {
      "label": "Model vs sensor",
      "effect": "~",
-     "detail": "wave proxy ~3 ft vs pier sensor ~27 ft (differ)"
+     "detail": "wave proxy ~3 ft vs pier sensor ~25 ft (differ)"
     },
     {
      "label": "Turbidity",
      "effect": "+",
-     "detail": "0.3 NTU at Scripps Pier (~27 ft)"
+     "detail": "0.3 NTU at Scripps Pier (~25 ft)"
     },
     {
      "label": "Tide",
@@ -1293,50 +1537,50 @@
     {
      "label": "Wind",
      "effect": "+",
-     "detail": "~2 kt"
+     "detail": "~4 kt"
     }
    ],
    "conditions": {
-    "hs_ft": 3.7,
-    "tp_s": 16.666667938232422,
-    "swell_dir_deg": 244.18035888671875,
+    "hs_ft": 3.8,
+    "tp_s": 15.384615898132324,
+    "swell_dir_deg": 243.7176055908203,
     "wave_source": "mop",
-    "orbital_ms": 0.929,
-    "wind_kt": 7.2,
-    "gust_kt": 9.1,
-    "wind_dir_deg": 264.0,
+    "orbital_ms": 0.972,
+    "wind_kt": 6.2,
+    "gust_kt": 9.5,
+    "wind_dir_deg": 278.0,
     "wind_onshore": true,
-    "tide_ft": 3.1,
+    "tide_ft": 3.9,
     "tide_trend": "incoming"
    },
    "hourly": [
     {
      "time": "2026-11-05T14:30:00Z",
-     "score": 0.692,
+     "score": 0.66,
      "tide_ft": 5.41,
      "tide_trend": "outgoing",
-     "wind_kt": 3.9
+     "wind_kt": 4.1
     },
     {
      "time": "2026-11-05T15:00:00Z",
-     "score": 0.692,
+     "score": 0.66,
      "tide_ft": 5.23,
      "tide_trend": "outgoing",
-     "wind_kt": 3.9
+     "wind_kt": 4.1
     },
     {
      "time": "2026-11-05T15:30:00Z",
-     "score": 0.905,
+     "score": 0.724,
      "tide_ft": 4.92,
      "tide_trend": "outgoing",
-     "wind_kt": 2.2
+     "wind_kt": 3.7
     },
     {
      "time": "2026-11-05T16:00:00Z",
-     "score": 0.905,
+     "score": 0.724,
      "tide_ft": 4.5,
      "tide_trend": "outgoing",
-     "wind_kt": 2.2
+     "wind_kt": 3.7
     },
     {
      "time": "2026-11-05T16:30:00Z",
@@ -1449,13 +1693,12 @@
    "confidence": "high",
    "vis_ft": [
     5,
-    9
+    10
    ],
-   "reason": "Rain 3 day(s) ago (county 72 h advisory)",
+   "reason": "Waves ~4 ft, over 2 ft",
    "window": null,
    "window_day": null,
    "gates": [
-    "Rain 3 day(s) ago (county 72 h advisory)",
     "Waves ~4 ft, over 2 ft"
    ],
    "cautions": [
@@ -1473,6 +1716,11 @@
      "detail": "surf 3–5 ft, high rip current risk (county beaches)"
     },
     {
+     "label": "Rain",
+     "effect": "+",
+     "detail": "None in the last few days"
+    },
+    {
      "label": "Swell",
      "effect": "-",
      "detail": "near-bottom motion 0.70 m/s"
@@ -1480,7 +1728,7 @@
     {
      "label": "Plankton",
      "effect": "+",
-     "detail": "chlorophyll 0.5 µg/L at the pier"
+     "detail": "chlorophyll 0.4 µg/L at the pier"
     },
     {
      "label": "Tide",
@@ -1494,46 +1742,46 @@
     }
    ],
    "conditions": {
-    "hs_ft": 3.8,
+    "hs_ft": 4.0,
     "tp_s": 15.384615898132324,
-    "swell_dir_deg": 263.7110290527344,
+    "swell_dir_deg": 264.3651123046875,
     "wave_source": "mop",
-    "orbital_ms": 0.697,
-    "wind_kt": 7.2,
-    "gust_kt": 9.1,
-    "wind_dir_deg": 264.0,
+    "orbital_ms": 0.703,
+    "wind_kt": 6.2,
+    "gust_kt": 9.5,
+    "wind_dir_deg": 278.0,
     "wind_onshore": true,
-    "tide_ft": 3.1,
+    "tide_ft": 3.9,
     "tide_trend": "incoming"
    },
    "hourly": [
     {
      "time": "2026-11-05T14:30:00Z",
-     "score": -0.713,
+     "score": -0.75,
      "tide_ft": 5.41,
      "tide_trend": "outgoing",
-     "wind_kt": 3.3
+     "wind_kt": 3.5
     },
     {
      "time": "2026-11-05T15:00:00Z",
-     "score": -0.713,
+     "score": -0.75,
      "tide_ft": 5.23,
      "tide_trend": "outgoing",
-     "wind_kt": 3.3
+     "wind_kt": 3.5
     },
     {
      "time": "2026-11-05T15:30:00Z",
-     "score": -0.646,
+     "score": -0.75,
      "tide_ft": 4.92,
      "tide_trend": "outgoing",
-     "wind_kt": 2.7
+     "wind_kt": 3.5
     },
     {
      "time": "2026-11-05T16:00:00Z",
-     "score": -0.646,
+     "score": -0.75,
      "tide_ft": 4.5,
      "tide_trend": "outgoing",
-     "wind_kt": 2.7
+     "wind_kt": 3.5
     },
     {
      "time": "2026-11-05T16:30:00Z",
@@ -1637,212 +1885,6 @@
    "shore_normal_deg": 265.0
   },
   {
-   "id": "mission-point",
-   "name": "Mission Point (bay side)",
-   "tier": 3,
-   "difficulty": "easy",
-   "area": "Point Loma & Mission Bay",
-   "verdict": "no",
-   "confidence": "high",
-   "vis_ft": [
-    10,
-    15
-   ],
-   "reason": "Rain 3 day(s) ago (county 72 h advisory)",
-   "window": null,
-   "window_day": null,
-   "gates": [
-    "Rain 3 day(s) ago (county 72 h advisory)"
-   ],
-   "cautions": [
-    "NWS high rip current risk"
-   ],
-   "factors": [
-    {
-     "label": "Water quality",
-     "effect": "+",
-     "detail": "No county advisory"
-    },
-    {
-     "label": "NWS surf forecast",
-     "effect": "-",
-     "detail": "surf 3–5 ft, high rip current risk (county beaches)"
-    },
-    {
-     "label": "Shelter",
-     "effect": "+",
-     "detail": "about 20% of the open-coast waves reach here"
-    },
-    {
-     "label": "Swell",
-     "effect": "+",
-     "detail": "near-bottom motion 0.19 m/s"
-    },
-    {
-     "label": "Plankton",
-     "effect": "+",
-     "detail": "chlorophyll 0.5 µg/L at the pier"
-    },
-    {
-     "label": "Bay water",
-     "effect": "~",
-     "detail": "bay water mixes in; estimate capped at 15 ft"
-    },
-    {
-     "label": "Tide",
-     "effect": "+",
-     "detail": "Incoming during the window"
-    },
-    {
-     "label": "Wind",
-     "effect": "~",
-     "detail": "~8 kt"
-    }
-   ],
-   "conditions": {
-    "hs_ft": 0.8,
-    "tp_s": 15.384615898132324,
-    "swell_dir_deg": 266.4029235839844,
-    "wave_source": "mop",
-    "orbital_ms": 0.192,
-    "wind_kt": 7.2,
-    "gust_kt": 9.1,
-    "wind_dir_deg": 264.0,
-    "wind_onshore": false,
-    "tide_ft": 3.1,
-    "tide_trend": "incoming"
-   },
-   "hourly": [
-    {
-     "time": "2026-11-05T14:30:00Z",
-     "score": -0.693,
-     "tide_ft": 5.41,
-     "tide_trend": "outgoing",
-     "wind_kt": 3.7
-    },
-    {
-     "time": "2026-11-05T15:00:00Z",
-     "score": -0.693,
-     "tide_ft": 5.23,
-     "tide_trend": "outgoing",
-     "wind_kt": 3.7
-    },
-    {
-     "time": "2026-11-05T15:30:00Z",
-     "score": -0.566,
-     "tide_ft": 4.92,
-     "tide_trend": "outgoing",
-     "wind_kt": 2.2
-    },
-    {
-     "time": "2026-11-05T16:00:00Z",
-     "score": -0.566,
-     "tide_ft": 4.5,
-     "tide_trend": "outgoing",
-     "wind_kt": 2.2
-    },
-    {
-     "time": "2026-11-05T16:30:00Z",
-     "score": -0.502,
-     "tide_ft": 3.99,
-     "tide_trend": "outgoing",
-     "wind_kt": 0.4
-    },
-    {
-     "time": "2026-11-05T17:00:00Z",
-     "score": -0.502,
-     "tide_ft": 3.42,
-     "tide_trend": "outgoing",
-     "wind_kt": 0.4
-    },
-    {
-     "time": "2026-11-05T17:30:00Z",
-     "score": -0.807,
-     "tide_ft": 2.83,
-     "tide_trend": "outgoing",
-     "wind_kt": 4.7
-    },
-    {
-     "time": "2026-11-05T18:00:00Z",
-     "score": -0.807,
-     "tide_ft": 2.25,
-     "tide_trend": "outgoing",
-     "wind_kt": 4.7
-    },
-    {
-     "time": "2026-11-05T18:30:00Z",
-     "score": -0.972,
-     "tide_ft": 1.72,
-     "tide_trend": "outgoing",
-     "wind_kt": 5.8
-    },
-    {
-     "time": "2026-11-05T19:00:00Z",
-     "score": -0.972,
-     "tide_ft": 1.27,
-     "tide_trend": "outgoing",
-     "wind_kt": 5.8
-    },
-    {
-     "time": "2026-11-05T19:30:00Z",
-     "score": -1.085,
-     "tide_ft": 0.93,
-     "tide_trend": "outgoing",
-     "wind_kt": 6.5
-    },
-    {
-     "time": "2026-11-05T20:00:00Z",
-     "score": -1.085,
-     "tide_ft": 0.72,
-     "tide_trend": "outgoing",
-     "wind_kt": 6.5
-    },
-    {
-     "time": "2026-11-05T20:30:00Z",
-     "score": -0.802,
-     "tide_ft": 0.64,
-     "tide_trend": "slack",
-     "wind_kt": 7.6
-    },
-    {
-     "time": "2026-11-05T21:00:00Z",
-     "score": 0.198,
-     "tide_ft": 0.7,
-     "tide_trend": "incoming",
-     "wind_kt": 7.6
-    },
-    {
-     "time": "2026-11-05T21:30:00Z",
-     "score": 0.048,
-     "tide_ft": 0.89,
-     "tide_trend": "incoming",
-     "wind_kt": 8.3
-    },
-    {
-     "time": "2026-11-05T22:00:00Z",
-     "score": 0.048,
-     "tide_ft": 1.2,
-     "tide_trend": "incoming",
-     "wind_kt": 8.3
-    },
-    {
-     "time": "2026-11-05T22:30:00Z",
-     "score": 0.135,
-     "tide_ft": 1.6,
-     "tide_trend": "incoming",
-     "wind_kt": 7.9
-    },
-    {
-     "time": "2026-11-05T23:00:00Z",
-     "score": 0.135,
-     "tide_ft": 2.06,
-     "tide_trend": "incoming",
-     "wind_kt": 7.9
-    }
-   ],
-   "shore_normal_deg": 180.0
-  },
-  {
    "id": "tide-beach",
    "name": "Tide Beach Park (Solana Beach)",
    "tier": 3,
@@ -1852,13 +1894,12 @@
    "confidence": "high",
    "vis_ft": [
     2,
-    5
+    4
    ],
-   "reason": "Rain 3 day(s) ago (county 72 h advisory)",
+   "reason": "Waves ~4 ft, over 2 ft",
    "window": null,
    "window_day": null,
    "gates": [
-    "Rain 3 day(s) ago (county 72 h advisory)",
     "Waves ~4 ft, over 2 ft"
    ],
    "cautions": [
@@ -1876,14 +1917,19 @@
      "detail": "surf 3–5 ft, high rip current risk (county beaches)"
     },
     {
+     "label": "Rain",
+     "effect": "+",
+     "detail": "None in the last few days"
+    },
+    {
      "label": "Swell",
      "effect": "-",
-     "detail": "near-bottom motion 0.90 m/s"
+     "detail": "near-bottom motion 0.97 m/s"
     },
     {
      "label": "Plankton",
      "effect": "+",
-     "detail": "chlorophyll 0.5 µg/L at the pier"
+     "detail": "chlorophyll 0.4 µg/L at the pier"
     },
     {
      "label": "Tide",
@@ -1893,50 +1939,50 @@
     {
      "label": "Wind",
      "effect": "+",
-     "detail": "~2 kt"
+     "detail": "~3 kt"
     }
    ],
    "conditions": {
-    "hs_ft": 3.5,
+    "hs_ft": 3.6,
     "tp_s": 16.666667938232422,
-    "swell_dir_deg": 254.92349243164062,
+    "swell_dir_deg": 256.4246826171875,
     "wave_source": "mop",
-    "orbital_ms": 0.904,
-    "wind_kt": 7.2,
-    "gust_kt": 9.1,
-    "wind_dir_deg": 264.0,
+    "orbital_ms": 0.975,
+    "wind_kt": 6.2,
+    "gust_kt": 9.5,
+    "wind_dir_deg": 278.0,
     "wind_onshore": true,
-    "tide_ft": 3.1,
+    "tide_ft": 3.9,
     "tide_trend": "incoming"
    },
    "hourly": [
     {
      "time": "2026-11-05T14:30:00Z",
-     "score": 0.752,
+     "score": 0.736,
      "tide_ft": 5.41,
      "tide_trend": "outgoing",
-     "wind_kt": 3.5
+     "wind_kt": 3.6
     },
     {
      "time": "2026-11-05T15:00:00Z",
-     "score": 0.752,
+     "score": 0.736,
      "tide_ft": 5.23,
      "tide_trend": "outgoing",
-     "wind_kt": 3.5
+     "wind_kt": 3.6
     },
     {
      "time": "2026-11-05T15:30:00Z",
-     "score": 0.872,
+     "score": 0.828,
      "tide_ft": 4.92,
      "tide_trend": "outgoing",
-     "wind_kt": 2.5
+     "wind_kt": 2.9
     },
     {
      "time": "2026-11-05T16:00:00Z",
-     "score": 0.872,
+     "score": 0.828,
      "tide_ft": 4.5,
      "tide_trend": "outgoing",
-     "wind_kt": 2.5
+     "wind_kt": 2.9
     },
     {
      "time": "2026-11-05T16:30:00Z",
@@ -2049,13 +2095,12 @@
    "confidence": "high",
    "vis_ft": [
     5,
-    11
+    10
    ],
-   "reason": "Rain 3 day(s) ago (county 72 h advisory)",
+   "reason": "Waves ~3 ft, over 2 ft",
    "window": null,
    "window_day": null,
    "gates": [
-    "Rain 3 day(s) ago (county 72 h advisory)",
     "Waves ~3 ft, over 2 ft"
    ],
    "cautions": [
@@ -2073,14 +2118,19 @@
      "detail": "surf 3–5 ft, high rip current risk (county beaches)"
     },
     {
+     "label": "Rain",
+     "effect": "+",
+     "detail": "None in the last few days"
+    },
+    {
      "label": "Swell",
      "effect": "-",
-     "detail": "near-bottom motion 0.65 m/s"
+     "detail": "near-bottom motion 0.70 m/s"
     },
     {
      "label": "Plankton",
      "effect": "+",
-     "detail": "chlorophyll 0.5 µg/L at the pier"
+     "detail": "chlorophyll 0.4 µg/L at the pier"
     },
     {
      "label": "Tide",
@@ -2090,50 +2140,50 @@
     {
      "label": "Wind",
      "effect": "+",
-     "detail": "~2 kt"
+     "detail": "~3 kt"
     }
    ],
    "conditions": {
     "hs_ft": 3.1,
     "tp_s": 15.384615898132324,
-    "swell_dir_deg": 251.55429077148438,
+    "swell_dir_deg": 251.47093200683594,
     "wave_source": "mop",
-    "orbital_ms": 0.654,
-    "wind_kt": 7.2,
-    "gust_kt": 9.1,
-    "wind_dir_deg": 264.0,
+    "orbital_ms": 0.696,
+    "wind_kt": 6.2,
+    "gust_kt": 9.5,
+    "wind_dir_deg": 278.0,
     "wind_onshore": true,
-    "tide_ft": 3.1,
+    "tide_ft": 3.9,
     "tide_trend": "incoming"
    },
    "hourly": [
     {
      "time": "2026-11-05T14:30:00Z",
-     "score": 0.752,
+     "score": 0.736,
      "tide_ft": 5.41,
      "tide_trend": "outgoing",
-     "wind_kt": 3.5
+     "wind_kt": 3.6
     },
     {
      "time": "2026-11-05T15:00:00Z",
-     "score": 0.752,
+     "score": 0.736,
      "tide_ft": 5.23,
      "tide_trend": "outgoing",
-     "wind_kt": 3.5
+     "wind_kt": 3.6
     },
     {
      "time": "2026-11-05T15:30:00Z",
-     "score": 0.872,
+     "score": 0.828,
      "tide_ft": 4.92,
      "tide_trend": "outgoing",
-     "wind_kt": 2.5
+     "wind_kt": 2.9
     },
     {
      "time": "2026-11-05T16:00:00Z",
-     "score": 0.872,
+     "score": 0.828,
      "tide_ft": 4.5,
      "tide_trend": "outgoing",
-     "wind_kt": 2.5
+     "wind_kt": 2.9
     },
     {
      "time": "2026-11-05T16:30:00Z",
@@ -2246,13 +2296,12 @@
    "confidence": "high",
    "vis_ft": [
     5,
-    11
+    10
    ],
-   "reason": "Rain 3 day(s) ago (county 72 h advisory)",
+   "reason": "Waves ~3 ft, over 2 ft",
    "window": null,
    "window_day": null,
    "gates": [
-    "Rain 3 day(s) ago (county 72 h advisory)",
     "Waves ~3 ft, over 2 ft"
    ],
    "cautions": [
@@ -2270,14 +2319,19 @@
      "detail": "surf 3–5 ft, high rip current risk (county beaches)"
     },
     {
+     "label": "Rain",
+     "effect": "+",
+     "detail": "None in the last few days"
+    },
+    {
      "label": "Swell",
      "effect": "-",
-     "detail": "near-bottom motion 0.65 m/s"
+     "detail": "near-bottom motion 0.72 m/s"
     },
     {
      "label": "Plankton",
      "effect": "+",
-     "detail": "chlorophyll 0.5 µg/L at the pier"
+     "detail": "chlorophyll 0.4 µg/L at the pier"
     },
     {
      "label": "Tide",
@@ -2292,45 +2346,45 @@
    ],
    "conditions": {
     "hs_ft": 3.1,
-    "tp_s": 16.666667938232422,
-    "swell_dir_deg": 244.57546997070312,
+    "tp_s": 15.384615898132324,
+    "swell_dir_deg": 243.46328735351562,
     "wave_source": "mop",
-    "orbital_ms": 0.648,
-    "wind_kt": 7.2,
-    "gust_kt": 9.1,
-    "wind_dir_deg": 264.0,
+    "orbital_ms": 0.722,
+    "wind_kt": 6.2,
+    "gust_kt": 9.5,
+    "wind_dir_deg": 278.0,
     "wind_onshore": true,
-    "tide_ft": 3.1,
+    "tide_ft": 3.9,
     "tide_trend": "incoming"
    },
    "hourly": [
     {
      "time": "2026-11-05T14:30:00Z",
-     "score": 0.727,
+     "score": 0.721,
      "tide_ft": 5.41,
      "tide_trend": "outgoing",
      "wind_kt": 3.7
     },
     {
      "time": "2026-11-05T15:00:00Z",
-     "score": 0.727,
+     "score": 0.721,
      "tide_ft": 5.23,
      "tide_trend": "outgoing",
      "wind_kt": 3.7
     },
     {
      "time": "2026-11-05T15:30:00Z",
-     "score": 0.939,
+     "score": 0.909,
      "tide_ft": 4.92,
      "tide_trend": "outgoing",
-     "wind_kt": 1.7
+     "wind_kt": 2.1
     },
     {
      "time": "2026-11-05T16:00:00Z",
-     "score": 0.939,
+     "score": 0.909,
      "tide_ft": 4.5,
      "tide_trend": "outgoing",
-     "wind_kt": 1.7
+     "wind_kt": 2.1
     },
     {
      "time": "2026-11-05T16:30:00Z",
@@ -2435,257 +2489,252 @@
   }
  ],
  "day": {
-  "date": "2026-11-04",
-  "sunrise": "2026-11-04T14:09:50.591090Z",
-  "sunset": "2026-11-05T00:54:52.509841Z",
+  "date": "2026-11-05",
+  "sunrise": "2026-11-05T14:10:43.323998Z",
+  "sunset": "2026-11-06T00:54:03.386675Z",
   "water_temp_f": 75.9,
   "water_temp_source": "sccoos",
   "wetsuit": "Rash guard or shorty",
-  "turbidity_ntu": 0.3,
-  "chlorophyll_ug_l": 0.49,
+  "turbidity_ntu": 0.32,
+  "chlorophyll_ug_l": 0.38,
   "alerts": [],
   "surf_forecast": "Surf 3–5 ft · high rip current risk",
   "tide_curve": [
    {
-    "time": "2026-11-04T12:30:00Z",
-    "ft": 4.55
-   },
-   {
-    "time": "2026-11-04T12:45:00Z",
-    "ft": 4.71
-   },
-   {
-    "time": "2026-11-04T13:00:00Z",
-    "ft": 4.85
-   },
-   {
-    "time": "2026-11-04T13:15:00Z",
-    "ft": 4.94
-   },
-   {
-    "time": "2026-11-04T13:30:00Z",
-    "ft": 5.01
-   },
-   {
-    "time": "2026-11-04T13:45:00Z",
-    "ft": 5.05
-   },
-   {
-    "time": "2026-11-04T14:00:00Z",
-    "ft": 5.05
-   },
-   {
-    "time": "2026-11-04T14:15:00Z",
-    "ft": 5.02
-   },
-   {
-    "time": "2026-11-04T14:30:00Z",
-    "ft": 4.96
-   },
-   {
-    "time": "2026-11-04T14:45:00Z",
-    "ft": 4.87
-   },
-   {
-    "time": "2026-11-04T15:00:00Z",
-    "ft": 4.75
-   },
-   {
-    "time": "2026-11-04T15:15:00Z",
-    "ft": 4.61
-   },
-   {
-    "time": "2026-11-04T15:30:00Z",
-    "ft": 4.44
-   },
-   {
-    "time": "2026-11-04T15:45:00Z",
-    "ft": 4.25
-   },
-   {
-    "time": "2026-11-04T16:00:00Z",
-    "ft": 4.04
-   },
-   {
-    "time": "2026-11-04T16:15:00Z",
-    "ft": 3.82
-   },
-   {
-    "time": "2026-11-04T16:30:00Z",
-    "ft": 3.58
-   },
-   {
-    "time": "2026-11-04T16:45:00Z",
-    "ft": 3.34
-   },
-   {
-    "time": "2026-11-04T17:00:00Z",
-    "ft": 3.1
-   },
-   {
-    "time": "2026-11-04T17:15:00Z",
-    "ft": 2.86
-   },
-   {
-    "time": "2026-11-04T17:30:00Z",
-    "ft": 2.62
-   },
-   {
-    "time": "2026-11-04T17:45:00Z",
-    "ft": 2.39
-   },
-   {
-    "time": "2026-11-04T18:00:00Z",
-    "ft": 2.18
-   },
-   {
-    "time": "2026-11-04T18:15:00Z",
-    "ft": 1.98
-   },
-   {
-    "time": "2026-11-04T18:30:00Z",
-    "ft": 1.8
-   },
-   {
-    "time": "2026-11-04T18:45:00Z",
-    "ft": 1.65
-   },
-   {
-    "time": "2026-11-04T19:00:00Z",
-    "ft": 1.52
-   },
-   {
-    "time": "2026-11-04T19:15:00Z",
-    "ft": 1.42
-   },
-   {
-    "time": "2026-11-04T19:30:00Z",
-    "ft": 1.34
-   },
-   {
-    "time": "2026-11-04T19:45:00Z",
-    "ft": 1.3
-   },
-   {
-    "time": "2026-11-04T20:00:00Z",
-    "ft": 1.28
-   },
-   {
-    "time": "2026-11-04T20:15:00Z",
-    "ft": 1.3
-   },
-   {
-    "time": "2026-11-04T20:30:00Z",
-    "ft": 1.34
-   },
-   {
-    "time": "2026-11-04T20:45:00Z",
-    "ft": 1.41
-   },
-   {
-    "time": "2026-11-04T21:00:00Z",
-    "ft": 1.51
-   },
-   {
-    "time": "2026-11-04T21:15:00Z",
-    "ft": 1.64
-   },
-   {
-    "time": "2026-11-04T21:30:00Z",
-    "ft": 1.79
-   },
-   {
-    "time": "2026-11-04T21:45:00Z",
-    "ft": 1.96
-   },
-   {
-    "time": "2026-11-04T22:00:00Z",
-    "ft": 2.14
-   },
-   {
-    "time": "2026-11-04T22:15:00Z",
-    "ft": 2.34
-   },
-   {
-    "time": "2026-11-04T22:30:00Z",
-    "ft": 2.55
-   },
-   {
-    "time": "2026-11-04T22:45:00Z",
-    "ft": 2.76
-   },
-   {
-    "time": "2026-11-04T23:00:00Z",
-    "ft": 2.98
-   },
-   {
-    "time": "2026-11-04T23:15:00Z",
-    "ft": 3.2
-   },
-   {
-    "time": "2026-11-04T23:30:00Z",
-    "ft": 3.41
-   },
-   {
-    "time": "2026-11-04T23:45:00Z",
-    "ft": 3.61
-   },
-   {
-    "time": "2026-11-05T00:00:00Z",
-    "ft": 3.8
-   },
-   {
-    "time": "2026-11-05T00:15:00Z",
-    "ft": 3.97
-   },
-   {
-    "time": "2026-11-05T00:30:00Z",
-    "ft": 4.12
-   },
-   {
-    "time": "2026-11-05T00:45:00Z",
-    "ft": 4.25
-   },
-   {
-    "time": "2026-11-05T01:00:00Z",
-    "ft": 4.36
-   },
-   {
-    "time": "2026-11-05T01:15:00Z",
-    "ft": 4.43
-   },
-   {
-    "time": "2026-11-05T01:30:00Z",
+    "time": "2026-11-05T12:30:00Z",
     "ft": 4.48
    },
    {
-    "time": "2026-11-05T01:45:00Z",
+    "time": "2026-11-05T12:45:00Z",
+    "ft": 4.7
+   },
+   {
+    "time": "2026-11-05T13:00:00Z",
+    "ft": 4.91
+   },
+   {
+    "time": "2026-11-05T13:15:00Z",
+    "ft": 5.08
+   },
+   {
+    "time": "2026-11-05T13:30:00Z",
+    "ft": 5.22
+   },
+   {
+    "time": "2026-11-05T13:45:00Z",
+    "ft": 5.33
+   },
+   {
+    "time": "2026-11-05T14:00:00Z",
+    "ft": 5.41
+   },
+   {
+    "time": "2026-11-05T14:15:00Z",
+    "ft": 5.44
+   },
+   {
+    "time": "2026-11-05T14:30:00Z",
+    "ft": 5.45
+   },
+   {
+    "time": "2026-11-05T14:45:00Z",
+    "ft": 5.41
+   },
+   {
+    "time": "2026-11-05T15:00:00Z",
+    "ft": 5.34
+   },
+   {
+    "time": "2026-11-05T15:15:00Z",
+    "ft": 5.23
+   },
+   {
+    "time": "2026-11-05T15:30:00Z",
+    "ft": 5.1
+   },
+   {
+    "time": "2026-11-05T15:45:00Z",
+    "ft": 4.92
+   },
+   {
+    "time": "2026-11-05T16:00:00Z",
+    "ft": 4.72
+   },
+   {
+    "time": "2026-11-05T16:15:00Z",
     "ft": 4.5
    },
    {
-    "time": "2026-11-05T02:00:00Z",
-    "ft": 4.49
+    "time": "2026-11-05T16:30:00Z",
+    "ft": 4.25
    },
    {
-    "time": "2026-11-05T02:15:00Z",
-    "ft": 4.45
+    "time": "2026-11-05T16:45:00Z",
+    "ft": 3.99
+   },
+   {
+    "time": "2026-11-05T17:00:00Z",
+    "ft": 3.71
+   },
+   {
+    "time": "2026-11-05T17:15:00Z",
+    "ft": 3.42
+   },
+   {
+    "time": "2026-11-05T17:30:00Z",
+    "ft": 3.12
+   },
+   {
+    "time": "2026-11-05T17:45:00Z",
+    "ft": 2.83
+   },
+   {
+    "time": "2026-11-05T18:00:00Z",
+    "ft": 2.53
+   },
+   {
+    "time": "2026-11-05T18:15:00Z",
+    "ft": 2.25
+   },
+   {
+    "time": "2026-11-05T18:30:00Z",
+    "ft": 1.98
+   },
+   {
+    "time": "2026-11-05T18:45:00Z",
+    "ft": 1.72
+   },
+   {
+    "time": "2026-11-05T19:00:00Z",
+    "ft": 1.49
+   },
+   {
+    "time": "2026-11-05T19:15:00Z",
+    "ft": 1.27
+   },
+   {
+    "time": "2026-11-05T19:30:00Z",
+    "ft": 1.09
+   },
+   {
+    "time": "2026-11-05T19:45:00Z",
+    "ft": 0.93
+   },
+   {
+    "time": "2026-11-05T20:00:00Z",
+    "ft": 0.81
+   },
+   {
+    "time": "2026-11-05T20:15:00Z",
+    "ft": 0.72
+   },
+   {
+    "time": "2026-11-05T20:30:00Z",
+    "ft": 0.66
+   },
+   {
+    "time": "2026-11-05T20:45:00Z",
+    "ft": 0.64
+   },
+   {
+    "time": "2026-11-05T21:00:00Z",
+    "ft": 0.65
+   },
+   {
+    "time": "2026-11-05T21:15:00Z",
+    "ft": 0.7
+   },
+   {
+    "time": "2026-11-05T21:30:00Z",
+    "ft": 0.78
+   },
+   {
+    "time": "2026-11-05T21:45:00Z",
+    "ft": 0.89
+   },
+   {
+    "time": "2026-11-05T22:00:00Z",
+    "ft": 1.03
+   },
+   {
+    "time": "2026-11-05T22:15:00Z",
+    "ft": 1.2
+   },
+   {
+    "time": "2026-11-05T22:30:00Z",
+    "ft": 1.39
+   },
+   {
+    "time": "2026-11-05T22:45:00Z",
+    "ft": 1.6
+   },
+   {
+    "time": "2026-11-05T23:00:00Z",
+    "ft": 1.82
+   },
+   {
+    "time": "2026-11-05T23:15:00Z",
+    "ft": 2.06
+   },
+   {
+    "time": "2026-11-05T23:30:00Z",
+    "ft": 2.3
+   },
+   {
+    "time": "2026-11-05T23:45:00Z",
+    "ft": 2.55
+   },
+   {
+    "time": "2026-11-06T00:00:00Z",
+    "ft": 2.8
+   },
+   {
+    "time": "2026-11-06T00:15:00Z",
+    "ft": 3.04
+   },
+   {
+    "time": "2026-11-06T00:30:00Z",
+    "ft": 3.27
+   },
+   {
+    "time": "2026-11-06T00:45:00Z",
+    "ft": 3.49
+   },
+   {
+    "time": "2026-11-06T01:00:00Z",
+    "ft": 3.69
+   },
+   {
+    "time": "2026-11-06T01:15:00Z",
+    "ft": 3.87
+   },
+   {
+    "time": "2026-11-06T01:30:00Z",
+    "ft": 4.03
+   },
+   {
+    "time": "2026-11-06T01:45:00Z",
+    "ft": 4.16
+   },
+   {
+    "time": "2026-11-06T02:00:00Z",
+    "ft": 4.27
+   },
+   {
+    "time": "2026-11-06T02:15:00Z",
+    "ft": 4.34
    }
   ],
   "tide_turns": [
    {
-    "time": "2026-11-04T13:54:00Z",
-    "ft": 5.06,
+    "time": "2026-11-05T14:23:00Z",
+    "ft": 5.45,
     "kind": "high"
    },
    {
-    "time": "2026-11-04T20:00:00Z",
-    "ft": 1.28,
+    "time": "2026-11-05T20:47:00Z",
+    "ft": 0.64,
     "kind": "low"
-   },
-   {
-    "time": "2026-11-05T01:47:00Z",
-    "ft": 4.5,
-    "kind": "high"
    }
   ]
  },
@@ -2695,8 +2744,8 @@
    "label": "Tide predictions (NOAA 9410230)",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-11-04T23:05:42.752684Z",
-   "valid_at": "2026-11-04T23:05:42.752684Z",
+   "fetched_at": "2026-11-05T00:05:58.428656Z",
+   "valid_at": "2026-11-05T00:05:58.428656Z",
    "error": null
   },
   {
@@ -2704,8 +2753,8 @@
    "label": "Pier wind (NOAA 9410230)",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-11-04T23:05:42.752684Z",
-   "valid_at": "2026-11-04T23:00:00Z",
+   "fetched_at": "2026-11-05T00:05:58.428656Z",
+   "valid_at": "2026-11-05T00:00:00Z",
    "error": null
   },
   {
@@ -2713,8 +2762,8 @@
    "label": "Water temperature",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-11-04T23:05:42.752684Z",
-   "valid_at": "2026-11-04T22:52:00Z",
+   "fetched_at": "2026-11-05T00:05:58.428656Z",
+   "valid_at": "2026-11-04T23:52:00Z",
    "error": null
   },
   {
@@ -2722,8 +2771,8 @@
    "label": "Chlorophyll (SCCOOS pier)",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-11-04T23:05:42.752684Z",
-   "valid_at": "2026-11-04T22:52:00Z",
+   "fetched_at": "2026-11-05T00:05:58.428656Z",
+   "valid_at": "2026-11-04T23:52:00Z",
    "error": null
   },
   {
@@ -2731,8 +2780,8 @@
    "label": "Turbidity (SCCOOS pier)",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-11-04T23:05:42.752684Z",
-   "valid_at": "2026-11-04T22:52:00Z",
+   "fetched_at": "2026-11-05T00:05:58.428656Z",
+   "valid_at": "2026-11-04T23:48:00Z",
    "error": null
   },
   {
@@ -2740,8 +2789,8 @@
    "label": "NWS alerts",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-11-04T23:05:42.752684Z",
-   "valid_at": "2026-11-04T23:05:42.752684Z",
+   "fetched_at": "2026-11-05T00:05:58.428656Z",
+   "valid_at": "2026-11-05T00:05:58.428656Z",
    "error": null
   },
   {
@@ -2749,7 +2798,7 @@
    "label": "NWS surf zone forecast",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-11-04T23:05:42.752684Z",
+   "fetched_at": "2026-11-05T00:05:58.428656Z",
    "valid_at": "2026-11-04T20:27:00Z",
    "error": null
   },
@@ -2758,8 +2807,8 @@
    "label": "Waves (mop) · la-jolla-cove",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-11-04T23:05:42.752684Z",
-   "valid_at": "2026-11-04T21:00:00Z",
+   "fetched_at": "2026-11-05T00:05:58.428656Z",
+   "valid_at": "2026-11-04T22:00:00Z",
    "error": null
   },
   {
@@ -2767,8 +2816,8 @@
    "label": "Waves (mop) · marine-room",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-11-04T23:05:42.752684Z",
-   "valid_at": "2026-11-04T21:00:00Z",
+   "fetched_at": "2026-11-05T00:05:58.428656Z",
+   "valid_at": "2026-11-04T22:00:00Z",
    "error": null
   },
   {
@@ -2776,8 +2825,8 @@
    "label": "Waves (mop) · shell-beach",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-11-04T23:05:42.752684Z",
-   "valid_at": "2026-11-04T21:00:00Z",
+   "fetched_at": "2026-11-05T00:05:58.428656Z",
+   "valid_at": "2026-11-04T22:00:00Z",
    "error": null
   },
   {
@@ -2785,8 +2834,8 @@
    "label": "Waves (mop) · goldfish-point",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-11-04T23:05:42.752684Z",
-   "valid_at": "2026-11-04T21:00:00Z",
+   "fetched_at": "2026-11-05T00:05:58.428656Z",
+   "valid_at": "2026-11-04T22:00:00Z",
    "error": null
   },
   {
@@ -2794,8 +2843,8 @@
    "label": "Waves (mop) · sea-caves",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-11-04T23:05:42.752684Z",
-   "valid_at": "2026-11-04T21:00:00Z",
+   "fetched_at": "2026-11-05T00:05:58.428656Z",
+   "valid_at": "2026-11-04T22:00:00Z",
    "error": null
   },
   {
@@ -2803,8 +2852,8 @@
    "label": "Waves (mop) · turtle-town",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-11-04T23:05:42.752684Z",
-   "valid_at": "2026-11-04T21:00:00Z",
+   "fetched_at": "2026-11-05T00:05:58.428656Z",
+   "valid_at": "2026-11-04T22:00:00Z",
    "error": null
   },
   {
@@ -2812,8 +2861,8 @@
    "label": "Waves (mop) · bird-rock",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-11-04T23:05:42.752684Z",
-   "valid_at": "2026-11-04T21:00:00Z",
+   "fetched_at": "2026-11-05T00:05:58.428656Z",
+   "valid_at": "2026-11-04T22:00:00Z",
    "error": null
   },
   {
@@ -2821,8 +2870,8 @@
    "label": "Waves (mop) · sunset-cliffs",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-11-04T23:05:42.752684Z",
-   "valid_at": "2026-11-04T21:00:00Z",
+   "fetched_at": "2026-11-05T00:05:58.428656Z",
+   "valid_at": "2026-11-04T22:00:00Z",
    "error": null
   },
   {
@@ -2830,8 +2879,8 @@
    "label": "Waves (mop) · mission-point",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-11-04T23:05:42.752684Z",
-   "valid_at": "2026-11-04T21:00:00Z",
+   "fetched_at": "2026-11-05T00:05:58.428656Z",
+   "valid_at": "2026-11-04T22:00:00Z",
    "error": null
   },
   {
@@ -2839,8 +2888,8 @@
    "label": "Waves (mop) · tide-beach",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-11-04T23:05:42.752684Z",
-   "valid_at": "2026-11-04T21:00:00Z",
+   "fetched_at": "2026-11-05T00:05:58.428656Z",
+   "valid_at": "2026-11-04T22:00:00Z",
    "error": null
   },
   {
@@ -2848,8 +2897,8 @@
    "label": "Waves (mop) · cardiff-reef",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-11-04T23:05:42.752684Z",
-   "valid_at": "2026-11-04T21:00:00Z",
+   "fetched_at": "2026-11-05T00:05:58.428656Z",
+   "valid_at": "2026-11-04T22:00:00Z",
    "error": null
   },
   {
@@ -2857,8 +2906,8 @@
    "label": "Waves (mop) · swamis",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-11-04T23:05:42.752684Z",
-   "valid_at": "2026-11-04T21:00:00Z",
+   "fetched_at": "2026-11-05T00:05:58.428656Z",
+   "valid_at": "2026-11-04T22:00:00Z",
    "error": null
   },
   {
@@ -2866,8 +2915,8 @@
    "label": "Wind forecast (Open-Meteo) · la-jolla-cove",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-11-04T23:05:42.752684Z",
-   "valid_at": "2026-11-04T23:05:42.752684Z",
+   "fetched_at": "2026-11-05T00:05:58.428656Z",
+   "valid_at": "2026-11-05T00:05:58.428656Z",
    "error": null
   },
   {
@@ -2875,8 +2924,8 @@
    "label": "Wind forecast (Open-Meteo) · marine-room",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-11-04T23:05:42.752684Z",
-   "valid_at": "2026-11-04T23:05:42.752684Z",
+   "fetched_at": "2026-11-05T00:05:58.428656Z",
+   "valid_at": "2026-11-05T00:05:58.428656Z",
    "error": null
   },
   {
@@ -2884,8 +2933,8 @@
    "label": "Wind forecast (Open-Meteo) · shell-beach",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-11-04T23:05:42.752684Z",
-   "valid_at": "2026-11-04T23:05:42.752684Z",
+   "fetched_at": "2026-11-05T00:05:58.428656Z",
+   "valid_at": "2026-11-05T00:05:58.428656Z",
    "error": null
   },
   {
@@ -2893,8 +2942,8 @@
    "label": "Wind forecast (Open-Meteo) · goldfish-point",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-11-04T23:05:42.752684Z",
-   "valid_at": "2026-11-04T23:05:42.752684Z",
+   "fetched_at": "2026-11-05T00:05:58.428656Z",
+   "valid_at": "2026-11-05T00:05:58.428656Z",
    "error": null
   },
   {
@@ -2902,8 +2951,8 @@
    "label": "Wind forecast (Open-Meteo) · sea-caves",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-11-04T23:05:42.752684Z",
-   "valid_at": "2026-11-04T23:05:42.752684Z",
+   "fetched_at": "2026-11-05T00:05:58.428656Z",
+   "valid_at": "2026-11-05T00:05:58.428656Z",
    "error": null
   },
   {
@@ -2911,8 +2960,8 @@
    "label": "Wind forecast (Open-Meteo) · turtle-town",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-11-04T23:05:42.752684Z",
-   "valid_at": "2026-11-04T23:05:42.752684Z",
+   "fetched_at": "2026-11-05T00:05:58.428656Z",
+   "valid_at": "2026-11-05T00:05:58.428656Z",
    "error": null
   },
   {
@@ -2920,8 +2969,8 @@
    "label": "Wind forecast (Open-Meteo) · bird-rock",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-11-04T23:05:42.752684Z",
-   "valid_at": "2026-11-04T23:05:42.752684Z",
+   "fetched_at": "2026-11-05T00:05:58.428656Z",
+   "valid_at": "2026-11-05T00:05:58.428656Z",
    "error": null
   },
   {
@@ -2929,8 +2978,8 @@
    "label": "Wind forecast (Open-Meteo) · sunset-cliffs",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-11-04T23:05:42.752684Z",
-   "valid_at": "2026-11-04T23:05:42.752684Z",
+   "fetched_at": "2026-11-05T00:05:58.428656Z",
+   "valid_at": "2026-11-05T00:05:58.428656Z",
    "error": null
   },
   {
@@ -2938,8 +2987,8 @@
    "label": "Wind forecast (Open-Meteo) · mission-point",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-11-04T23:05:42.752684Z",
-   "valid_at": "2026-11-04T23:05:42.752684Z",
+   "fetched_at": "2026-11-05T00:05:58.428656Z",
+   "valid_at": "2026-11-05T00:05:58.428656Z",
    "error": null
   },
   {
@@ -2947,8 +2996,8 @@
    "label": "Wind forecast (Open-Meteo) · tide-beach",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-11-04T23:05:42.752684Z",
-   "valid_at": "2026-11-04T23:05:42.752684Z",
+   "fetched_at": "2026-11-05T00:05:58.428656Z",
+   "valid_at": "2026-11-05T00:05:58.428656Z",
    "error": null
   },
   {
@@ -2956,8 +3005,8 @@
    "label": "Wind forecast (Open-Meteo) · cardiff-reef",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-11-04T23:05:42.752684Z",
-   "valid_at": "2026-11-04T23:05:42.752684Z",
+   "fetched_at": "2026-11-05T00:05:58.428656Z",
+   "valid_at": "2026-11-05T00:05:58.428656Z",
    "error": null
   },
   {
@@ -2965,8 +3014,8 @@
    "label": "Wind forecast (Open-Meteo) · swamis",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-11-04T23:05:42.752684Z",
-   "valid_at": "2026-11-04T23:05:42.752684Z",
+   "fetched_at": "2026-11-05T00:05:58.428656Z",
+   "valid_at": "2026-11-05T00:05:58.428656Z",
    "error": null
   },
   {
@@ -2974,8 +3023,8 @@
    "label": "Rain (Open-Meteo) · la-jolla-cove",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-11-04T23:05:42.752684Z",
-   "valid_at": "2026-11-04T23:05:42.752684Z",
+   "fetched_at": "2026-11-05T00:05:58.428656Z",
+   "valid_at": "2026-11-05T00:05:58.428656Z",
    "error": null
   },
   {
@@ -2983,8 +3032,8 @@
    "label": "Rain (Open-Meteo) · marine-room",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-11-04T23:05:42.752684Z",
-   "valid_at": "2026-11-04T23:05:42.752684Z",
+   "fetched_at": "2026-11-05T00:05:58.428656Z",
+   "valid_at": "2026-11-05T00:05:58.428656Z",
    "error": null
   },
   {
@@ -2992,8 +3041,8 @@
    "label": "Rain (Open-Meteo) · shell-beach",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-11-04T23:05:42.752684Z",
-   "valid_at": "2026-11-04T23:05:42.752684Z",
+   "fetched_at": "2026-11-05T00:05:58.428656Z",
+   "valid_at": "2026-11-05T00:05:58.428656Z",
    "error": null
   },
   {
@@ -3001,8 +3050,8 @@
    "label": "Rain (Open-Meteo) · goldfish-point",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-11-04T23:05:42.752684Z",
-   "valid_at": "2026-11-04T23:05:42.752684Z",
+   "fetched_at": "2026-11-05T00:05:58.428656Z",
+   "valid_at": "2026-11-05T00:05:58.428656Z",
    "error": null
   },
   {
@@ -3010,8 +3059,8 @@
    "label": "Rain (Open-Meteo) · sea-caves",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-11-04T23:05:42.752684Z",
-   "valid_at": "2026-11-04T23:05:42.752684Z",
+   "fetched_at": "2026-11-05T00:05:58.428656Z",
+   "valid_at": "2026-11-05T00:05:58.428656Z",
    "error": null
   },
   {
@@ -3019,8 +3068,8 @@
    "label": "Rain (Open-Meteo) · turtle-town",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-11-04T23:05:42.752684Z",
-   "valid_at": "2026-11-04T23:05:42.752684Z",
+   "fetched_at": "2026-11-05T00:05:58.428656Z",
+   "valid_at": "2026-11-05T00:05:58.428656Z",
    "error": null
   },
   {
@@ -3028,8 +3077,8 @@
    "label": "Rain (Open-Meteo) · bird-rock",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-11-04T23:05:42.752684Z",
-   "valid_at": "2026-11-04T23:05:42.752684Z",
+   "fetched_at": "2026-11-05T00:05:58.428656Z",
+   "valid_at": "2026-11-05T00:05:58.428656Z",
    "error": null
   },
   {
@@ -3037,8 +3086,8 @@
    "label": "Rain (Open-Meteo) · sunset-cliffs",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-11-04T23:05:42.752684Z",
-   "valid_at": "2026-11-04T23:05:42.752684Z",
+   "fetched_at": "2026-11-05T00:05:58.428656Z",
+   "valid_at": "2026-11-05T00:05:58.428656Z",
    "error": null
   },
   {
@@ -3046,8 +3095,8 @@
    "label": "Rain (Open-Meteo) · mission-point",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-11-04T23:05:42.752684Z",
-   "valid_at": "2026-11-04T23:05:42.752684Z",
+   "fetched_at": "2026-11-05T00:05:58.428656Z",
+   "valid_at": "2026-11-05T00:05:58.428656Z",
    "error": null
   },
   {
@@ -3055,8 +3104,8 @@
    "label": "Rain (Open-Meteo) · tide-beach",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-11-04T23:05:42.752684Z",
-   "valid_at": "2026-11-04T23:05:42.752684Z",
+   "fetched_at": "2026-11-05T00:05:58.428656Z",
+   "valid_at": "2026-11-05T00:05:58.428656Z",
    "error": null
   },
   {
@@ -3064,8 +3113,8 @@
    "label": "Rain (Open-Meteo) · cardiff-reef",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-11-04T23:05:42.752684Z",
-   "valid_at": "2026-11-04T23:05:42.752684Z",
+   "fetched_at": "2026-11-05T00:05:58.428656Z",
+   "valid_at": "2026-11-05T00:05:58.428656Z",
    "error": null
   },
   {
@@ -3073,8 +3122,8 @@
    "label": "Rain (Open-Meteo) · swamis",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-11-04T23:05:42.752684Z",
-   "valid_at": "2026-11-04T23:05:42.752684Z",
+   "fetched_at": "2026-11-05T00:05:58.428656Z",
+   "valid_at": "2026-11-05T00:05:58.428656Z",
    "error": null
   },
   {
@@ -3082,8 +3131,8 @@
    "label": "Water quality · la-jolla-cove",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-11-04T23:05:42.752684Z",
-   "valid_at": "2026-11-04T23:05:42.752684Z",
+   "fetched_at": "2026-11-05T00:05:58.428656Z",
+   "valid_at": "2026-11-05T00:05:58.428656Z",
    "error": null
   },
   {
@@ -3091,8 +3140,8 @@
    "label": "Water quality · marine-room",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-11-04T23:05:42.752684Z",
-   "valid_at": "2026-11-04T23:05:42.752684Z",
+   "fetched_at": "2026-11-05T00:05:58.428656Z",
+   "valid_at": "2026-11-05T00:05:58.428656Z",
    "error": null
   },
   {
@@ -3100,8 +3149,8 @@
    "label": "Water quality · shell-beach",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-11-04T23:05:42.752684Z",
-   "valid_at": "2026-11-04T23:05:42.752684Z",
+   "fetched_at": "2026-11-05T00:05:58.428656Z",
+   "valid_at": "2026-11-05T00:05:58.428656Z",
    "error": null
   },
   {
@@ -3109,8 +3158,8 @@
    "label": "Water quality · goldfish-point",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-11-04T23:05:42.752684Z",
-   "valid_at": "2026-11-04T23:05:42.752684Z",
+   "fetched_at": "2026-11-05T00:05:58.428656Z",
+   "valid_at": "2026-11-05T00:05:58.428656Z",
    "error": null
   },
   {
@@ -3118,8 +3167,8 @@
    "label": "Water quality · sea-caves",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-11-04T23:05:42.752684Z",
-   "valid_at": "2026-11-04T23:05:42.752684Z",
+   "fetched_at": "2026-11-05T00:05:58.428656Z",
+   "valid_at": "2026-11-05T00:05:58.428656Z",
    "error": null
   },
   {
@@ -3127,8 +3176,8 @@
    "label": "Water quality · turtle-town",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-11-04T23:05:42.752684Z",
-   "valid_at": "2026-11-04T23:05:42.752684Z",
+   "fetched_at": "2026-11-05T00:05:58.428656Z",
+   "valid_at": "2026-11-05T00:05:58.428656Z",
    "error": null
   },
   {
@@ -3136,8 +3185,8 @@
    "label": "Water quality · bird-rock",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-11-04T23:05:42.752684Z",
-   "valid_at": "2026-11-04T23:05:42.752684Z",
+   "fetched_at": "2026-11-05T00:05:58.428656Z",
+   "valid_at": "2026-11-05T00:05:58.428656Z",
    "error": null
   },
   {
@@ -3145,8 +3194,8 @@
    "label": "Water quality · sunset-cliffs",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-11-04T23:05:42.752684Z",
-   "valid_at": "2026-11-04T23:05:42.752684Z",
+   "fetched_at": "2026-11-05T00:05:58.428656Z",
+   "valid_at": "2026-11-05T00:05:58.428656Z",
    "error": null
   },
   {
@@ -3154,8 +3203,8 @@
    "label": "Water quality · mission-point",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-11-04T23:05:42.752684Z",
-   "valid_at": "2026-11-04T23:05:42.752684Z",
+   "fetched_at": "2026-11-05T00:05:58.428656Z",
+   "valid_at": "2026-11-05T00:05:58.428656Z",
    "error": null
   },
   {
@@ -3163,8 +3212,8 @@
    "label": "Water quality · tide-beach",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-11-04T23:05:42.752684Z",
-   "valid_at": "2026-11-04T23:05:42.752684Z",
+   "fetched_at": "2026-11-05T00:05:58.428656Z",
+   "valid_at": "2026-11-05T00:05:58.428656Z",
    "error": null
   },
   {
@@ -3172,8 +3221,8 @@
    "label": "Water quality · cardiff-reef",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-11-04T23:05:42.752684Z",
-   "valid_at": "2026-11-04T23:05:42.752684Z",
+   "fetched_at": "2026-11-05T00:05:58.428656Z",
+   "valid_at": "2026-11-05T00:05:58.428656Z",
    "error": null
   },
   {
@@ -3181,8 +3230,8 @@
    "label": "Water quality · swamis",
    "ok": true,
    "stale": false,
-   "fetched_at": "2026-11-04T23:05:42.752684Z",
-   "valid_at": "2026-11-04T23:05:42.752684Z",
+   "fetched_at": "2026-11-05T00:05:58.428656Z",
+   "valid_at": "2026-11-05T00:05:58.428656Z",
    "error": null
   }
  ],
