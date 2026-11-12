@@ -6,11 +6,27 @@
     <title>Snorkel Status · San Diego</title>
     <meta name="description" content="Yes, maybe or no on snorkeling today at San Diego's best spots, and where: waves, tide, water quality and visibility in one answer." />
     <meta name="robots" content="noindex" />
-    <meta name="theme-color" content="#f3f7f8" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#061319" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#131B29" />
+    <script>
+      // Indigo Ledger reading settings, applied before first paint: saved choices,
+      // else the system's contrast and motion preferences, else dark.
+      (function () {
+        var r = document.documentElement;
+        function get(k) { try { return localStorage.getItem("il-" + k); } catch (e) { return null; } }
+        function mq(q) { try { return matchMedia(q).matches; } catch (e) { return false; } }
+        var theme = get("theme");
+        if (["dark", "light", "contrast", "calm"].indexOf(theme) < 0) {
+          theme = mq("(prefers-contrast: more)") ? "contrast" : mq("(prefers-contrast: less)") ? "calm" : "dark";
+        }
+        var text = get("text");
+        r.setAttribute("data-theme", theme);
+        r.setAttribute("data-text", text === "large" || text === "larger" ? text : "normal");
+        r.setAttribute("data-motion", get("motion") || (mq("(prefers-reduced-motion: reduce)") ? "reduce" : "full"));
+      })();
+    </script>
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-title" content="Snorkel" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <link rel="manifest" href="manifest.webmanifest" />
     <link rel="icon" href="icon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="apple-touch-icon.png" />

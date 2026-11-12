@@ -1,3 +1,5 @@
+import "./indigo/tokens.css";
+import "./indigo/bundle.css";
 import "./styles.css";
 import { clock, ft } from "./format";
 import { renderPage } from "./render";
@@ -24,6 +26,63 @@ function paint(next: StatusDoc): void {
 
 function bind(): void {
   bindTide();
+  bindSettings();
+}
+
+// Indigo Ledger ReadingSettings: data-theme, data-text and data-motion on <html>,
+// saved in this browser. index.html applies the saved values before first paint.
+const ROOT_ATTR: Record<string, string> = { theme: "data-theme", text: "data-text", motion: "data-motion" };
+
+function save(key: string, value: string): void {
+  try {
+    localStorage.setItem(`il-${key}`, value);
+  } catch {
+    /* private mode: the choice lasts for this visit */
+  }
+}
+
+function setSetting(key: string, value: string): void {
+  document.documentElement.setAttribute(ROOT_ATTR[key], value);
+  save(key, value);
+  syncSettings();
+}
+
+function syncSettings(): void {
+  const root = document.documentElement;
+  for (const group of app.querySelectorAll<HTMLElement>(".il-dial-row[data-setting]")) {
+    const current = root.getAttribute(ROOT_ATTR[group.dataset.setting!]);
+    for (const opt of group.querySelectorAll<HTMLButtonElement>(".il-dial-opt")) {
+      const on = opt.dataset.value === current;
+      opt.classList.toggle("il-dial-on", on);
+      opt.setAttribute("aria-checked", String(on));
+      opt.tabIndex = on ? 0 : -1;
+    }
+  }
+  const motion = app.querySelector<HTMLButtonElement>(".il-switch[data-setting='motion']");
+  motion?.setAttribute("aria-checked", String(root.getAttribute("data-motion") === "reduce"));
+}
+
+function bindSettings(): void {
+  for (const group of app.querySelectorAll<HTMLElement>(".il-dial-row[data-setting]")) {
+    const key = group.dataset.setting!;
+    const opts = [...group.querySelectorAll<HTMLButtonElement>(".il-dial-opt")];
+    opts.forEach((opt, i) => {
+      opt.addEventListener("click", () => setSetting(key, opt.dataset.value!));
+      opt.addEventListener("keydown", (e) => {
+        const step = e.key === "ArrowRight" || e.key === "ArrowDown" ? 1 : e.key === "ArrowLeft" || e.key === "ArrowUp" ? -1 : 0;
+        if (!step) return;
+        e.preventDefault();
+        const next = opts[(i + step + opts.length) % opts.length];
+        setSetting(key, next.dataset.value!);
+        next.focus();
+      });
+    });
+  }
+  const motion = app.querySelector<HTMLButtonElement>(".il-switch[data-setting='motion']");
+  motion?.addEventListener("click", () =>
+    setSetting("motion", document.documentElement.getAttribute("data-motion") === "reduce" ? "full" : "reduce"),
+  );
+  syncSettings();
 }
 
 function bindTide(): void {

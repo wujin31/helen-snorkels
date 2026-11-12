@@ -1,0 +1,371 @@
+/* Indigo Ledger component styles, copied unchanged from the design system (https://claude.ai/artifact/YZ13aAJF5JvRcQKChwpSvQ, project/components/bundle.css). Site-specific styles live in ../styles.css. */
+/* Indigo Ledger, component styles. Motion only answers an action or a change of data. */
+@view-transition { navigation: auto; }
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: var(--duration-page); }
+
+body { margin: 0; font-family: var(--font-sans); font-size: 16px; line-height: 24px; background: var(--surface); color: var(--ink); -webkit-font-smoothing: antialiased; font-variant-numeric: tabular-nums; }
+h1, h2, h3 { text-wrap: balance; }
+p { text-wrap: pretty; }
+.il-row { display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: center; padding: var(--space-4); }
+.il-stack { display: grid; gap: var(--space-4); padding: var(--space-4); }
+.il-label { font-size: 13px; line-height: 18px; color: var(--ink-muted); }
+.il-tc { font-family: var(--font-serif-tc); font-weight: 600; }
+
+/* Scroll reveal: opt-in, for the one block per page that deserves an entrance. Compositor-driven, no listeners. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .il-reveal { animation: il-rise linear both; animation-timeline: view(); animation-range: entry 10% cover 30%; }
+  }
+}
+@keyframes il-rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+
+/* Button: keycap. The heavier bottom edge and the 1px press are the feedback. */
+.il-btn { font: inherit; font-size: 15px; font-weight: 500; height: 38px; padding: 0 var(--space-4); border-radius: var(--radius-md);
+  border: 1px solid var(--hairline); border-bottom-width: 3px; background: var(--surface-raised); color: var(--ink); cursor: pointer;
+  transition: transform var(--duration-press) ease-out, background-color var(--duration-press) ease-out; }
+.il-btn:hover { background: var(--indigo-soft); color: var(--indigo-ink); }
+.il-btn:active { transform: translateY(1px); }
+.il-btn:focus-visible { outline: 2px solid var(--indigo); outline-offset: 2px; }
+.il-btn-primary { background: var(--indigo); border-color: var(--indigo); color: var(--on-indigo); }
+.il-btn-primary:hover { background: var(--indigo); color: var(--on-indigo); filter: brightness(1.1); }
+.il-btn-danger { border-color: var(--shu); color: var(--shu); }
+.il-btn-danger:hover { background: var(--shu-soft); color: var(--shu-ink); }
+.il-btn:disabled { opacity: var(--opacity-disabled); cursor: not-allowed; transform: none; }
+
+/* StatusStamp: an accountant's chop, not a pill. Double rule, slight tilt that differs per word, lands when the status changes. */
+.il-stamp { display: inline-flex; align-items: baseline; gap: 6px; padding: 2px 8px 3px; border-radius: var(--radius-sm);
+  border: 1.5px solid currentColor; box-shadow: inset 0 0 0 1.5px var(--stamp-bg), inset 0 0 0 2.5px currentColor;
+  background: var(--stamp-bg); font-family: var(--font-condensed); font-size: 15px; line-height: 20px; font-weight: 600;
+  transform: rotate(var(--tilt, -1deg)); }
+.il-stamp .il-tc { font-size: 14px; }
+.il-stamp-go { --stamp-bg: var(--kelp-soft); color: var(--kelp-ink); }
+.il-stamp-caution { --stamp-bg: var(--amber-soft); color: var(--amber-ink); }
+.il-stamp-stop { --stamp-bg: var(--shu-soft); color: var(--shu-ink); }
+@media (prefers-reduced-motion: no-preference) {
+  .il-stamp { animation: il-land var(--duration-land) var(--ease-press) both; }
+}
+@keyframes il-land { from { transform: rotate(var(--tilt, -1deg)) scale(1.12); opacity: .4; } to { transform: rotate(var(--tilt, -1deg)); opacity: 1; } }
+
+/* Figure: a ledger number. Sans with tabular digits; the rule above it is the ledger line. */
+.il-fig { display: grid; gap: 2px; min-width: 150px; padding-top: var(--space-2); border-top: 1px solid var(--hairline); }
+.il-fig-value { font-size: 16px; line-height: 24px; font-weight: 500; }
+.il-fig-lg .il-fig-value { font-size: 36px; line-height: 40px; letter-spacing: -.015em; }
+.il-fig-meta { display: flex; flex-wrap: wrap; column-gap: var(--space-2); font-size: 13px; line-height: 18px; color: var(--ink-muted); }
+.il-fig-delta-good { color: var(--kelp); } .il-fig-delta-warn { color: var(--amber); } .il-fig-delta-bad { color: var(--shu); }
+
+/* RangeBar */
+.il-range { display: grid; gap: 6px; min-width: 220px; }
+.il-range-head, .il-range-foot { display: flex; justify-content: space-between; align-items: baseline; gap: var(--space-2); }
+.il-range-val { font-size: 16px; font-weight: 500; }
+.il-range-track { position: relative; height: 10px; background: var(--surface-raised); box-shadow: inset 0 0 0 1px var(--hairline); }
+.il-range-band { position: absolute; top: 0; bottom: 0; background: var(--indigo-soft); box-shadow: inset 0 0 0 1px var(--indigo); }
+.il-range-point { position: absolute; top: -3px; bottom: -3px; width: 2px; margin-left: -1px; background: var(--indigo); }
+.il-range-foot { font-size: 13px; line-height: 18px; color: var(--ink-muted); }
+
+/* TierList */
+.il-tiers { display: grid; gap: 2px; }
+.il-tier-row { display: grid; grid-template-columns: 52px 1fr; background: var(--surface-raised); }
+.il-tier-key { display: grid; place-items: center; font-family: var(--font-condensed); font-size: 28px; line-height: 1; font-weight: 700; }
+.il-tier-s { background: var(--tier-s); color: var(--tier-s-ink); } .il-tier-a { background: var(--tier-a); color: var(--tier-a-ink); }
+.il-tier-b { background: var(--tier-b); color: var(--tier-b-ink); } .il-tier-c { background: var(--tier-c); color: var(--tier-c-ink); }
+.il-tier-d { background: var(--tier-d); color: var(--tier-d-ink); }
+.il-tier-items { list-style: none; margin: 0; padding: var(--space-2); display: flex; flex-wrap: wrap; gap: var(--space-2); min-height: 40px; align-items: center; }
+.il-tier-item { display: inline-flex; gap: var(--space-2); align-items: baseline; padding: 3px 10px; border-radius: var(--radius-sm); background: var(--surface); font-size: 15px; line-height: 22px; }
+.il-tier-item .il-tc { font-size: 16px; }
+
+/* FlapBoard: only characters that change remount and flip */
+.il-flap { display: grid; gap: var(--space-2); }
+.il-flap-row { display: flex; gap: 3px; perspective: 400px; }
+.il-flap-cell { position: relative; display: grid; place-items: center; width: 22px; height: 32px; border-radius: var(--radius-sm);
+  background: var(--ink); color: var(--surface); font-family: var(--font-mono); font-size: 22px; line-height: 32px; font-weight: 500; overflow: hidden; }
+.il-flap-cell::after { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: var(--surface); opacity: var(--opacity-seam); }
+@media (prefers-reduced-motion: no-preference) {
+  .il-flap-cell { animation: il-flip var(--duration-flip) var(--ease-out) both; animation-delay: calc(var(--i, 0) * var(--duration-stagger)); }
+}
+@keyframes il-flip { from { transform: rotateX(-90deg); opacity: .3; } to { transform: none; opacity: 1; } }
+
+/* Seal: hanzi stamp; vermilion in both themes, because a seal is ink */
+.il-seal { --seal-size: 40px; display: inline-grid; place-items: center; width: var(--seal-size); height: var(--seal-size); border-radius: var(--radius-sm);
+  background: var(--seal); color: var(--seal-paper); box-shadow: inset 0 0 0 calc(var(--seal-size) * .06) var(--seal), inset 0 0 0 calc(var(--seal-size) * .09) var(--seal-paper);
+  font-family: var(--font-serif-tc); font-weight: 900; font-size: calc(var(--seal-size) * .62); line-height: 1; }
+.il-seal-indigo { background: var(--indigo); color: var(--on-indigo); box-shadow: inset 0 0 0 calc(var(--seal-size) * .06) var(--indigo), inset 0 0 0 calc(var(--seal-size) * .09) var(--on-indigo); }
+.il-seal-multi > span { writing-mode: vertical-rl; font-size: calc(var(--seal-size) * .34); letter-spacing: .02em; }
+
+/* TitleBlock: headline, optional subline, vertical 中文 aside. No eyebrow. */
+.il-title { display: flex; gap: var(--space-6); align-items: flex-start; justify-content: space-between; }
+.il-title-main { display: grid; gap: var(--space-2); max-width: 34ch; }
+.il-title-h { margin: 0; font-size: 28px; line-height: 34px; font-weight: 600; letter-spacing: -.01em; }
+.il-title-poster .il-title-h { font-family: var(--font-condensed); font-size: 56px; line-height: 54px; font-weight: 700; letter-spacing: -.01em; }
+.il-title-sub { margin: 0; color: var(--ink-muted); }
+.il-title-tc { writing-mode: vertical-rl; font-family: var(--font-serif-tc); font-size: 16px; line-height: 26px; font-weight: 600; letter-spacing: .25em; color: var(--shu); }
+
+/* Card: a filled panel set apart by tone, not border or glow. Layout follows its own width. */
+.il-card { display: block; container-type: inline-size; background: var(--surface-raised); color: inherit; text-decoration: none; border-radius: var(--radius-sm); }
+.il-card-inner { display: grid; gap: var(--space-3); padding: var(--space-4); }
+.il-card-body { display: grid; gap: var(--space-2); align-content: start; }
+.il-card-title { margin: 0; font-size: 20px; line-height: 28px; font-weight: 600; }
+a.il-card { transition: background-color var(--duration-press) ease-out; }
+a.il-card:hover { background: var(--indigo-soft); }
+a.il-card:hover .il-card-title { text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+.il-card:focus-visible { outline: 2px solid var(--indigo); outline-offset: 2px; }
+@container (min-width: 440px) { .il-card-inner { grid-template-columns: auto 1fr; padding: var(--space-6); gap: var(--space-6); } }
+
+/* Grille: Taiwanese iron window-grille (鐵窗花) coin pattern, a CSS mask that takes any token color */
+.il-grille { width: 100%;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Cg fill='none' stroke='%23000' stroke-width='1.5'%3E%3Ccircle cx='0' cy='0' r='17'/%3E%3Ccircle cx='24' cy='0' r='17'/%3E%3Ccircle cx='0' cy='24' r='17'/%3E%3Ccircle cx='24' cy='24' r='17'/%3E%3C/g%3E%3C/svg%3E") 0 0 / 24px 24px repeat;
+          mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24'%3E%3Cg fill='none' stroke='%23000' stroke-width='1.5'%3E%3Ccircle cx='0' cy='0' r='17'/%3E%3Ccircle cx='24' cy='0' r='17'/%3E%3Ccircle cx='0' cy='24' r='17'/%3E%3Ccircle cx='24' cy='24' r='17'/%3E%3C/g%3E%3C/svg%3E") 0 0 / 24px 24px repeat; }
+.il-grille-tile { background: var(--tile); } .il-grille-indigo { background: var(--indigo); } .il-grille-hairline { background: var(--hairline); }
+
+.il-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* Matchup: verdict first, then each criterion leans toward a side. The lean bar grows from the center. */
+.il-mu { display: grid; gap: var(--space-4); container-type: inline-size; }
+.il-mu-verdict { margin: 0; font-size: 20px; line-height: 28px; font-weight: 600; max-width: 40ch; }
+.il-mu-grid { display: grid; }
+.il-mu-row { display: grid; grid-template-columns: 1fr minmax(120px, 160px) 1fr; gap: var(--space-4); align-items: center; padding: var(--space-2) 0; border-top: 1px solid var(--hairline); }
+.il-mu-head { border-top: 0; font-weight: 600; padding-top: 0; }
+.il-mu-a { text-align: right; } .il-mu-b { text-align: left; }
+.il-mu-win { color: var(--ink); font-weight: 600; } .il-mu-lose { color: var(--ink-muted); }
+.il-mu-mid { display: grid; gap: 4px; justify-items: center; text-align: center; }
+.il-mu-lean { position: relative; width: 100%; height: 4px; background: var(--surface-raised); box-shadow: inset 0 0 0 1px var(--hairline); }
+.il-mu-lean::after { content: ""; position: absolute; left: 50%; top: -3px; bottom: -3px; width: 1px; background: var(--ink-muted); }
+.il-mu-fill { position: absolute; top: 0; bottom: 0; background: var(--indigo);
+  left: calc(50% + min(0, var(--lean)) * 25%); width: calc(max(var(--lean), -1 * var(--lean)) * 25%); }
+@container (max-width: 420px) { .il-mu-row { grid-template-columns: 1fr 96px 1fr; gap: var(--space-2); font-size: 14px; } }
+
+/* Attributes: the Football Manager 1-20 read. Fill to current, outline to potential, band by lightness. */
+.il-attrs { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-6); }
+.il-attrs-name { margin: 0 0 var(--space-2); font-size: 14px; line-height: 20px; font-weight: 600; }
+.il-attrs-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.il-attr { display: grid; grid-template-columns: 1fr 24px 64px; gap: var(--space-2); align-items: center; font-size: 14px; line-height: 20px; }
+.il-attr-val { font-weight: 600; text-align: right; }
+.il-attr-track { position: relative; height: 6px; background: var(--surface-raised); }
+.il-attr-pot { position: absolute; inset: 0 auto 0 0; box-shadow: inset 0 0 0 1px var(--ink-muted); }
+.il-attr-fill { position: absolute; inset: 0 auto 0 0; }
+.il-attr-s { background: var(--tier-s); } .il-attr-a { background: var(--tier-a); } .il-attr-b { background: var(--tier-b); } .il-attr-c { background: var(--tier-c); }
+
+/* Claim: how a statement is known, shown in the underline. Solid = checked, dashed = inferred, dotted = not verified. */
+.il-claim { text-decoration-line: underline; text-decoration-thickness: 1.5px; text-underline-offset: 4px; text-decoration-color: var(--ink-muted); cursor: help; }
+.il-claim-checked { text-decoration-style: solid; text-decoration-color: var(--kelp); }
+.il-claim-inferred { text-decoration-style: dashed; }
+.il-claim-unverified { text-decoration-style: dotted; text-decoration-color: var(--amber); }
+
+/* SpecList: a spec sheet with ledger leaders, like the back page of a manual */
+.il-spec { margin: 0; display: grid; gap: 2px; max-width: 520px; }
+.il-spec-row { display: flex; align-items: baseline; gap: var(--space-2); padding: 3px 0; font-size: 15px; line-height: 22px; }
+.il-spec-row dt { color: var(--ink-muted); flex: none; }
+.il-spec-leader { flex: 1; min-width: 16px; border-bottom: 1px dotted var(--hairline); transform: translateY(-4px); }
+.il-spec-row dd { margin: 0; text-align: right; font-weight: 500; }
+.il-spec-note { display: block; font-size: 13px; line-height: 18px; font-weight: 400; color: var(--ink-muted); }
+
+/* Receipt: modeled on Taiwan's uniform invoice (統一發票): narrow paper, track number, dashed tear lines, one bold total */
+.il-receipt { margin: 0; width: min(100%, 300px); }
+.il-receipt-paper { background: var(--surface-raised); padding: var(--space-4) var(--space-4) var(--space-6);
+  -webkit-mask: linear-gradient(#000 0 0) top / 100% calc(100% - 6px) no-repeat, radial-gradient(circle at 6px 6px, transparent 0 4px, #000 4.5px) bottom / 12px 6px repeat-x;
+          mask: linear-gradient(#000 0 0) top / 100% calc(100% - 6px) no-repeat, radial-gradient(circle at 6px 6px, transparent 0 4px, #000 4.5px) bottom / 12px 6px repeat-x; }
+.il-receipt-head { text-align: center; display: grid; gap: 2px; padding-bottom: var(--space-3); border-bottom: 1px dashed var(--ink-muted); }
+.il-receipt-title { font-weight: 600; }
+.il-receipt-no { font-family: var(--font-condensed); font-size: 22px; line-height: 28px; font-weight: 700; letter-spacing: .04em; }
+.il-receipt-date { font-size: 13px; line-height: 18px; color: var(--ink-muted); }
+.il-receipt-lines { margin: 0; padding: var(--space-3) 0; display: grid; gap: 4px; }
+.il-receipt-line { display: flex; justify-content: space-between; gap: var(--space-3); font-size: 15px; line-height: 22px; }
+.il-receipt-line dd { margin: 0; }
+.il-receipt-minus dd { color: var(--kelp); }
+.il-receipt-total { display: flex; justify-content: space-between; padding-top: var(--space-3); border-top: 1px dashed var(--ink-muted); font-size: 20px; line-height: 28px; font-weight: 600; }
+.il-receipt-note { margin: var(--space-3) 0 0; font-size: 13px; line-height: 18px; color: var(--ink-muted); }
+
+/* Kbd: a keycap in text, same build as the Button */
+.il-kbds { display: inline-flex; align-items: baseline; gap: 3px; }
+.il-kbd { display: inline-block; min-width: 1.6em; padding: 0 6px; border: 1px solid var(--hairline); border-bottom-width: 2px; border-radius: 4px;
+  background: var(--surface-raised); font: 500 13px/20px var(--font-sans); text-align: center; color: var(--ink); }
+.il-kbd-plus { font-size: 12px; color: var(--ink-muted); }
+
+/* TitleCard: the one loud moment per page. After 90s anime title cards: black card, heavy serif, stacked lines at
+   different sizes, squeezed horizontally the way those cards were. */
+.il-tcard { background: var(--titlecard); color: var(--titlecard-ink); padding: var(--space-10) var(--space-6); overflow: hidden; }
+.il-tcard-stack { display: grid; gap: 2px; font-family: var(--font-serif-tc); font-weight: 900; transform: scaleX(.82); transform-origin: left center; }
+.il-tcard-line { line-height: 1.02; letter-spacing: -.01em; white-space: nowrap; }
+.il-tcard-s + .il-tcard-xl, .il-tcard-s + .il-tcard-l { margin-top: 4px; }
+.il-tcard-xl + .il-tcard-s, .il-tcard-l + .il-tcard-s, .il-tcard-m + .il-tcard-s { margin-top: 14px; }
+.il-tcard-xl { font-size: clamp(56px, 12vw, 120px); }
+.il-tcard-l { font-size: clamp(40px, 8vw, 84px); }
+.il-tcard-m { font-size: clamp(24px, 4.5vw, 44px); }
+.il-tcard-s { font-size: clamp(15px, 2vw, 20px); font-weight: 700; letter-spacing: .02em; }
+.il-tcard-right { justify-self: end; }
+
+/* Still: a wide frame with stacked bilingual subtitles, the way Taiwanese films print them */
+.il-still { margin: 0; display: grid; gap: var(--space-2); }
+.il-still-frame { position: relative; aspect-ratio: var(--ratio, 2.39); background: var(--titlecard); overflow: hidden; }
+.il-still-frame img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.il-still-empty { display: grid; place-items: center; height: 100%; color: var(--titlecard-ink); opacity: var(--opacity-placeholder); font-size: 13px; }
+.il-still-sub { position: absolute; left: 0; right: 0; bottom: 6%; display: grid; justify-items: center; gap: 2px; padding: 0 var(--space-4); text-align: center;
+  color: var(--subtitle); text-shadow: 0 0 2px #000, 0 0 2px #000, 0 1px 3px #000; }
+.il-still-tc { font-family: var(--font-sans); font-size: clamp(15px, 2.2vw, 22px); line-height: 1.35; font-weight: 500; letter-spacing: .04em; }
+.il-still-en { font-size: clamp(13px, 1.8vw, 18px); line-height: 1.35; }
+.il-still-credit { font-size: 13px; line-height: 18px; color: var(--ink-muted); }
+
+/* Catalog: the menswear-magazine essentials spread. Dense, numbered, maker over item, price, one line of why. */
+.il-cat { display: grid; gap: var(--space-3); }
+.il-cat-title { margin: 0; font-size: 20px; line-height: 28px; font-weight: 600; }
+.il-cat-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: var(--space-4) var(--space-6); }
+.il-cat-item { display: grid; grid-template-columns: 22px 1fr; gap: var(--space-2); align-items: start; }
+.il-cat-no { display: grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: var(--ink); color: var(--surface); font-size: 11px; font-weight: 600; margin-top: 1px; }
+.il-cat-maker { font-size: 13px; line-height: 18px; color: var(--ink-muted); }
+.il-cat-name { font-size: 15px; line-height: 21px; font-weight: 600; }
+.il-cat-price { margin-left: var(--space-2); font-weight: 400; color: var(--ink-muted); white-space: nowrap; }
+.il-cat-note { margin: 2px 0 0; font-size: 13px; line-height: 18px; }
+
+/* Exits: San Diego freeway guide signs as section navigation. Green panel, white rule, exit tab. */
+.il-exits { display: flex; flex-wrap: wrap; gap: var(--space-4); align-items: flex-end; }
+.il-exit { display: inline-grid; justify-items: end; text-decoration: none; color: var(--freeway-ink); }
+.il-exit-tab { background: var(--freeway); border: 2px solid var(--freeway-ink); border-bottom: 0; border-radius: 4px 4px 0 0; padding: 1px 8px 0;
+  font-family: var(--font-condensed); font-size: 12px; line-height: 16px; font-weight: 700; margin-right: 10px; position: relative; top: 2px; }
+.il-exit-panel { display: inline-flex; align-items: center; gap: var(--space-3); background: var(--freeway); padding: 6px 12px; border-radius: 6px;
+  box-shadow: inset 0 0 0 2px var(--freeway), inset 0 0 0 4px var(--freeway-ink); font-family: var(--font-condensed); font-size: 20px; line-height: 26px; font-weight: 600; }
+.il-exit-tc { font-size: 16px; font-family: var(--font-serif-tc); }
+.il-exit-arrow { font-size: 18px; transition: transform var(--duration-press) ease-out; }
+.il-exit:hover .il-exit-arrow { transform: translate(2px, -2px); }
+.il-exit:focus-visible { outline: 2px solid var(--indigo); outline-offset: 3px; border-radius: 6px; }
+
+/* Base elements */
+a { color: var(--indigo); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+a:hover { text-decoration-thickness: 2px; }
+::selection { background: var(--indigo-soft); color: var(--indigo-ink); }
+:focus-visible { outline: 2px solid var(--indigo); outline-offset: 2px; }
+hr { border: 0; border-top: 1px solid var(--hairline); margin: var(--space-6) 0; }
+code { font-family: var(--font-mono); font-size: .9em; background: var(--surface-raised); padding: 1px 4px; border-radius: var(--radius-sm); }
+[lang|="zh"] { letter-spacing: 0; }
+
+/* TextField and Select */
+.il-field { display: grid; gap: 6px; max-width: 360px; }
+.il-field-label { font-size: 14px; line-height: 20px; font-weight: 500; }
+.il-input-wrap { display: flex; align-items: center; height: 40px; border: 1px solid var(--hairline); border-radius: var(--radius-md); background: var(--surface-raised); }
+.il-input-wrap:focus-within { outline: 2px solid var(--indigo); outline-offset: 1px; border-color: var(--indigo); }
+.il-input { flex: 1; min-width: 0; height: 100%; border: 0; background: transparent; color: var(--ink); font: inherit; font-size: 16px; padding: 0 var(--space-3); outline: none; }
+.il-input::placeholder { color: var(--ink-muted); }
+.il-input-affix { padding: 0 var(--space-3); color: var(--ink-muted); }
+.il-input-affix:first-child { padding-right: 0; } .il-input-affix:last-child { padding-left: 0; }
+.il-field-hint, .il-field-msg { margin: 0; font-size: 13px; line-height: 18px; color: var(--ink-muted); }
+.il-field-error .il-input-wrap { border-color: var(--shu); }
+.il-field-error .il-field-msg { color: var(--shu); }
+.il-input:disabled, .il-select:disabled { opacity: var(--opacity-disabled); cursor: not-allowed; }
+.il-select-wrap { position: relative; }
+.il-select { appearance: none; padding-right: 36px; cursor: pointer; }
+.il-select option { background: var(--surface-raised); color: var(--ink); }
+.il-select-wrap::after { content: ""; position: absolute; right: 14px; top: 50%; width: 7px; height: 7px; margin-top: -6px; border-right: 1.5px solid var(--ink-muted); border-bottom: 1.5px solid var(--ink-muted); transform: rotate(45deg); pointer-events: none; }
+
+/* Checkbox: a square box, ticked like a ledger */
+.il-check { display: inline-flex; gap: var(--space-2); align-items: flex-start; cursor: pointer; font-size: 15px; line-height: 22px; }
+.il-check-box { appearance: none; flex: none; width: 18px; height: 18px; margin: 2px 0 0; border: 1.5px solid var(--ink-muted); border-radius: var(--radius-sm); background: var(--surface-raised); display: grid; place-content: center; cursor: pointer; }
+.il-check-box::after { content: ""; width: 5px; height: 9px; border-right: 2px solid var(--on-indigo); border-bottom: 2px solid var(--on-indigo); transform: rotate(45deg) translate(-1px, -1px); opacity: 0; }
+.il-check-box:checked { background: var(--indigo); border-color: var(--indigo); }
+.il-check-box:checked::after { opacity: 1; }
+.il-check-box:disabled { opacity: var(--opacity-disabled); cursor: not-allowed; }
+.il-check-text { display: grid; }
+.il-check-hint { font-size: 13px; line-height: 18px; color: var(--ink-muted); }
+.il-check-box:checked + .il-check-text > :first-child { }
+
+/* Switch: a square rocker, not a pill */
+.il-switch { display: inline-flex; align-items: center; gap: var(--space-2); background: none; border: 0; padding: 0; color: var(--ink); font: inherit; font-size: 15px; cursor: pointer; }
+.il-switch-track { position: relative; width: 40px; height: 22px; border-radius: var(--radius-sm); background: var(--surface-raised); box-shadow: inset 0 0 0 1.5px var(--ink-muted); transition: background-color var(--duration-press) ease-out; }
+.il-switch-thumb { position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 1px; background: var(--ink-muted); transition: transform var(--duration-press) var(--ease-press); }
+.il-switch[aria-checked="true"] .il-switch-track { background: var(--indigo); box-shadow: inset 0 0 0 1.5px var(--indigo); }
+.il-switch[aria-checked="true"] .il-switch-thumb { transform: translateX(18px); background: var(--on-indigo); }
+.il-switch:disabled { opacity: var(--opacity-disabled); cursor: not-allowed; }
+
+/* Dial: a segmented control with detent ticks, after a camera's shutter dial */
+.il-dial { display: inline-grid; gap: 6px; }
+.il-dial-row { display: inline-flex; border: 1px solid var(--hairline); border-radius: var(--radius-md); background: var(--surface-raised); padding: 2px; gap: 2px; }
+.il-dial-opt { position: relative; font: inherit; font-size: 14px; font-weight: 500; line-height: 20px; padding: 9px 12px 7px; border: 0; border-radius: 4px; background: transparent; color: var(--ink-muted); cursor: pointer; }
+.il-dial-tick { position: absolute; top: 2px; left: 50%; width: 1px; height: 4px; background: currentColor; opacity: .5; }
+.il-dial-opt:hover { color: var(--ink); }
+.il-dial-on { background: var(--indigo); color: var(--on-indigo); }
+.il-dial-on:hover { color: var(--on-indigo); }
+
+/* LedgerTable: numbers right-aligned, one rule above the total and a double rule under it */
+.il-ledger-wrap { overflow-x: auto; }
+.il-ledger { border-collapse: collapse; width: 100%; font-size: 15px; line-height: 22px; }
+.il-ledger caption { text-align: left; font-size: 13px; line-height: 18px; color: var(--ink-muted); padding-bottom: var(--space-2); }
+.il-ledger th, .il-ledger td { padding: 6px var(--space-3); text-align: left; border-bottom: 1px solid var(--hairline); vertical-align: baseline; }
+.il-ledger thead th { font-size: 13px; font-weight: 500; color: var(--ink-muted); border-bottom-color: var(--ink-muted); }
+.il-ledger tbody th { font-weight: 400; }
+.il-ledger .il-num { text-align: right; white-space: nowrap; }
+.il-ledger tfoot th, .il-ledger tfoot td { font-weight: 600; border-top: 1px solid var(--ink); border-bottom: 3px double var(--ink); }
+.il-ledger tbody tr:hover { background: var(--surface-raised); }
+
+/* Notice: a full tinted band, title in the tone's ink. No side stripe, no icon. */
+.il-notice { padding: var(--space-3) var(--space-4); border-radius: var(--radius-sm); background: var(--indigo-soft); color: var(--ink); max-width: 68ch; }
+.il-notice-title { margin: 0; font-weight: 600; color: var(--indigo-ink); }
+.il-notice-body { font-size: 15px; line-height: 22px; }
+.il-notice-body > * { margin: 4px 0 0; }
+.il-notice-go { background: var(--kelp-soft); } .il-notice-go .il-notice-title { color: var(--kelp-ink); }
+.il-notice-caution { background: var(--amber-soft); } .il-notice-caution .il-notice-title { color: var(--amber-ink); }
+.il-notice-stop { background: var(--shu-soft); } .il-notice-stop .il-notice-title { color: var(--shu-ink); }
+
+/* SiteHeader and SiteFooter */
+.il-header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-4); padding: var(--space-4) 0; }
+.il-header-home { display: inline-flex; align-items: center; gap: var(--space-3); color: var(--ink); text-decoration: none; view-transition-name: il-seal; }
+.il-header-name { font-weight: 600; font-size: 17px; }
+.il-header-nav { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4); }
+.il-footer { display: flex; gap: var(--space-3); align-items: flex-start; padding: var(--space-6) 0; border-top: 1px solid var(--hairline); font-size: 13px; line-height: 18px; color: var(--ink-muted); }
+.il-footer-text p { margin: 0; }
+
+/* Steps: a phased plan you can tick off */
+.il-steps { display: grid; gap: var(--space-3); max-width: 560px; }
+.il-steps-count { margin: 0; font-size: 13px; color: var(--ink-muted); }
+.il-steps-list { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--space-4); }
+.il-phase-title { margin: 0 0 var(--space-2); font-size: 16px; line-height: 22px; font-weight: 600; display: flex; gap: var(--space-2); align-items: baseline; }
+.il-phase-no { font-family: var(--font-condensed); font-weight: 600; color: var(--indigo); }
+.il-phase-items { list-style: none; margin: 0; padding: 0 0 0 2px; display: grid; gap: 6px; }
+
+/* CodeBlock */
+.il-code { margin: 0; background: var(--surface-raised); border-radius: var(--radius-sm); overflow: hidden; max-width: 680px; }
+.il-code-head { display: flex; justify-content: space-between; align-items: center; padding: 6px var(--space-3); font-size: 13px; color: var(--ink-muted); border-bottom: 1px solid var(--hairline); }
+.il-code-copy { font: inherit; font-size: 13px; background: none; border: 0; color: var(--indigo); cursor: pointer; padding: 2px 4px; }
+.il-code pre { margin: 0; padding: var(--space-3); overflow-x: auto; font-family: var(--font-mono); font-size: 14px; line-height: 20px; }
+.il-code pre code { background: none; padding: 0; font-size: inherit; }
+
+/* Page layout: one content column, uneven section gaps, prose at a readable measure */
+.il-page { max-width: var(--page-max); margin: 0 auto; padding: 0 var(--space-4); }
+.il-section { margin-top: var(--space-10); }
+.il-section-major { margin-top: var(--space-16); }
+.il-prose { max-width: var(--measure); }
+.il-prose p { margin: 0 0 var(--space-4); }
+.il-prose h2 { font-size: 20px; line-height: 28px; font-weight: 600; margin: var(--space-10) 0 var(--space-3); }
+.il-meta { font-size: 14px; line-height: 20px; color: var(--ink-muted); margin: var(--space-2) 0 0; }
+.il-h1 { margin: 0; font-size: 48px; line-height: 52px; font-weight: 600; letter-spacing: -.02em; }
+.il-h2 { margin: 0 0 var(--space-4); font-size: 20px; line-height: 28px; font-weight: 600; }
+.il-list { list-style: none; margin: 0; padding: 0; display: grid; max-width: var(--measure); }
+.il-list li { display: flex; justify-content: space-between; gap: var(--space-4); padding: 10px 0; border-bottom: 1px solid var(--hairline); }
+.il-list li > span:last-child { color: var(--ink-muted); white-space: nowrap; }
+.il-split { display: grid; gap: var(--space-10); grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); align-items: start; }
+@media (max-width: 600px) { .il-h1 { font-size: 36px; line-height: 40px; } }
+
+/* Calm and predictable.
+   data-motion="reduce" (or the OS setting, or the calm theme) stops every animation and transition.
+   The calm theme also squares up stamps, drops decorative texture, and simplifies dense layouts.
+   data-text="large" / "larger" scales the whole page for reading. */
+[data-motion="reduce"] *, [data-motion="reduce"] *::before, [data-motion="reduce"] *::after,
+[data-theme="calm"] *, [data-theme="calm"] *::before, [data-theme="calm"] *::after {
+  animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+@media (prefers-reduced-motion: reduce) { ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; } }
+[data-motion="reduce"]::view-transition-old(root), [data-motion="reduce"]::view-transition-new(root),
+[data-theme="calm"]::view-transition-old(root), [data-theme="calm"]::view-transition-new(root) { animation: none !important; }
+[data-theme="calm"] .il-stamp { --tilt: 0deg !important; transform: none; }
+[data-theme="calm"] .il-grille { display: none; }
+[data-theme="calm"] .il-exit:hover .il-exit-arrow { transform: none; }
+[data-theme="calm"] .il-cat-list { grid-template-columns: 1fr; max-width: var(--measure); }
+[data-theme="calm"] .il-tcard-stack { transform: none; }
+[data-theme="calm"] .il-tcard-xl { font-size: clamp(40px, 7vw, 72px); }
+[data-theme="calm"] .il-tcard-l { font-size: clamp(32px, 5vw, 56px); }
+[data-text="large"] body { zoom: 1.15; }
+[data-text="larger"] body { zoom: 1.3; }
+
+/* ReadingSettings: every option visible at once, no dropdowns, same place on every page */
+.il-settings { display: grid; gap: var(--space-4); padding: var(--space-4); background: var(--surface-raised); border-radius: var(--radius-sm); max-width: 520px; }
+.il-settings-title { margin: 0; font-size: 16px; line-height: 22px; font-weight: 600; }
+.il-settings-note { margin: 0; font-size: 13px; line-height: 18px; color: var(--ink-muted); }
+.il-settings-row { display: flex; flex-wrap: wrap; gap: var(--space-6); align-items: flex-end; }
+
+/* Footer links: plain, always in the same order */
+.il-footer-links { display: flex; flex-wrap: wrap; gap: var(--space-4); margin-top: var(--space-2); }

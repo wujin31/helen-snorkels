@@ -74,8 +74,11 @@ export function tideChart(day: DayConditions, window: TimeWindow | null, now: Da
     // Highs label above the dot; lows below unless that would hit the hour ticks.
     const above = turn.kind === "high" || y + 16 > h - bottom - 2;
     parts.push(`<circle class="tide-dot" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="4" />`);
+    // Labels near either edge anchor inward so they aren't cut off.
+    const anchor = x > w - right - 55 ? "end" : x < left + 55 ? "start" : "middle";
+    const lx = anchor === "end" ? w - right : anchor === "start" ? left : x;
     parts.push(
-      `<text class="tide-label" x="${x.toFixed(1)}" y="${(above ? y - 9 : y + 16).toFixed(1)}" text-anchor="middle">` +
+      `<text class="tide-label" x="${lx.toFixed(1)}" y="${(above ? y - 9 : y + 16).toFixed(1)}" text-anchor="${anchor}">` +
         `${turn.kind === "high" ? "High" : "Low"} ${esc(ft(turn.ft))} ft · ${esc(clock(turn.time))}</text>`,
     );
   }
