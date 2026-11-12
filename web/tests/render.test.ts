@@ -13,7 +13,8 @@ function clone(): StatusDoc {
 describe("renderPage", () => {
   it("leads with the best bet's verdict and window, then the details", () => {
     const html = renderPage(sample, null);
-    expect(html).toContain('<span class="verdict-word">Maybe</span> <span class="verdict-where">Marine Room</span>');
+    // The verdict is an Indigo Ledger StatusStamp: the word, in the caution tone.
+    expect(html).toMatch(/<span class="il-stamp il-stamp-caution verdict-word stamp-lg"[^>]*>Maybe<\/span> <span class="verdict-where">Marine Room<\/span>/);
     expect(html).toContain('<p class="verdict-when">7:00–8:30 am</p>');
     expect(html.indexOf('id="verdict"')).toBeLessThan(html.indexOf('id="details"'));
     expect(html).toContain("Other spots");
@@ -62,6 +63,21 @@ describe("renderPage", () => {
     expect(html).not.toContain("Other spots");
   });
 
+  it("stamps verdicts with go, caution and stop tones", () => {
+    const doc = clone();
+    doc.spots[0].verdict = "yes";
+    const html = renderPage(doc, null);
+    expect(html).toMatch(/il-stamp il-stamp-go[^>]*>Yes</);
+    expect(html).toMatch(/il-stamp-stop[^>]*>No</);
+  });
+
+  it("shows visibility as a range, and offers reading settings without form fields", () => {
+    const html = renderPage(sample, null);
+    expect(html).toContain('<div class="il-range vis">');
+    expect(html).toContain('data-setting="theme"');
+    expect(html).toContain('role="switch"');
+  });
+
   it("never calls conditions safe", () => {
     expect(renderPage(sample, new Date(sample.generated_at)).toLowerCase()).not.toMatch(/\bsafe\b/);
   });
@@ -103,7 +119,7 @@ describe("water panel", () => {
   it("shows the NWS surf forecast when there is one", () => {
     const doc = clone();
     doc.day.surf_forecast = "Surf 2–4 ft · moderate rip current risk";
-    expect(renderPage(doc, null)).toContain("<dt>NWS surf</dt><dd>Surf 2–4 ft · moderate rip current risk</dd>");
+    expect(renderPage(doc, null)).toMatch(/<dt>NWS surf<\/dt><span class="il-spec-leader"[^>]*><\/span><dd>Surf 2–4 ft · moderate rip current risk<\/dd>/);
     delete doc.day.surf_forecast;
     expect(renderPage(doc, null)).not.toContain("NWS surf");
   });

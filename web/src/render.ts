@@ -5,11 +5,12 @@
 import { directionDial } from "./arrows";
 import { STALE_AFTER_MIN } from "./config";
 import { ago, clock, compass, dayName, esc, ft, range } from "./format";
-import { VERDICT_WORD, verdictIcon } from "./icons";
+import { stamp } from "./icons";
 import { tideChart } from "./tide";
 import type { Factor, SpotStatus, StatusDoc } from "./types";
 
 const CONFIDENCE_TEXT = { high: "High confidence", medium: "Medium confidence", low: "Low confidence" };
+const VIS_SCALE_FT = 40; // the visibility estimate's ceiling (config max_ft)
 const EFFECT_WORD = { "+": "helps", "-": "hurts", "~": "neutral" };
 
 export function hero(doc: StatusDoc): SpotStatus | null {
@@ -26,14 +27,21 @@ function short(name: string): string {
   return name.split(" / ")[0];
 }
 
-function confidenceDots(level: SpotStatus["confidence"]): string {
-  const n = { low: 1, medium: 2, high: 3 }[level];
-  const dots = [1, 2, 3].map((i) => `<span class="dot${i <= n ? " on" : ""}"></span>`).join("");
-  return `<span class="conf" title="${CONFIDENCE_TEXT[level]}"><span class="dots" aria-hidden="true">${dots}</span>${CONFIDENCE_TEXT[level]}</span>`;
+/** Indigo Ledger RangeBar: the visibility estimate as its interval, never one number. */
+function visRange(spot: SpotStatus): string {
+  const confidence = CONFIDENCE_TEXT[spot.confidence];
+  if (!spot.vis_ft) return `<p class="il-label conf">${confidence}</p>`;
+  const [lo, hi] = spot.vis_ft;
+  const pct = (v: number) => `${Math.max(0, Math.min(100, (v / VIS_SCALE_FT) * 100)).toFixed(1)}%`;
+  return `<div class="il-range vis">
+      <div class="il-range-head"><span class="il-label">Visibility estimate</span><span class="il-range-val">${lo}–${hi} ft</span></div>
+      <div class="il-range-track" role="img" aria-label="Visibility estimate: ${lo} to ${hi} ft"><span class="il-range-band" style="left:${pct(lo)};right:calc(100% - ${pct(hi)})"></span></div>
+      <div class="il-range-foot"><span>0 ft</span><span class="conf">${confidence}</span><span>${VIS_SCALE_FT} ft</span></div>
+    </div>`;
 }
 
 function withoutVis(reason: string): string {
-  // The vis range has its own chip; don't repeat it at the start of the reason.
+  // The vis range has its own bar; don't repeat it at the start of the reason.
   return reason.replace(/^~\d+–\d+ ft vis(, |$)/, "");
 }
 
@@ -66,35 +74,30 @@ function why(spot: SpotStatus): string {
 /** The answer, first: verdict, where, when, and why in a line. */
 function verdictBar(doc: StatusDoc, featured: SpotStatus | null, now: Date | null): string {
   const dead = doc.sources.filter((s) => !s.ok).length;
-  const age = now ? ` <span class="verdict-age">Updated ${esc(ago(doc.generated_at, now))}</span>` : "";
+  const age = now ? `<span class="verdict-age">Updated ${esc(ago(doc.generated_at, now))}</span>` : "";
   const badge = dead
     ? ` <a class="verdict-dead" href="#foot" role="alert">${dead} source${dead > 1 ? "s" : ""} down</a>`
     : "";
-  const meta = `<p class="verdict-meta">${age}${badge}</p>`;
+  const meta = age || badge ? `<p class="verdict-meta il-label">${age}${badge}</p>` : "";
   if (!featured) {
     const verdict = doc.spots.some((s) => s.verdict === "no") ? "no" : "unknown";
     const title = verdict === "no" ? "Not today" : "Can't tell right now";
     return `
   <section class="verdict v-${verdict}" id="verdict" aria-labelledby="hero-title">
-    ${verdictIcon(verdict, 40)}
-    <div class="verdict-text">
-      <h1 id="hero-title" class="verdict-word">${title}</h1>
-      <p class="verdict-reason">${esc(doc.summary)}</p>
-      ${meta}
-    </div>
+    <p class="verdict-stamp">${stamp(verdict === "no" ? "no" : "unknown", "stamp-lg")}</p>
+    <h1 id="hero-title" class="verdict-word">${title}</h1>
+    <p class="verdict-reason">${esc(doc.summary)}</p>
+    ${meta}
   </section>`;
   }
   const when = windowText(featured);
   const reason = withoutVis(featured.reason);
   return `
   <section class="verdict v-${featured.verdict}" id="verdict" aria-labelledby="hero-title">
-    ${verdictIcon(featured.verdict, 40)}
-    <div class="verdict-text">
-      <h1 id="hero-title"><span class="verdict-word">${VERDICT_WORD[featured.verdict]}</span> <span class="verdict-where">${esc(short(featured.name))}</span></h1>
-      ${when ? `<p class="verdict-when">${esc(when)}</p>` : ""}
-      ${reason ? `<p class="verdict-reason">${esc(reason)}</p>` : ""}
-      ${meta}
-    </div>
+    <h1 id="hero-title">${stamp(featured.verdict, "verdict-word stamp-lg")} <span class="verdict-where">${esc(short(featured.name))}</span></h1>
+    ${when ? `<p class="verdict-when">${esc(when)}</p>` : ""}
+    ${reason ? `<p class="verdict-reason">${esc(reason)}</p>` : ""}
+    ${meta}
   </section>`;
 }
 
@@ -104,7 +107,7 @@ function factorList(factors: Factor[]): string {
     .map(
       (f) =>
         `<li class="f f-${f.effect === "+" ? "plus" : f.effect === "-" ? "minus" : "neutral"}">` +
-        `<span class="f-mark" aria-label="${EFFECT_WORD[f.effect]}">${f.effect === "-" ? "−" : f.effect}</span>` +
+        `<span class="f-mark" aria-label="${EFFECT_WORD[f.effect]}" title="${EFFECT_WORD[f.effect]}">${f.effect === "-" ? "−" : f.effect}</span>` +
         `<span class="f-label">${esc(f.label)}</span> <span class="f-detail">${esc(f.detail)}</span></li>`,
     )
     .join("")}</ul>`;
@@ -112,15 +115,14 @@ function factorList(factors: Factor[]): string {
 
 /** The best bet's full card, right under the answer. */
 function featuredCard(spot: SpotStatus): string {
-  const meta = `<div class="spot-meta">${spot.vis_ft ? `<span class="chip">~${spot.vis_ft[0]}–${spot.vis_ft[1]} ft vis</span>` : ""}${confidenceDots(spot.confidence)}</div>`;
   return `
-  <article class="spot featured v-${spot.verdict}" id="spot-${esc(spot.id)}">
+  <article class="il-card spot featured v-${spot.verdict}" id="spot-${esc(spot.id)}">
     <header class="spot-head">
-      <h2>${esc(spot.name)}</h2>
-      <span class="verdict-chip">${verdictIcon(spot.verdict, 20)}${VERDICT_WORD[spot.verdict]}</span>
+      <h2 class="il-card-title">${esc(spot.name)}</h2>
+      ${stamp(spot.verdict)}
     </header>
     <p class="spot-reason">${esc(withoutVis(spot.reason) || spot.reason)}</p>
-    ${meta}
+    ${visRange(spot)}
     ${readings(spot)}
     ${why(spot)}
   </article>`;
@@ -140,9 +142,8 @@ function spotRow(spot: SpotStatus): string {
   return `
   <details class="row v-${spot.verdict}" id="spot-${esc(spot.id)}">
     <summary>
-      ${verdictIcon(spot.verdict, 22)}
       <span class="row-main"><span class="row-name">${esc(spot.name)}${tag}</span><span class="row-sub">${esc(sub)}</span>${win}</span>
-      <span class="row-verdict">${VERDICT_WORD[spot.verdict]}</span>
+      <span class="row-verdict">${stamp(spot.verdict)}</span>
     </summary>
     <div class="row-body">
       ${go ? `<p class="spot-reason">${esc(withoutVis(spot.reason) || spot.reason)}</p>` : ""}
@@ -161,7 +162,7 @@ function spotList(spots: SpotStatus[], featured: boolean): string {
     .filter((g) => g.spots.length);
   return `
   <section class="spot-list" aria-labelledby="spots-title">
-    <h2 class="section-title" id="spots-title">${featured ? "Other spots" : "Spots"}</h2>
+    <h2 class="il-h2 section-title" id="spots-title">${featured ? "Other spots" : "Spots"}</h2>
     ${groups
       .map((g) => `<h3 class="area">${esc(g.area)}</h3><div class="rows">${g.spots.map(spotRow).join("")}</div>`)
       .join("")}
@@ -172,22 +173,27 @@ function waterSection(doc: StatusDoc): string {
   const d = doc.day;
   const rows: string[] = [];
   if (d.water_temp_f != null) {
-    rows.push(`<div><dt>Water</dt><dd>${Math.round(d.water_temp_f)}°F${d.wetsuit ? ` · ${esc(d.wetsuit)}` : ""}</dd></div>`);
+    rows.push(spec("Water", `${Math.round(d.water_temp_f)}°F`, d.wetsuit ? esc(d.wetsuit) : ""));
   }
   if (d.turbidity_ntu != null) {
-    rows.push(`<div><dt>Pier turbidity</dt><dd>${esc(d.turbidity_ntu.toFixed(1))} NTU</dd></div>`);
+    rows.push(spec("Pier turbidity", `${esc(d.turbidity_ntu.toFixed(1))} NTU`));
   }
   if (d.chlorophyll_ug_l != null) {
-    rows.push(`<div><dt>Chlorophyll</dt><dd>${esc(d.chlorophyll_ug_l.toFixed(1))} µg/L</dd></div>`);
+    rows.push(spec("Chlorophyll", `${esc(d.chlorophyll_ug_l.toFixed(1))} µg/L`));
   }
   if (d.surf_forecast) {
-    rows.push(`<div><dt>NWS surf</dt><dd>${esc(d.surf_forecast)}</dd></div>`);
+    rows.push(spec("NWS surf", esc(d.surf_forecast)));
   }
-  rows.push(`<div><dt>Daylight</dt><dd>${esc(range(d.sunrise, d.sunset))}</dd></div>`);
+  rows.push(spec("Daylight", esc(range(d.sunrise, d.sunset))));
   const alerts = d.alerts.length
-    ? `<p class="alerts" role="note"><strong>NWS:</strong> ${d.alerts.map(esc).join(", ")}</p>`
+    ? `<div class="il-notice il-notice-caution alerts" role="status"><p class="il-notice-title">NWS: ${d.alerts.map(esc).join(", ")}</p></div>`
     : "";
-  return `<section class="panel" aria-labelledby="water-title"><h2 id="water-title">Water</h2><dl class="facts">${rows.join("")}</dl>${alerts}</section>`;
+  return `<section class="panel" aria-labelledby="water-title"><h2 id="water-title" class="panel-title">Water</h2>${alerts}<dl class="il-spec facts">${rows.join("")}</dl></section>`;
+}
+
+/** One SpecList row: label, dotted leader, value, optional note. Values arrive escaped. */
+function spec(label: string, value: string, note = ""): string {
+  return `<div class="il-spec-row"><dt>${label}</dt><span class="il-spec-leader" aria-hidden="true"></span><dd>${value}${note ? `<span class="il-spec-note">${note}</span>` : ""}</dd></div>`;
 }
 
 function tideSection(doc: StatusDoc, now: Date): string {
@@ -201,7 +207,7 @@ function tideSection(doc: StatusDoc, now: Date): string {
   const legend = window
     ? `<p class="fine"><span class="key-window" aria-hidden="true"></span>Best window at ${esc(short(best!.name))}</p>`
     : "";
-  return `<section class="panel" aria-labelledby="tide-title"><h2 id="tide-title">Tide · ${esc(dayName(doc.day.sunrise))} (ft, MLLW)</h2>${tideChart(doc.day, window, now)}${legend}${turns}</section>`;
+  return `<section class="panel" aria-labelledby="tide-title"><h2 id="tide-title" class="panel-title">Tide · ${esc(dayName(doc.day.sunrise))} <span class="il-label">ft, MLLW</span></h2>${tideChart(doc.day, window, now)}${legend}${turns}</section>`;
 }
 
 function freshness(doc: StatusDoc, now: Date | null): string {
@@ -211,13 +217,37 @@ function freshness(doc: StatusDoc, now: Date | null): string {
     ? `<ul class="stale-list">${stale.map((s) => `<li>${esc(s.label)}${s.error ? ` <span class="fine">(${esc(shortError(s.error))})</span>` : ""}</li>`).join("")}</ul>`
     : `<p class="fine">All ${doc.sources.length} sources fresh.</p>`;
   return `
-  <footer class="foot" id="foot">
-    <p>Updated ${esc(clock(doc.generated_at))}${esc(age)}.${doc.cam_url ? ` <a href="${esc(doc.cam_url)}" rel="noopener">Scripps Pier cam ↗</a>` : ""}</p>
-    <details class="sources"><summary>${stale.length ? `${stale.length} source${stale.length > 1 ? "s" : ""} stale or down` : "Data sources"}</summary>${staleList}
-      <p class="fine">NOAA CO-OPS & NWS, CDIP (Scripps), SCCOOS, Open-Meteo, County of San Diego DEHQ. Estimates, not guarantees.</p>
-    </details>
-    <p class="disclaimer">${esc(doc.disclaimer)}</p>
+  ${readingSettings()}
+  <footer class="il-footer foot" id="foot">
+    <div class="il-footer-text">
+      <p>Updated ${esc(clock(doc.generated_at))} Pacific time${esc(age)}.</p>
+      <details class="sources"><summary>${stale.length ? `${stale.length} source${stale.length > 1 ? "s" : ""} stale or down` : "Data sources"}</summary>${staleList}
+        <p class="fine">NOAA CO-OPS & NWS, CDIP (Scripps), SCCOOS, Open-Meteo, County of San Diego DEHQ. Estimates, not guarantees.</p>
+      </details>
+      <p class="disclaimer">${esc(doc.disclaimer)}</p>
+      <nav class="il-footer-links" aria-label="Footer">${doc.cam_url ? `<a href="${esc(doc.cam_url)}" rel="noopener">Scripps Pier cam</a>` : ""}<a href="#top">Back to top</a></nav>
+    </div>
   </footer>`;
+}
+
+const THEMES = [["dark", "Dark"], ["light", "Light"], ["contrast", "High contrast"], ["calm", "Calm"]];
+const SIZES = [["normal", "Default"], ["large", "Large"], ["larger", "Larger"]];
+
+function dial(name: string, label: string, options: string[][]): string {
+  return `<div class="il-dial"><span class="il-label">${label}</span><div class="il-dial-row" role="radiogroup" aria-label="${label}" data-setting="${name}">${options
+    .map(([value, text]) => `<button type="button" role="radio" aria-checked="false" tabindex="-1" class="il-dial-opt" data-value="${value}"><span class="il-dial-tick" aria-hidden="true"></span>${text}</button>`)
+    .join("")}</div></div>`;
+}
+
+/** Indigo Ledger ReadingSettings: colors, text size and motion, every option in view. main.ts wires it up. */
+function readingSettings(): string {
+  return `
+  <section class="il-settings settings" aria-labelledby="settings-title">
+    <h2 class="il-settings-title" id="settings-title">Reading settings</h2>
+    <div class="il-settings-row">${dial("theme", "Colors", THEMES)}${dial("text", "Text size", SIZES)}</div>
+    <button type="button" role="switch" aria-checked="false" class="il-switch" data-setting="motion"><span class="il-switch-track" aria-hidden="true"><span class="il-switch-thumb"></span></span><span class="il-switch-label">Stop all motion</span></button>
+    <p class="il-settings-note">Changes apply right away and are saved in this browser. Calm uses softer colors and also stops motion.</p>
+  </section>`;
 }
 
 function shortError(error: string): string {
@@ -227,7 +257,7 @@ function shortError(error: string): string {
 export function staleBanner(doc: StatusDoc, now: Date): string {
   const minutes = (now.getTime() - Date.parse(doc.generated_at)) / 60000;
   if (minutes < STALE_AFTER_MIN) return "";
-  return `<p class="banner" role="alert">These conditions are from ${esc(clock(doc.generated_at))} (${esc(ago(doc.generated_at, now))}). The updater may be down; treat them as old.</p>`;
+  return `<div class="il-notice il-notice-caution banner" role="alert"><p class="il-notice-title">These conditions are from ${esc(clock(doc.generated_at))} (${esc(ago(doc.generated_at, now))}).</p><div class="il-notice-body"><p>The updater may be down. Treat them as old.</p></div></div>`;
 }
 
 /** The page body. `now` is null at build time (no relative ages baked in). */
@@ -236,9 +266,9 @@ export function renderPage(doc: StatusDoc, now: Date | null): string {
   const others = doc.spots.filter((s) => s !== featured);
   const clockNow = now ?? new Date(doc.generated_at);
   return `
-  <header class="top" id="top">
-    <span class="brand">Snorkel Status <span class="muted">· San Diego</span></span>
-    <span class="updated">Updated ${esc(clock(doc.generated_at))}</span>
+  <header class="il-header top" id="top">
+    <a class="il-header-home" href="#top"><span class="il-header-name brand">Snorkel Status <span class="muted">· San Diego</span></span></a>
+    <span class="updated il-label">Updated ${esc(clock(doc.generated_at))}</span>
   </header>
   <div id="banner">${now ? staleBanner(doc, now) : ""}</div>
   <main>
