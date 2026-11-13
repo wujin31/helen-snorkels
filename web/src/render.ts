@@ -83,21 +83,36 @@ function verdictBar(doc: StatusDoc, featured: SpotStatus | null, now: Date | nul
     const verdict = doc.spots.some((s) => s.verdict === "no") ? "no" : "unknown";
     const title = verdict === "no" ? "Not today" : "Can't tell right now";
     return `
-  <section class="verdict v-${verdict}" id="verdict" aria-labelledby="hero-title">
-    <p class="verdict-stamp">${stamp(verdict === "no" ? "no" : "unknown", "stamp-lg")}</p>
-    <h1 id="hero-title" class="verdict-word">${title}</h1>
-    <p class="verdict-reason">${esc(doc.summary)}</p>
-    ${meta}
-  </section>`;
+  ${heroBand(verdict, `
+      <p class="verdict-stamp">${stamp(verdict === "no" ? "no" : "unknown", "stamp-lg")}</p>
+      <h1 id="hero-title" class="verdict-word">${title}</h1>
+      <p class="verdict-reason">${esc(doc.summary)}</p>
+      ${meta}`)}`;
   }
   const when = windowText(featured);
   const reason = withoutVis(featured.reason);
   return `
-  <section class="verdict v-${featured.verdict}" id="verdict" aria-labelledby="hero-title">
-    <h1 id="hero-title">${stamp(featured.verdict, "verdict-word stamp-lg")} <span class="verdict-where">${esc(short(featured.name))}</span></h1>
-    ${when ? `<p class="verdict-when">${esc(when)}</p>` : ""}
-    ${reason ? `<p class="verdict-reason">${esc(reason)}</p>` : ""}
-    ${meta}
+  ${heroBand(featured.verdict, `
+      <h1 id="hero-title">${stamp(featured.verdict, "verdict-word stamp-lg")} <span class="verdict-where">${esc(short(featured.name))}</span></h1>
+      ${when ? `<p class="verdict-when">${esc(when)}</p>` : ""}
+      ${reason ? `<p class="verdict-reason">${esc(reason)}</p>` : ""}
+      ${meta}`)}`;
+}
+
+/**
+ * Indigo Ledger Band: a full-bleed indigo block, the page's opening. The giant
+ * 水 (water) is a cropped watermark and the vertical 今天 (today) a margin
+ * title; both are decoration, hidden from screen readers, and off in Calm.
+ */
+function heroBand(verdict: string, body: string): string {
+  return `
+  <section class="il-band il-band-indigo il-band-has-v verdict v-${verdict}" id="verdict" aria-labelledby="hero-title">
+    <span class="il-band-hanzi" lang="zh-Hant-TW" aria-hidden="true">水</span>
+    <div class="il-band-inner">
+      <span class="il-band-v" lang="zh-Hant-TW" aria-hidden="true">今天</span>
+      <div class="il-band-body hero-body">${body}
+      </div>
+    </div>
   </section>`;
 }
 
@@ -116,7 +131,7 @@ function factorList(factors: Factor[]): string {
 /** The best bet's full card, right under the answer. */
 function featuredCard(spot: SpotStatus): string {
   return `
-  <article class="il-card spot featured v-${spot.verdict}" id="spot-${esc(spot.id)}">
+  <article class="il-card il-card-paper spot featured v-${spot.verdict}" id="spot-${esc(spot.id)}">
     <header class="spot-head">
       <h2 class="il-card-title">${esc(spot.name)}</h2>
       ${stamp(spot.verdict)}
@@ -162,7 +177,7 @@ function spotList(spots: SpotStatus[], featured: boolean): string {
     .filter((g) => g.spots.length);
   return `
   <section class="spot-list" aria-labelledby="spots-title">
-    <h2 class="il-h2 section-title" id="spots-title">${featured ? "Other spots" : "Spots"}</h2>
+    <h2 class="section-title" id="spots-title">${featured ? "Other spots" : "Spots"}</h2>
     ${groups
       .map((g) => `<h3 class="area">${esc(g.area)}</h3><div class="rows">${g.spots.map(spotRow).join("")}</div>`)
       .join("")}
@@ -188,7 +203,7 @@ function waterSection(doc: StatusDoc): string {
   const alerts = d.alerts.length
     ? `<div class="il-notice il-notice-caution alerts" role="status"><p class="il-notice-title">NWS: ${d.alerts.map(esc).join(", ")}</p></div>`
     : "";
-  return `<section class="panel" aria-labelledby="water-title"><h2 id="water-title" class="panel-title">Water</h2>${alerts}<dl class="il-spec facts">${rows.join("")}</dl></section>`;
+  return `<section class="water" aria-labelledby="water-title"><h2 id="water-title" class="section-title">Water</h2>${alerts}<dl class="il-spec facts">${rows.join("")}</dl></section>`;
 }
 
 /** One SpecList row: label, dotted leader, value, optional note. Values arrive escaped. */
@@ -207,7 +222,14 @@ function tideSection(doc: StatusDoc, now: Date): string {
   const legend = window
     ? `<p class="fine"><span class="key-window" aria-hidden="true"></span>Best window at ${esc(short(best!.name))}</p>`
     : "";
-  return `<section class="panel" aria-labelledby="tide-title"><h2 id="tide-title" class="panel-title">Tide · ${esc(dayName(doc.day.sunrise))} <span class="il-label">ft, MLLW</span></h2>${tideChart(doc.day, window, now)}${legend}${turns}</section>`;
+  return `
+  <section class="il-band il-band-tile tide-band" aria-labelledby="tide-title">
+    <span class="il-band-hanzi" lang="zh-Hant-TW" aria-hidden="true">月</span>
+    <div class="il-band-inner">
+      <h2 id="tide-title" class="band-title">Tide · ${esc(dayName(doc.day.sunrise))} <span class="il-label">ft, MLLW</span></h2>
+      <div class="tide-wrap">${tideChart(doc.day, window, now)}</div>${legend}${turns}
+    </div>
+  </section>`;
 }
 
 function freshness(doc: StatusDoc, now: Date | null): string {

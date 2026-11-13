@@ -17,9 +17,17 @@ const colorFor = (theme) =>
     })
     .join("\n");
 
-const plain = ["spacing", "radius", "shadow", "duration", "easing", "opacity", "container", "aspect"]
-  .flatMap((family) => (t[family]?.tokens ?? []).map((tok) => `  --${tok.name}: ${tok.value};`))
-  .join("\n");
+const FAMILIES = ["spacing", "radius", "shadow", "duration", "easing", "opacity", "container", "aspect"];
+const others = FAMILIES.flatMap((family) => t[family]?.tokens ?? []);
+// Most of these are one value; some (the v11 shadows) differ per theme.
+const valueFor = (tok, theme) =>
+  typeof tok.value === "object" ? tok.value[theme] ?? tok.value[first] : tok.value;
+const plain = others.map((tok) => `  --${tok.name}: ${valueFor(tok, first)};`).join("\n");
+const themed = (theme) =>
+  others
+    .filter((tok) => typeof tok.value === "object")
+    .map((tok) => `  --${tok.name}: ${valueFor(tok, theme)};`)
+    .join("\n");
 
 const fonts = Object.entries(t.type.families)
   .map(([name, stack]) => `  --font-${name}: ${stack};`)
@@ -35,7 +43,7 @@ ${plain}
 }
 ${themes
   .slice(1)
-  .map((id) => `:root[data-theme="${id}"] {\n  color-scheme: ${scheme[id] ?? "dark"};\n${colorFor(id)}\n}`)
+  .map((id) => `:root[data-theme="${id}"] {\n  color-scheme: ${scheme[id] ?? "dark"};\n${colorFor(id)}\n${themed(id)}\n}`)
   .join("\n")}
 `;
 writeFileSync(new URL("tokens.css", here), out);
