@@ -20,7 +20,12 @@
 [hidden] { display: none !important; }
 html { -webkit-text-size-adjust: 100%; }
 body { padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom); overflow-x: clip; }
-#app { max-width: 36rem; margin: 0 auto; padding: 0 var(--space-4) var(--space-10); }
+/* The page is full width; everything but a Band sits in a 36rem column with a
+   16px gutter. Bands are full width because they're the page's own children,
+   not because they break out with 100vw: iOS Safari doesn't scale vw with page
+   zoom, so a 100vw band shifts sideways and clips its text when zoom is on. */
+#app { padding-bottom: var(--space-10); }
+:is(#app, main, #details) > :not(.il-band, main, #details) { width: min(36rem, 100% - 2 * var(--space-4)); margin-inline: auto; }
 a { color: var(--indigo); text-underline-offset: 3px; }
 a:focus-visible, summary:focus-visible, button:focus-visible { outline: 2px solid var(--indigo); outline-offset: 2px; }
 h1, h2, h3 { margin: 0; }
@@ -40,8 +45,8 @@ h1, h2, h3 { margin: 0; }
 .stamp-lg { font-size: 22px; line-height: 28px; padding: 3px 12px 4px; border-width: 2px; box-shadow: inset 0 0 0 2px var(--stamp-bg), inset 0 0 0 3.5px currentColor; }
 
 /* Bands span the screen; their content stays in the page's column. */
-.il-band-inner { max-width: 36rem; }
-.il-band { padding: var(--space-10) 0; }
+.il-band { width: auto; margin-left: 0; padding: var(--space-10) 0; }
+.il-band-inner { max-width: calc(36rem + 2 * var(--space-4)); }
 
 /* The answer, first: an indigo band, the spot as a sign-size condensed headline. */
 .verdict { margin-top: var(--space-2); padding: var(--space-10) 0 var(--space-16); }
