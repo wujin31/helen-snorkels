@@ -1,12 +1,15 @@
-/* Snorkel Status on Indigo Ledger. Tokens come from ./indigo/tokens.css and the
+/* Snorkel Status on Indigo Ledger (v11). Tokens come from ./indigo/tokens.css and the
    component classes (il-*) from ./indigo/bundle.css; this file only lays out
    the page and draws what the system has no part for (the tide chart, the
-   swell and wind dials). Panels separate from the ground by tone, never by a
-   border or a shadow; hairlines only in lists, specs and charts. */
+   swell and wind dials). Rhythm: indigo band (the answer), quiet section (the
+   spots), tile band (the tide), quiet section (the water). Depth is hard
+   offsets, never blur; Calm and high contrast turn the decoration off. */
 
 @font-face { font-family: "IBM Plex Sans"; src: url("./indigo/fonts/IBMPlexSans-Variable.woff2") format("woff2"); font-weight: 400 700; font-style: normal; font-display: swap; }
 @font-face { font-family: "IBM Plex Sans Condensed"; src: url("./indigo/fonts/IBMPlexSansCondensed-SemiBold.woff2") format("woff2"); font-weight: 600; font-style: normal; font-display: swap; }
 @font-face { font-family: "IBM Plex Sans Condensed"; src: url("./indigo/fonts/IBMPlexSansCondensed-Bold.woff2") format("woff2"); font-weight: 700; font-style: normal; font-display: swap; }
+/* The system's subset: covers 水, 今, 天 and 月, the only hanzi the page sets. */
+@font-face { font-family: "Noto Serif TC"; src: url("./indigo/fonts/NotoSerifTC-900-subset.woff2") format("woff2"); font-weight: 900; font-style: normal; font-display: swap; }
 
 :root {
   --night: color-mix(in srgb, var(--ink) 7%, transparent);
@@ -16,7 +19,7 @@
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
 html { -webkit-text-size-adjust: 100%; }
-body { padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom); }
+body { padding: env(safe-area-inset-top) 0 env(safe-area-inset-bottom); overflow-x: clip; }
 #app { max-width: 36rem; margin: 0 auto; padding: 0 var(--space-4) var(--space-10); }
 a { color: var(--indigo); text-underline-offset: 3px; }
 a:focus-visible, summary:focus-visible, button:focus-visible { outline: 2px solid var(--indigo); outline-offset: 2px; }
@@ -36,22 +39,30 @@ h1, h2, h3 { margin: 0; }
 .il-stamp-none { --stamp-bg: var(--surface-raised); color: var(--ink-muted); }
 .stamp-lg { font-size: 22px; line-height: 28px; padding: 3px 12px 4px; border-width: 2px; box-shadow: inset 0 0 0 2px var(--stamp-bg), inset 0 0 0 3.5px currentColor; }
 
-/* The answer, first: the page's one loud moment, a poster headline on the ground. */
-.verdict { margin-top: var(--space-6); }
-.verdict h1 { display: grid; justify-items: start; gap: var(--space-3); font-weight: 700; }
+/* Bands span the screen; their content stays in the page's column. */
+.il-band-inner { max-width: 36rem; }
+.il-band { padding: var(--space-10) 0; }
+
+/* The answer, first: an indigo band, the spot as a sign-size condensed headline. */
+.verdict { margin-top: var(--space-2); padding: var(--space-10) 0 var(--space-16); }
+.verdict .il-band-has-v .il-band-inner, .verdict.il-band-has-v .il-band-inner { grid-template-columns: 32px minmax(0, 1fr); gap: var(--space-4); }
+.verdict .il-band-hanzi { font-size: clamp(240px, 70vw, 440px); }
+.hero-body { gap: 0; }
+.verdict h1 { display: grid; justify-items: start; gap: var(--space-4); font-weight: 700; }
 .verdict-where, .verdict .verdict-word:not(.il-stamp) {
-  font-family: var(--font-condensed); font-weight: 700; font-size: clamp(44px, 13vw, 68px); line-height: 0.95; letter-spacing: -0.01em;
+  font-family: var(--font-condensed); font-weight: 700; font-size: clamp(56px, 17vw, 96px); line-height: 0.88; letter-spacing: -0.01em;
+  text-shadow: var(--shadow-riso);
 }
-.verdict-stamp { margin: 0 0 var(--space-3); }
-.verdict-when { margin: var(--space-3) 0 0; font-size: 20px; line-height: 28px; font-weight: 600; }
-.verdict-reason { margin: var(--space-2) 0 0; color: var(--ink-muted); max-width: var(--measure); }
-.verdict-meta { margin: var(--space-3) 0 0; display: flex; gap: var(--space-3); flex-wrap: wrap; }
-.verdict-dead { color: var(--shu); font-weight: 600; }
+.verdict-stamp { margin: 0 0 var(--space-4); }
+.verdict-when { margin: var(--space-4) 0 0; font-family: var(--font-condensed); font-size: 28px; line-height: 32px; font-weight: 600; }
+.verdict-reason { margin: var(--space-3) 0 0; opacity: .88; max-width: 30ch; }
+.verdict-meta { margin: var(--space-4) 0 0; display: flex; gap: var(--space-3); flex-wrap: wrap; }
+.verdict-dead { color: inherit; font-weight: 700; }
+.verdict .il-stamp { box-shadow: inset 0 0 0 2px var(--stamp-bg), inset 0 0 0 3.5px currentColor, 3px 3px 0 color-mix(in srgb, var(--band-bg) 60%, #000); }
 
 /* Best spot: one Card, set apart by tone. */
 #details { display: grid; }
-.spot.featured { margin-top: var(--space-10); }
-.spot.featured { padding: var(--space-4); }
+.spot.featured { margin-top: calc(-1 * var(--space-10)); padding: var(--space-4); position: relative; }
 .spot-head { display: flex; justify-content: space-between; align-items: center; gap: var(--space-3); }
 .spot-reason { margin: var(--space-2) 0 0; }
 .vis { margin-top: var(--space-4); min-width: 0; }
@@ -79,8 +90,8 @@ summary { cursor: pointer; color: var(--indigo); font-weight: 500; min-height: 3
 .f-detail { color: var(--ink-muted); }
 
 /* Other spots: a ledger list on the ground, not a stack of cards. */
-.spot-list { margin-top: var(--space-10); }
-.section-title { margin-bottom: 0; }
+.spot-list { margin-top: var(--space-16); }
+.section-title { margin: 0; font-family: var(--font-condensed); font-size: 40px; line-height: 40px; font-weight: 700; letter-spacing: -0.005em; }
 .area { margin: var(--space-6) 0 0; font-size: 16px; line-height: 22px; font-weight: 600; color: var(--ink-muted); }
 .rows { display: grid; border-top: 1px solid var(--hairline); margin-top: var(--space-2); }
 .row { margin: 0; border-bottom: 1px solid var(--hairline); }
@@ -101,11 +112,20 @@ summary { cursor: pointer; color: var(--indigo); font-weight: 500; min-height: 3
 .tag { margin-left: var(--space-1); vertical-align: 1px; }
 .chip.window { justify-self: start; color: var(--kelp-ink); background: var(--kelp-soft); margin-top: 2px; }
 
-/* Tide and water: raised panels. */
-.panel { position: relative; margin-top: var(--space-10); background: var(--surface-raised); border-radius: var(--radius-sm); padding: var(--space-4); }
-.panel-title { font-size: 20px; line-height: 28px; font-weight: 600; margin-bottom: var(--space-3); display: flex; align-items: baseline; gap: var(--space-2); flex-wrap: wrap; }
+/* Tide: a mint tile band. The chart takes the band's own ink. */
+.tide-band { margin-top: var(--space-16); --ink: var(--band-ink); --ink-muted: var(--band-ink); --indigo: var(--band-ink); --hairline: color-mix(in srgb, var(--band-ink) 25%, transparent); --surface-raised: var(--band-bg); }
+.tide-band .il-band-inner { gap: var(--space-3); }
+.band-title { margin: 0; font-family: var(--font-condensed); font-size: clamp(40px, 11vw, 56px); line-height: 0.95; font-weight: 700; display: flex; align-items: baseline; gap: var(--space-2); flex-wrap: wrap; }
+.band-title .il-label { font-family: var(--font-sans); font-size: 13px; line-height: 18px; font-weight: 400; }
+.tide-wrap { position: relative; }
+.tide-band summary { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
+.tide-band .fine { opacity: .85; }
+
+/* Water: a quiet section, facts on the ground. */
+.water { margin-top: var(--space-16); }
+.water .section-title { margin-bottom: var(--space-4); }
 .facts { max-width: none; }
-.alerts { margin-bottom: var(--space-3); max-width: none; }
+.alerts { margin-bottom: var(--space-4); max-width: none; }
 
 /* Tide chart: one series, recessive chrome. */
 .tide { width: 100%; height: auto; display: block; touch-action: pan-y; }
@@ -116,26 +136,27 @@ summary { cursor: pointer; color: var(--indigo); font-weight: 500; min-height: 3
 .tide .tick-now { fill: var(--ink); font-weight: 600; }
 .tide-night { fill: var(--night); }
 .tide-window { fill: var(--window); }
-.tide-area { fill: var(--indigo-soft); }
+.tide-area { fill: color-mix(in srgb, var(--indigo) 14%, transparent); }
 .tide-line { fill: none; stroke: var(--indigo); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
 .tide-dot { fill: var(--indigo); stroke: var(--surface-raised); stroke-width: 2; }
 .tide-label { fill: var(--ink); font-size: 10px; font-weight: 600; paint-order: stroke; stroke: var(--surface-raised); stroke-width: 3px; stroke-linejoin: round; }
 .tide-now { stroke: var(--ink-muted); stroke-width: 1; }
 .tide-cross { stroke: var(--ink-muted); stroke-width: 1; }
 .tide-cross-dot { fill: var(--indigo); stroke: var(--surface-raised); stroke-width: 2; }
-.tide-tip {
-  position: absolute; top: 56px; width: 110px; text-align: center; pointer-events: none;
-  background: var(--surface); border-radius: var(--radius-sm); padding: 4px 6px;
+.tide-tip { box-shadow: var(--shadow-paper);
+  position: absolute; top: 8px; width: 110px; text-align: center; pointer-events: none;
+  background: var(--surface); color: var(--ink-muted); border-radius: var(--radius-sm); padding: 4px 6px;
   font-size: 13px; line-height: 18px; color: var(--ink-muted);
 }
-.tide-tip strong { color: var(--ink); font-weight: 600; }
+.tide-band .tide-tip { --ink: initial; background: var(--band-ink); color: var(--band-bg); }
+.tide-tip strong { font-weight: 600; }
 .key-window { display: inline-block; width: 14px; height: 10px; background: var(--window); margin-right: 6px; vertical-align: -1px; }
 .table-view table { border-collapse: collapse; font-size: 15px; }
 .table-view th, .table-view td { text-align: left; padding: 4px 16px 4px 0; border-bottom: 1px solid var(--hairline); font-weight: 400; }
 .table-view th { color: var(--ink-muted); }
 
 /* Reading settings, then the footer, in the same place on every visit. */
-.settings { margin-top: var(--space-16); max-width: none; }
+.settings { margin-top: var(--space-16); max-width: none; box-shadow: var(--shadow-paper); }
 .il-dial-row { flex-wrap: wrap; }
 .il-dial-opt { min-height: 36px; }
 .foot { margin-top: var(--space-10); }
@@ -145,7 +166,7 @@ summary { cursor: pointer; color: var(--indigo); font-weight: 500; min-height: 3
 
 @media (forced-colors: active) {
   .il-stamp { border: 2px solid CanvasText; }
-  .panel, .spot.featured { border: 1px solid CanvasText; }
+  .spot.featured, .il-band { border: 1px solid CanvasText; }
 }
 @media (prefers-reduced-motion: reduce) {
   * { scroll-behavior: auto !important; }

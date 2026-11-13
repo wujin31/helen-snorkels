@@ -87,7 +87,8 @@ export function tideChart(day: DayConditions, window: TimeWindow | null, now: Da
   if (n >= s.t0 && n <= s.t1) {
     const x = s.x(n).toFixed(1);
     parts.push(`<line class="tide-now" x1="${x}" x2="${x}" y1="${top}" y2="${h - bottom}" />`);
-    parts.push(`<text class="tick tick-now" x="${x}" y="${top - 4}" text-anchor="middle">now</text>`);
+    // Beside the line, just above the axis: the top edge is where high-tide labels sit.
+    parts.push(`<text class="tick tick-now" x="${(Number(x) + 3).toFixed(1)}" y="${h - bottom - 4}" text-anchor="start">now</text>`);
   }
   // Hour ticks every 3 hours.
   const firstTick = new Date(s.t0);
